@@ -264,7 +264,7 @@
         "model": {
           "__rl": true,
           "mode": "list",
-          "value": "gpt-4.1-mini"
+          "value": "gpt-4o-mini"
         },
         "responsesApiEnabled": false,
         "options": {}
@@ -356,7 +356,7 @@
         "operation": "sendAndWait",
         "sendTo": "gonzalo.insua11@gmail.com",
         "subject": "Test",
-        "message": "=Se requiere aprobación de nuevo lead:\n\n{{ $('Tally Trigger').item.json.question_OXW4La.value }} de\n{{ $('Tally Trigger').item.json.question_oMq62P.value }}- Esta buscando automatización de {{ $('Tally Trigger').item.json.question_k62k6r.value }} contando con un presupuesto de {{ $('Tally Trigger').item.json.question_vyldyg.value }} en un plazo de {{ $('Tally Trigger').item.json.question_Kl9alg.value }}.\n\nPor favor aprobá o rechaza este mail redactado por nuestro Agente\n\n{{ $json.output.response.output.subject }}\n\n{{ $json.output.response.output.body }}\n",
+        "message": "=Se requiere aprobación de nuevo lead:\n\n{{ $('Tally Trigger').item.json.question_OXW4La.value }} de\n{{ $('Tally Trigger').item.json.question_oMq62P.value }}- Esta buscando automatización de {{ $('Tally Trigger').item.json.question_k62k6r.value }} contando con un presupuesto de {{ $('Tally Trigger').item.json.question_vyldyg.value }} en un plazo de {{ $('Tally Trigger').item.json.question_Kl9alg.value }}.\n\nPor favor aprobá o rechaza este mail redactado por nuestro Agente\n\n{{ $json.email_subject }}\n\n{{ $json.email_body }}\n",
         "responseType": "freeText",
         "options": {}
       },
@@ -405,9 +405,9 @@
     {
       "parameters": {
         "sendTo": "gonzalo.insua11@gmail.com",
-        "subject": "={{ $('Agente de Ventas').item.json.output.response.output.subject }}",
+        "subject": "={{ $('Captura Email Final').item.json.email_subject }}",
         "emailType": "text",
-        "message": "={{ $('Agente de Ventas').item.json.output.response.output.body }}",
+        "message": "={{ $('Captura Email Final').item.json.email_body }}",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
@@ -429,7 +429,7 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Nombre: {{ $json.fields.Name }}\nServicio de interés: {{ $json.fields['¿En qué servicio de automatización estás interesado?'] }}\nEmpresa: {{ $json.fields.Empresa }}\nPresupuesto: {{ $json.fields['¿Cuál es tu presupuesto?'] }}\nEmail: {{ $json.fields.Email }}\nRol: {{ $json.fields.Rol }}\nPlazo: {{ $json.fields['¿Para cuándo esperas implementarlo?'] }}\nDescripcion: {{ $json.fields['¿Para cuándo esperas implementarlo?'] }} ",
+        "text": "=Nombre: {{ $json.fields.Name }}\nServicio de interés: {{ $json.fields['¿En qué servicio de automatización estás interesado?'] }}\nEmpresa: {{ $json.fields.Empresa }}\nPresupuesto: {{ $json.fields['¿Cuál es tu presupuesto?'] }}\nEmail: {{ $json.fields.Email }}\nRol: {{ $json.fields.Rol }}\nPlazo: {{ $json.fields['¿Para cuándo esperas implementarlo?'] }}\nDescripcion: {{ $json.fields['Describinos brevemente el proyecto'] }} ",
         "hasOutputParser": true,
         "options": {
           "systemMessage": "=Eres un experto vendedor de una agencia que ofrece soluciones de automatizaciones con IA.\nTu trabajo es responder a los clientes potenciales entrantes abordando sus necesidades de manera profesional.\nRecibirás información con la descripción del proyecto y el cronograma del lead, y tu objetivo es convencerlos de que somos la mejor Agencia de IA del mercado.\n\nHerramientas\n\nBase_datos – Usa esta herramienta para buscar entre los proyectos anteriores que hemos realizado.\n\nReglas\n\nRecibirás información sobre un lead y necesitas redactar un correo electrónico profesional.\nMantenlo conciso, a nadie le gusta leer un correo demasiado largo.\n\nTu objetivo principal es convencer al lead de agendar una segunda llamada.\nTu trabajo es hacerles creer que podemos llevar a cabo el proyecto que han descrito y superar sus expectativas.\n\nRecupera información sobre proyectos anteriores para compartir con el lead y demostrar que nuestro equipo es capaz de manejar su proyecto.\nEncuentra un proyecto similar que hayamos realizado para compartir con el lead.\nComparte el resultado de cómo ayudamos al cliente.\n\nEl tono debe ser cercano y no demasiado formal, tiene que parecer extremadamente humano.\n\nEl asunto debe ser corto, muy llamativo y que contenga el nombre del cliente potencial.\n\nNotas Finales\n\nFirma los correos electrónicos como:\nGonzalo Insua, Attik Automation Co.\n\nAquí está la fecha/hora actual: {{ $now }}\n  Hoy es: {{ $now.format('cccc') }}"
@@ -447,10 +447,10 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Email:  {{ $('Agente de Ventas').item.json.output.response.output.body }}\nFeedback: {{ $('Feedback Mail').item.json.data.text }}",
+        "text": "=Email:  {{ $('Captura Email Final').item.json.email_subject }}\n{{ $('Captura Email Final').item.json.email_body }}\nFeedback: {{ $('Feedback Mail').item.json.data.text }}",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "Eres un redactor experto en correos electrónicos. Tu trabajo es tomar un correo entrante y revisarlo con base en la retroalimentación proporcionada por la persona.\n\n Reglas\n\nFirma los correos electrónicos como:\nGonzalo Insua, IA Masters Automations\n\nEl tono debe ser cercano y no demasiado formal, tiene que parecer extremadamente humano.\n\nEl asunto debe ser corto, muy llamativo y debe contener el nombre del cliente potencial.\n\nAquí está la fecha y hora actual: {{$now]]\nHoy es: {{ $now.format('cccc') }}\n"
+          "systemMessage": "Eres un redactor experto en correos electrónicos. Tu trabajo es tomar un correo entrante y revisarlo con base en la retroalimentación proporcionada por la persona.\n\n Reglas\n\nFirma los correos electrónicos como:\nGonzalo Insua, Attik Automation Co.\n\nEl tono debe ser cercano y no demasiado formal, tiene que parecer extremadamente humano.\n\nEl asunto debe ser corto, muy llamativo y debe contener el nombre del cliente potencial.\n\nAquí está la fecha y hora actual: {{ $now }}\nHoy es: {{ $now.format('cccc') }}\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -461,6 +461,35 @@
       ],
       "id": "5a8364fd-d0e7-4dde-a37d-dfbf3b046396",
       "name": "AI Agent Revision"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "email_subject",
+              "name": "email_subject",
+              "value": "={{ $json.output.response.output.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "email_body",
+              "name": "email_body",
+              "value": "={{ $json.output.response.output.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        -144
+      ],
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Captura Email Final"
     }
   ],
   "pinData": {
@@ -630,7 +659,7 @@
       "main": [
         [
           {
-            "node": "Feedback Mail",
+            "node": "Captura Email Final",
             "type": "main",
             "index": 0
           }
@@ -638,6 +667,17 @@
       ]
     },
     "AI Agent Revision": {
+      "main": [
+        [
+          {
+            "node": "Captura Email Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Captura Email Final": {
       "main": [
         [
           {
