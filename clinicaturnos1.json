@@ -1,0 +1,896 @@
+{
+  "name": "Daily Appointment Reminder Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ],
+          "typeInterval": "hours"
+        },
+        "hour": 12,
+        "minute": 0
+      },
+      "id": "schedule-trigger-node",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate tomorrow at 00:00:00\nconst tomorrow = new Date();\ntomorrow.setDate(tomorrow.getDate() + 1);\ntomorrow.setHours(0, 0, 0, 0);\n\n// Calculate day after tomorrow at 00:00:00\nconst dayAfterTomorrow = new Date();\ndayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);\ndayAfterTomorrow.setHours(0, 0, 0, 0);\n\n// Return ISO strings\nreturn {\n  json: {\n    tomorrow: tomorrow.toISOString(),\n    day_after_tomorrow: dayAfterTomorrow.toISOString()\n  }\n};"
+      },
+      "id": "date-calculation-node",
+      "name": "Calculate Date Range",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendarId": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list",
+          "cachedResultName": "Primary"
+        },
+        "returnAll": true,
+        "options": {
+          "timeMin": "={{ $json.tomorrow }}",
+          "timeMax": "={{ $json.day_after_tomorrow }}"
+        }
+      },
+      "id": "calendar-clinic-1",
+      "name": "Google Calendar - Clinic 1",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.2,
+      "position": [
+        680,
+        200
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "1",
+          "name": "Google Calendar Account - Clinic 1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendarId": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list",
+          "cachedResultName": "Primary"
+        },
+        "returnAll": true,
+        "options": {
+          "timeMin": "={{ $json.tomorrow }}",
+          "timeMax": "={{ $json.day_after_tomorrow }}"
+        }
+      },
+      "id": "calendar-clinic-2",
+      "name": "Google Calendar - Clinic 2",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.2,
+      "position": [
+        680,
+        400
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "2",
+          "name": "Google Calendar Account - Clinic 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendarId": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list",
+          "cachedResultName": "Primary"
+        },
+        "returnAll": true,
+        "options": {
+          "timeMin": "={{ $json.tomorrow }}",
+          "timeMax": "={{ $json.day_after_tomorrow }}"
+        }
+      },
+      "id": "calendar-clinic-3",
+      "name": "Google Calendar - Clinic 3",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.2,
+      "position": [
+        680,
+        600
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "3",
+          "name": "Google Calendar Account - Clinic 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "append"
+      },
+      "id": "merge-calendars",
+      "name": "Merge Calendars",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        900,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "filter-valid-events",
+              "leftValue": "={{ $json.summary }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "filter-valid-events",
+      "name": "Filter Valid Events",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "loop-over-items",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1340,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract phone number from description using regex\nconst description = $input.item.json.description || '';\n\n// Pattern to match Tel: followed by phone number\nconst phoneRegex = /Tel:\\s*([+\\d\\s\\-\\(\\)]+)/i;\nconst match = description.match(phoneRegex);\n\nlet phoneNumber = '';\nif (match && match[1]) {\n  // Clean up the phone number - remove spaces, dashes, parentheses\n  phoneNumber = match[1].replace(/[\\s\\-\\(\\)]/g, '');\n}\n\nreturn {\n  json: {\n    ...($input.item.json),\n    phone_number: phoneNumber,\n    contact_name: $input.item.json.summary || 'Patient'\n  }\n};"
+      },
+      "id": "extract-phone-number",
+      "name": "Extract Phone Number",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/{{ $env.CHATWOOT_ACCOUNT_ID }}/contacts/search",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "chatwootApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.phone_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "search-contact",
+      "name": "Search Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1780,
+        400
+      ],
+      "credentials": {
+        "chatwootApi": {
+          "id": "4",
+          "name": "Chatwoot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "id": "contact-exists",
+              "operation": "notEmpty",
+              "value1": "={{ $json.payload && $json.payload.length > 0 ? $json.payload[0].id : null }}",
+              "output": 0
+            },
+            {
+              "id": "contact-missing",
+              "operation": "isEmpty",
+              "value1": "={{ $json.payload && $json.payload.length > 0 ? $json.payload[0].id : null }}",
+              "output": 1
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": 1
+        }
+      },
+      "id": "check-contact-exists",
+      "name": "Check Contact Exists",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.1,
+      "position": [
+        2000,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/{{ $env.CHATWOOT_ACCOUNT_ID }}/contacts",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "chatwootApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Extract Phone Number').item.json.contact_name }}"
+            },
+            {
+              "name": "phone_number",
+              "value": "={{ $('Extract Phone Number').item.json.phone_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "create-contact",
+      "name": "Create Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2220,
+        500
+      ],
+      "credentials": {
+        "chatwootApi": {
+          "id": "4",
+          "name": "Chatwoot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "contact-id-assignment",
+              "name": "contact_id",
+              "value": "={{ $json.payload && $json.payload.length > 0 ? $json.payload[0].id : $json.payload.contact.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-contact-id",
+      "name": "Set Contact ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2440,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/{{ $env.CHATWOOT_ACCOUNT_ID }}/contacts/{{ $json.contact_id }}/conversations",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "chatwootApi",
+        "options": {}
+      },
+      "id": "get-conversations",
+      "name": "Get Conversations",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2660,
+        400
+      ],
+      "credentials": {
+        "chatwootApi": {
+          "id": "4",
+          "name": "Chatwoot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate random message variant (1-3)\nconst messageVariant = Math.floor(Math.random() * 3) + 1;\n\n// Generate random wait delay (1-25 seconds)\nconst waitDelay = Math.floor(Math.random() * 25) + 1;\n\n// Get active conversation ID\nconst conversations = $input.item.json.payload || [];\nlet conversationId = null;\n\nif (conversations.length > 0) {\n  // Find first open conversation\n  const activeConv = conversations.find(conv => conv.status === 'open');\n  conversationId = activeConv ? activeConv.id : conversations[0].id;\n}\n\nreturn {\n  json: {\n    ...($input.item.json),\n    message_variant: messageVariant,\n    wait_delay: waitDelay,\n    conversation_id: conversationId,\n    contact_name: $('Extract Phone Number').item.json.contact_name,\n    appointment_start: $('Extract Phone Number').item.json.start.dateTime\n  }\n};"
+      },
+      "id": "randomize-message",
+      "name": "Randomize Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "id": "variant-1",
+              "operation": "equal",
+              "value1": "={{ $json.message_variant }}",
+              "value2": 1,
+              "output": 0
+            },
+            {
+              "id": "variant-2",
+              "operation": "equal",
+              "value1": "={{ $json.message_variant }}",
+              "value2": 2,
+              "output": 1
+            },
+            {
+              "id": "variant-3",
+              "operation": "equal",
+              "value1": "={{ $json.message_variant }}",
+              "value2": 3,
+              "output": 2
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "message-variant-switch",
+      "name": "Message Variant Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.1,
+      "position": [
+        3100,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "message-text-1",
+              "name": "message_text",
+              "value": "=Hola {{ $json.contact_name }}, confirmamos tu cita para mañana {{ $json.appointment_start }}. Te esperamos en nuestra clínica. Si necesitas reagendar, por favor avísanos lo antes posible.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "message-variant-1",
+      "name": "Message Variant 1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3320,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "message-text-2",
+              "name": "message_text",
+              "value": "=Hola {{ $json.contact_name }}, te recordamos tu consulta programada para mañana {{ $json.appointment_start }}. Estamos para servirte. Cualquier cambio, comunícate con nosotros.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "message-variant-2",
+      "name": "Message Variant 2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3320,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "message-text-3",
+              "name": "message_text",
+              "value": "=Estimado/a {{ $json.contact_name }}, este es un recordatorio de su cita médica mañana {{ $json.appointment_start }}. Le esperamos puntualmente. De requerir modificaciones, contáctenos.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "message-variant-3",
+      "name": "Message Variant 3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3320,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "unit": "seconds",
+        "amount": "={{ $json.wait_delay }}"
+      },
+      "id": "wait-delay",
+      "name": "Wait Delay",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3540,
+        400
+      ],
+      "webhookId": "random-wait-webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/{{ $env.CHATWOOT_ACCOUNT_ID }}/conversations/{{ $json.conversation_id }}/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "chatwootApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content",
+              "value": "={{ $json.message_text }}"
+            },
+            {
+              "name": "message_type",
+              "value": "outgoing"
+            },
+            {
+              "name": "private",
+              "value": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-message",
+      "name": "Send Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3760,
+        400
+      ],
+      "credentials": {
+        "chatwootApi": {
+          "id": "4",
+          "name": "Chatwoot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "chat_history",
+          "mode": "list",
+          "cachedResultName": "chat_history"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "conversation_id": "={{ $json.conversation_id }}",
+            "message_content": "={{ $json.message_text }}",
+            "message_type": "ai",
+            "phone_number": "={{ $('Extract Phone Number').item.json.phone_number }}",
+            "created_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message_content",
+              "displayName": "message_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message_type",
+              "displayName": "message_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "insert-to-memory",
+      "name": "Insert to Memory",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        3980,
+        400
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "5",
+          "name": "Postgres Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Calculate Date Range",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Date Range": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar - Clinic 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Calendar - Clinic 2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Calendar - Clinic 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar - Clinic 1": {
+      "main": [
+        [
+          {
+            "node": "Merge Calendars",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar - Clinic 2": {
+      "main": [
+        [
+          {
+            "node": "Merge Calendars",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Calendar - Clinic 3": {
+      "main": [
+        [
+          {
+            "node": "Merge Calendars",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge Calendars": {
+      "main": [
+        [
+          {
+            "node": "Filter Valid Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Valid Events": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Extract Phone Number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Phone Number": {
+      "main": [
+        [
+          {
+            "node": "Search Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Contact": {
+      "main": [
+        [
+          {
+            "node": "Check Contact Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Contact Exists": {
+      "main": [
+        [
+          {
+            "node": "Set Contact ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Contact": {
+      "main": [
+        [
+          {
+            "node": "Set Contact ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Contact ID": {
+      "main": [
+        [
+          {
+            "node": "Get Conversations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Conversations": {
+      "main": [
+        [
+          {
+            "node": "Randomize Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Randomize Message": {
+      "main": [
+        [
+          {
+            "node": "Message Variant Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Variant Switch": {
+      "main": [
+        [
+          {
+            "node": "Message Variant 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message Variant 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message Variant 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Variant 1": {
+      "main": [
+        [
+          {
+            "node": "Wait Delay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Variant 2": {
+      "main": [
+        [
+          {
+            "node": "Wait Delay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Variant 3": {
+      "main": [
+        [
+          {
+            "node": "Wait Delay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Delay": {
+      "main": [
+        [
+          {
+            "node": "Send Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message": {
+      "main": [
+        [
+          {
+            "node": "Insert to Memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert to Memory": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-12-10T12:00:00.000Z",
+  "versionId": "1"
+}
