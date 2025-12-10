@@ -1,0 +1,666 @@
+{
+  "name": "ASISTENTE DE VENTAS",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Propuesta Comercial",
+        "formDescription": "Descripción del proyecto requerido para el cliente",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nombre",
+              "placeholder": "Apellido"
+            },
+            {
+              "fieldLabel": "Qué proyecto le gustaría automatizar?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Escenario Contable"
+                  },
+                  {
+                    "option": "Lead Proposal"
+                  },
+                  {
+                    "option": "Chatbot DM"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Puesto",
+              "placeholder": "Ceo,Jefe de operaciones,Director"
+            },
+            {
+              "fieldLabel": "Empresa",
+              "placeholder": "Empresa"
+            },
+            {
+              "fieldLabel": "Puesto Solicitado",
+              "placeholder": "Puesto Solicitado"
+            },
+            {
+              "fieldLabel": "Descripción de la Empresa",
+              "placeholder": "Descripción de la empresa "
+            },
+            {
+              "fieldLabel": "Presupuesto Disponible ",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Junior"
+                  },
+                  {
+                    "option": "Senior"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -624,
+        -64
+      ],
+      "id": "165b818f-7395-4233-8912-37498217f8ad",
+      "name": "On form submission",
+      "webhookId": "687d8258-5750-4635-8a98-62f4c80b0d76",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "apppjKPuwesxt3MVQ",
+          "mode": "list",
+          "cachedResultName": "AGENCIA A.I GONZALO",
+          "cachedResultUrl": "https://airtable.com/apppjKPuwesxt3MVQ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblHzv8iXGBmDUtde",
+          "mode": "list",
+          "cachedResultName": "SAMPLE N8N",
+          "cachedResultUrl": "https://airtable.com/apppjKPuwesxt3MVQ/tblHzv8iXGBmDUtde"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.question_OXW4La.value }}",
+            "Email": "={{ $json.question_VPkQVj.value\n}}",
+            "Empresa": "={{ $json.question_oMq62P.value}}",
+            "Rol": "={{ $json.question_GdZvRZ.value\n}}",
+            "¿Cuál es tu presupuesto?": "={{ $json.question_vyldyg.value }}",
+            "¿En qué servicio de automatización estás interesado?": "={{ $json.question_k62k6r.value }}",
+            "¿Para cuándo esperas implementarlo?": "={{ $json.question_Kl9alg.value }}",
+            "Describinos brevemente el proyecto": "={{ $json.question_rAeyoN.value }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Empresa",
+              "displayName": "Empresa",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Rol",
+              "displayName": "Rol",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "¿En qué servicio de automatización estás interesado?",
+              "displayName": "¿En qué servicio de automatización estás interesado?",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Escenario Contable",
+                  "value": "Escenario Contable"
+                },
+                {
+                  "name": "Dynamic Sales Proposal System",
+                  "value": "Dynamic Sales Proposal System"
+                },
+                {
+                  "name": "Control Operativo y Contable",
+                  "value": "Control Operativo y Contable"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "¿Cuál es tu presupuesto?",
+              "displayName": "¿Cuál es tu presupuesto?",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "1.000 U$S A 2.000 U$S",
+                  "value": "1.000 U$S A 2.000 U$S"
+                },
+                {
+                  "name": "2.000 U$S A 5.000 U$S",
+                  "value": "2.000 U$S A 5.000 U$S"
+                },
+                {
+                  "name": "5.000 U$S A 7.000 U$S",
+                  "value": "5.000 U$S A 7.000 U$S"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "¿Para cuándo esperas implementarlo?",
+              "displayName": "¿Para cuándo esperas implementarlo?",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Lo antes posible",
+                  "value": "Lo antes posible"
+                },
+                {
+                  "name": "2 Semanas",
+                  "value": "2 Semanas"
+                },
+                {
+                  "name": "1 Mes",
+                  "value": "1 Mes"
+                },
+                {
+                  "name": "+ de 1 Mes",
+                  "value": "+ de 1 Mes"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Describinos brevemente el proyecto",
+              "displayName": "Describinos brevemente el proyecto",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        -96
+      ],
+      "id": "84f4aabe-e3a7-4671-979f-12e3be29e1e2",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D97fkLzHlVtjmHeX",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        272
+      ],
+      "id": "d52141ab-70b0-4249-ab9f-c3ffc2265594",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "BcxPyrU3gHvY2ePY",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formId": "nPJN1x"
+      },
+      "type": "n8n-nodes-tallyforms.tallyTrigger",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        -96
+      ],
+      "id": "10c63b41-a1be-4f4a-a062-49676b927f30",
+      "name": "Tally Trigger",
+      "webhookId": "0ea86fe4-5643-48ca-be2c-e421178b641c",
+      "credentials": {
+        "tallyApi": {
+          "id": "eFPHWARogC57hriK",
+          "name": "Tally account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"action\": \"parse\",\n  \"response\": {\n    \"output\": {\n      \"state\": \"email\",\n      \"subject\": \"Asunto: Juan Smith, la solución contable ideal para J.SMITH\",\n      \"body\": \"Hola Juan,\\n\\nGracias por contactarnos para tu proyecto de escenario contable. Entendemos la importancia de optimizar procesos contables en un plazo ajustado como el tuyo de 2 semanas. En Attik Automation Co., contamos con experiencia desarrollando soluciones similares, como nuestro proyecto de Control Operativo y Contable. Ahí implementamos un ERP liviano con IA que redujo la carga operativa de facturas en un 50%, automatizó extracción de datos y facilitó envíos automáticos de correos a proveedores, impactando directamente en la eficiencia y control del área contable.\\n\\nCreemos que podemos adaptar esta solución a las necesidades específicas de J.SMITH y superar tus expectativas con nuestra tecnología y expertise.\\n\\n¿Te gustaría agendar una segunda llamada para profundizar en tu proyecto y mostrarte cómo podemos empezar a trabajar juntos?\\n\\nEstamos listos para ayudarte a transformar tu departamento.\"\n    }\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        640,
+        256
+      ],
+      "id": "99b12ad8-5af6-400b-9681-b969c36b6232",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "apppjKPuwesxt3MVQ",
+          "mode": "list",
+          "cachedResultName": "AGENCIA A.I GONZALO",
+          "cachedResultUrl": "https://airtable.com/apppjKPuwesxt3MVQ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblhcCagWZMcIJ7fT",
+          "mode": "list",
+          "cachedResultName": "Proyecto",
+          "cachedResultUrl": "https://airtable.com/apppjKPuwesxt3MVQ/tblhcCagWZMcIJ7fT"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -144,
+        256
+      ],
+      "id": "836d7b6a-0d21-44cb-b033-4a58d0154b88",
+      "name": "Base_Datos",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D97fkLzHlVtjmHeX",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "gonzalo.insua11@gmail.com",
+        "subject": "Test",
+        "message": "=Se requiere aprobación de nuevo lead:\n\n{{ $('Tally Trigger').item.json.question_OXW4La.value }} de\n{{ $('Tally Trigger').item.json.question_oMq62P.value }}- Esta buscando automatización de {{ $('Tally Trigger').item.json.question_k62k6r.value }} contando con un presupuesto de {{ $('Tally Trigger').item.json.question_vyldyg.value }} en un plazo de {{ $('Tally Trigger').item.json.question_Kl9alg.value }}.\n\nPor favor aprobá o rechaza este mail redactado por nuestro Agente\n\n{{ $json.output.response.output.subject }}\n\n{{ $json.output.response.output.body }}\n",
+        "responseType": "freeText",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        -160
+      ],
+      "id": "fcac9e6a-15a1-4734-9f6a-dbd8bffe45a1",
+      "name": "Feedback Mail",
+      "webhookId": "706d07f1-5b2e-4275-99da-7b0bb38e8dbd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OtvaZ1gZh0wztfPg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.data.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Aprobado",
+              "description": "El correo electrónico ha sido revisado y aprobado tal como está. La persona, de forma explícita o implícita, expresa su aprobación, indicando que no se requieren cambios.\nFrases de ejemplo incluyen:\n\"Está ok\"\n\"Aprobado\"\n\" Vamos con ese\"\n\"Envialo asi\"\n\"Mandalo\"\n\"Ok\n\"No necesita Cambios\""
+            },
+            {
+              "category": "Re-Generar",
+              "description": "El Correo Electrónico ha sido revisado pero la persona solicita modificaciones  antes de enviarlo. Esto puede incluir ajustes, eliminación de partes, reformulaciones o revisiones importantes. \nFrases de ejemplo incluyen:\n\" ¿Podemos ajustar esa parte?\"\n\" Necesita algunos cambios\" \n\" Me gustaría reformular esto.\"\n\" No está del todo bien, revisemos esto.\"\n\" No está del todo bien, revisemoslo\"\n\"¿Podés ajustar esto antes de enviarlo?\"\n\"No menciones que no podemos hacer eso.\"\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        848,
+        -144
+      ],
+      "id": "1beea01a-0cda-4da4-8e92-35096fcfdace",
+      "name": "Verifica el Feedback"
+    },
+    {
+      "parameters": {
+        "sendTo": "gonzalo.insua11@gmail.com",
+        "subject": "={{ $('Agente de Ventas').item.json.output.response.output.subject }}",
+        "emailType": "text",
+        "message": "={{ $('Agente de Ventas').item.json.output.response.output.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1360,
+        -368
+      ],
+      "id": "9e78d02a-6a85-4cf1-8a71-57efb265a87d",
+      "name": "Envia Mail Aprobado",
+      "webhookId": "f7b9476f-8616-4f0f-951d-5120b8afb952",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OtvaZ1gZh0wztfPg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Nombre: {{ $json.fields.Name }}\nServicio de interés: {{ $json.fields['¿En qué servicio de automatización estás interesado?'] }}\nEmpresa: {{ $json.fields.Empresa }}\nPresupuesto: {{ $json.fields['¿Cuál es tu presupuesto?'] }}\nEmail: {{ $json.fields.Email }}\nRol: {{ $json.fields.Rol }}\nPlazo: {{ $json.fields['¿Para cuándo esperas implementarlo?'] }}\nDescripcion: {{ $json.fields['¿Para cuándo esperas implementarlo?'] }} ",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Eres un experto vendedor de una agencia que ofrece soluciones de automatizaciones con IA.\nTu trabajo es responder a los clientes potenciales entrantes abordando sus necesidades de manera profesional.\nRecibirás información con la descripción del proyecto y el cronograma del lead, y tu objetivo es convencerlos de que somos la mejor Agencia de IA del mercado.\n\nHerramientas\n\nBase_datos – Usa esta herramienta para buscar entre los proyectos anteriores que hemos realizado.\n\nReglas\n\nRecibirás información sobre un lead y necesitas redactar un correo electrónico profesional.\nMantenlo conciso, a nadie le gusta leer un correo demasiado largo.\n\nTu objetivo principal es convencer al lead de agendar una segunda llamada.\nTu trabajo es hacerles creer que podemos llevar a cabo el proyecto que han descrito y superar sus expectativas.\n\nRecupera información sobre proyectos anteriores para compartir con el lead y demostrar que nuestro equipo es capaz de manejar su proyecto.\nEncuentra un proyecto similar que hayamos realizado para compartir con el lead.\nComparte el resultado de cómo ayudamos al cliente.\n\nEl tono debe ser cercano y no demasiado formal, tiene que parecer extremadamente humano.\n\nEl asunto debe ser corto, muy llamativo y que contenga el nombre del cliente potencial.\n\nNotas Finales\n\nFirma los correos electrónicos como:\nGonzalo Insua, Attik Automation Co.\n\nAquí está la fecha/hora actual: {{ $now }}\n  Hoy es: {{ $now.format('cccc') }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        224,
+        -144
+      ],
+      "id": "bea03b71-14c8-47e5-b998-229ca9df9a6a",
+      "name": "Agente de Ventas"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Email:  {{ $('Agente de Ventas').item.json.output.response.output.body }}\nFeedback: {{ $('Feedback Mail').item.json.data.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Eres un redactor experto en correos electrónicos. Tu trabajo es tomar un correo entrante y revisarlo con base en la retroalimentación proporcionada por la persona.\n\n Reglas\n\nFirma los correos electrónicos como:\nGonzalo Insua, IA Masters Automations\n\nEl tono debe ser cercano y no demasiado formal, tiene que parecer extremadamente humano.\n\nEl asunto debe ser corto, muy llamativo y debe contener el nombre del cliente potencial.\n\nAquí está la fecha y hora actual: {{$now]]\nHoy es: {{ $now.format('cccc') }}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1264,
+        -112
+      ],
+      "id": "5a8364fd-d0e7-4dde-a37d-dfbf3b046396",
+      "name": "AI Agent Revision"
+    }
+  ],
+  "pinData": {
+    "Tally Trigger": [
+      {
+        "json": {
+          "id": "ODKVokp",
+          "formId": "nPJN1x",
+          "formName": "Form Attik Automatizaciones",
+          "respondentId": "ZjO42k0",
+          "createdAt": "2025-12-08T16:10:16.000Z",
+          "question_OXW4La": {
+            "label": "¿Cuál es tu nombre completo?",
+            "value": "JUAN SMITH 2",
+            "type": "INPUT_TEXT"
+          },
+          "question_VPkQVj": {
+            "label": "¿Cuál es tu email?",
+            "value": "Juansmith@jsmith.com",
+            "type": "INPUT_EMAIL"
+          },
+          "question_P9a1l1": {
+            "label": "¿Querés dejarnos tu teléfono? (opcional)",
+            "value": null,
+            "type": "INPUT_TEXT"
+          },
+          "question_oMq62P": {
+            "label": "Empresa",
+            "value": "J.SMITH",
+            "type": "INPUT_TEXT"
+          },
+          "question_GdZvRZ": {
+            "label": "Rol",
+            "value": "Director Contable",
+            "type": "INPUT_TEXT"
+          },
+          "question_k62k6r": {
+            "label": "\n\n ¿En qué servicio de automatización estás interesado?\n",
+            "value": "Escenario Contable",
+            "type": "DROPDOWN"
+          },
+          "question_vyldyg": {
+            "label": "\n\n ¿Cuál es tu presupuesto?\n",
+            "value": "2.000 U$S A 5.000 U$S",
+            "type": "DROPDOWN"
+          },
+          "question_Kl9alg": {
+            "label": "\n\n ¿Para cuándo esperas implementarlo?\n",
+            "value": "2 Semanas",
+            "type": "DROPDOWN"
+          },
+          "question_rAeyoN": {
+            "label": "\n\n \nDescribinos brevemente el proyecto\n\n",
+            "value": "Necesito reducir el tiempo operativo de carga de comprobantes y facturas, muchos de estos procesos los estamos realizando hoy de forma manual entorpeciendo todo el negocio y flujo operativo contable.",
+            "type": "TEXTAREA"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        []
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Agente de Ventas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente de Ventas",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Verifica el Feedback",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent Revision",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tally Trigger": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Agente de Ventas",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "AI Agent Revision",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Base_Datos": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Ventas",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feedback Mail": {
+      "main": [
+        [
+          {
+            "node": "Verifica el Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica el Feedback": {
+      "main": [
+        [
+          {
+            "node": "Envia Mail Aprobado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent Revision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente de Ventas": {
+      "main": [
+        [
+          {
+            "node": "Feedback Mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Revision": {
+      "main": [
+        [
+          {
+            "node": "Feedback Mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "Q7Re72V4C7cxIQNR"
+  },
+  "versionId": "4ccc10be-ae93-4a21-912f-43f6fe044dcb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "89dbe17b1d6844ebe461860833b924709cd8a3393ba96d7321a2cfeecf1fe85c"
+  },
+  "id": "bsszRkisSlVVFb5M",
+  "tags": []
+}
