@@ -158,7 +158,7 @@
     },
     {
       "parameters": {
-        "jsonSchemaExample": "{\n  \"action\": \"parse\",\n  \"response\": {\n    \"output\": {\n      \"state\": \"email\",\n      \"subject\": \"Asunto: Juan Smith, la solución contable ideal para J.SMITH\",\n      \"body\": \"Hola Juan,\\n\\nGracias por contactarnos...\"\n    }\n  }\n}\n"
+        "jsonSchemaExample": "{\n  \"subject\": \"Juan, la solución contable ideal para tu empresa\",\n  \"body\": \"Hola Juan,\\n\\nGracias por contactarnos para tu proyecto de escenario contable. En Attik Automation Co., contamos con experiencia desarrollando soluciones similares.\\n\\n¿Te gustaría agendar una llamada?\\n\\nGonzalo Insua, Attik Automation Co.\"\n}"
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
@@ -219,13 +219,13 @@
             {
               "id": "current-subject",
               "name": "current_subject",
-              "value": "={{ $json.output.response.output.subject }}",
+              "value": "={{ $json.output.subject }}",
               "type": "string"
             },
             {
               "id": "current-body",
               "name": "current_body",
-              "value": "={{ $json.output.response.output.body }}",
+              "value": "={{ $json.output.body }}",
               "type": "string"
             }
           ]
@@ -326,13 +326,13 @@
             {
               "id": "updated-subject",
               "name": "current_subject",
-              "value": "={{ $json.output.response.output.subject }}",
+              "value": "={{ $json.output.subject }}",
               "type": "string"
             },
             {
               "id": "updated-body",
               "name": "current_body",
-              "value": "={{ $json.output.response.output.body }}",
+              "value": "={{ $json.output.body }}",
               "type": "string"
             }
           ]
