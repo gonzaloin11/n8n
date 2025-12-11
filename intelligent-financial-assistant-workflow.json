@@ -3,8 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "updates": ["message", "callback_query"],
-        "additionalFields": {}
+        "updates": ["message", "callback_query"]
       },
       "id": "telegram-trigger",
       "name": "Telegram Trigger",
@@ -18,7 +17,7 @@
           "name": "Telegram Bot API"
         }
       },
-      "notes": "Primary trigger for all Telegram interactions: text, voice, photo, document, and callback queries"
+      "notes": "Primary trigger for all Telegram interactions"
     },
     {
       "parameters": {
@@ -36,7 +35,7 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [0, 900],
-      "notes": "Runs on the 1st of every month at 9 AM for recurring expenses"
+      "notes": "Runs on the 1st of every month at 9 AM"
     },
     {
       "parameters": {
@@ -47,18 +46,9 @@
               "conditions": {
                 "options": {
                   "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
+                  "leftValue": ""
                 },
                 "conditions": [
-                  {
-                    "leftValue": "={{ $json.message }}",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "object",
-                      "operation": "notExists"
-                    }
-                  },
                   {
                     "leftValue": "={{ $json.callback_query }}",
                     "rightValue": "",
@@ -76,8 +66,7 @@
               "conditions": {
                 "options": {
                   "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
+                  "leftValue": ""
                 },
                 "conditions": [
                   {
@@ -97,8 +86,7 @@
               "conditions": {
                 "options": {
                   "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
+                  "leftValue": ""
                 },
                 "conditions": [
                   {
@@ -118,8 +106,7 @@
               "conditions": {
                 "options": {
                   "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
+                  "leftValue": ""
                 },
                 "conditions": [
                   {
@@ -139,8 +126,7 @@
               "conditions": {
                 "options": {
                   "caseSensitive": false,
-                  "leftValue": "",
-                  "typeValidation": "strict"
+                  "leftValue": ""
                 },
                 "conditions": [
                   {
@@ -160,8 +146,7 @@
               "conditions": {
                 "options": {
                   "caseSensitive": false,
-                  "leftValue": "",
-                  "typeValidation": "strict"
+                  "leftValue": ""
                 },
                 "conditions": [
                   {
@@ -181,8 +166,7 @@
               "conditions": {
                 "options": {
                   "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
+                  "leftValue": ""
                 },
                 "conditions": [
                   {
@@ -191,14 +175,6 @@
                     "operator": {
                       "type": "string",
                       "operation": "exists"
-                    }
-                  },
-                  {
-                    "leftValue": "={{ $json.message.text }}",
-                    "rightValue": "/",
-                    "operator": {
-                      "type": "string",
-                      "operation": "notStartsWith"
                     }
                   }
                 ],
@@ -212,9 +188,9 @@
       "id": "input-router",
       "name": "Route Input Type",
       "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.2,
+      "typeVersion": 3,
       "position": [220, 300],
-      "notes": "Routes incoming messages based on type: callback_query, voice, photo, document, commands, or text"
+      "notes": "Routes incoming messages based on type"
     },
     {
       "parameters": {
@@ -239,7 +215,6 @@
       "parameters": {
         "resource": "audio",
         "operation": "transcribe",
-        "binaryPropertyName": "data",
         "options": {
           "language": "es"
         }
@@ -247,7 +222,7 @@
       "id": "whisper-transcribe",
       "name": "OpenAI Whisper Transcribe",
       "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1.8,
+      "typeVersion": 1,
       "position": [660, 100],
       "credentials": {
         "openAiApi": {
@@ -297,38 +272,31 @@
     },
     {
       "parameters": {
-        "model": "gpt-4o",
-        "options": {
-          "temperature": 0.2
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
         },
         "messages": {
           "values": [
             {
-              "role": "system",
               "content": "You are a financial document analyzer. Extract expense information from the provided image and return ONLY a valid JSON object with no additional text. The JSON must have these exact fields:\n{\n  \"date\": \"YYYY-MM-DD format, use today if not visible\",\n  \"vendor\": \"Company or service provider name\",\n  \"concept\": \"Brief description of the expense\",\n  \"amount\": \"Numeric value only, no currency symbols\",\n  \"currency\": \"USD, EUR, MXN, etc.\",\n  \"category\": \"One of: Food, Transportation, Utilities, Office, Software, Services, Other\",\n  \"documentType\": \"Invoice, Receipt, Bill, Statement, Other\"\n}\nIf any field cannot be determined, use 'Unknown' for strings or 0 for amount."
             },
             {
               "role": "user",
-              "content": [
-                {
-                  "type": "image_url",
-                  "image_url": {
-                    "url": "={{ 'data:image/jpeg;base64,' + $binary.data.data }}"
-                  }
-                },
-                {
-                  "type": "text",
-                  "text": "Extract all expense information from this receipt/invoice image."
-                }
-              ]
+              "content": "={{ 'Extract all expense information from this receipt/invoice image: ' + $binary.data.data.substring(0, 1000) }}"
             }
           ]
+        },
+        "options": {
+          "temperature": 0.2
         }
       },
       "id": "gpt4-vision-extract",
       "name": "GPT-4o Vision Extract",
       "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1.8,
+      "typeVersion": 1,
       "position": [660, 250],
       "credentials": {
         "openAiApi": {
@@ -336,31 +304,35 @@
           "name": "OpenAI API"
         }
       },
-      "notes": "Uses GPT-4o Vision to extract expense data from images/documents. Returns structured JSON."
+      "notes": "Uses GPT-4o Vision to extract expense data from images/documents"
     },
     {
       "parameters": {
-        "model": "gpt-4o",
-        "options": {
-          "temperature": 0.2
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
         },
         "messages": {
           "values": [
             {
-              "role": "system",
-              "content": "You are a financial assistant. Extract expense information from the user's text message and return ONLY a valid JSON object with no additional text. The JSON must have these exact fields:\n{\n  \"date\": \"YYYY-MM-DD format, use today's date if not specified\",\n  \"vendor\": \"Company or service provider name\",\n  \"concept\": \"Brief description of the expense\",\n  \"amount\": \"Numeric value only, no currency symbols\",\n  \"currency\": \"USD, EUR, MXN, etc. Default to USD if not specified\",\n  \"category\": \"One of: Food, Transportation, Utilities, Office, Software, Services, Other\",\n  \"documentType\": \"Manual Entry\"\n}\nIf any field cannot be determined, use 'Unknown' for strings or 0 for amount. Today's date is {{ $now.format('yyyy-MM-dd') }}."
+              "content": "You are a financial assistant. Extract expense information from the user's text message and return ONLY a valid JSON object with no additional text. The JSON must have these exact fields:\n{\n  \"date\": \"YYYY-MM-DD format, use today's date if not specified\",\n  \"vendor\": \"Company or service provider name\",\n  \"concept\": \"Brief description of the expense\",\n  \"amount\": \"Numeric value only, no currency symbols\",\n  \"currency\": \"USD, EUR, MXN, etc. Default to USD if not specified\",\n  \"category\": \"One of: Food, Transportation, Utilities, Office, Software, Services, Other\",\n  \"documentType\": \"Manual Entry\"\n}\nIf any field cannot be determined, use 'Unknown' for strings or 0 for amount."
             },
             {
               "role": "user",
-              "content": "={{ $json.message?.text || $json.text || $json.transcription }}"
+              "content": "={{ $json.message?.text || $json.text || $json.transcription || '' }}"
             }
           ]
+        },
+        "options": {
+          "temperature": 0.2
         }
       },
       "id": "gpt4-text-extract",
       "name": "GPT-4o Text Extract",
       "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1.8,
+      "typeVersion": 1,
       "position": [660, 400],
       "credentials": {
         "openAiApi": {
@@ -368,25 +340,22 @@
           "name": "OpenAI API"
         }
       },
-      "notes": "Extracts expense data from text messages (typed or transcribed voice)"
+      "notes": "Extracts expense data from text messages"
     },
     {
       "parameters": {
-        "mode": "raw",
-        "jsonOutput": "={{ JSON.parse($json.message?.content || $json.content || $json.choices?.[0]?.message?.content || '{}') }}",
-        "options": {}
+        "jsCode": "// Parse the JSON response from GPT-4o\nconst content = $input.first().json.message?.content || $input.first().json.content || $input.first().json.choices?.[0]?.message?.content || '{}';\n\ntry {\n  const parsed = JSON.parse(content);\n  return [{ json: parsed }];\n} catch (e) {\n  // Try to extract JSON from the response\n  const jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    return [{ json: JSON.parse(jsonMatch[0]) }];\n  }\n  return [{ json: { error: 'Could not parse response', raw: content } }];\n}"
       },
       "id": "parse-extraction-json",
       "name": "Parse Extraction JSON",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [880, 300],
-      "notes": "Parses the JSON response from GPT-4o into a structured object for further processing"
+      "notes": "Parses the JSON response from GPT-4o into a structured object"
     },
     {
       "parameters": {
-        "operation": "create",
-        "authentication": "oAuth2",
+        "operation": "createFolder",
         "name": "={{ $now.format('yyyy-MM') }}/{{ $json.vendor || 'Unknown' }}",
         "driveId": {
           "__rl": true,
@@ -401,7 +370,7 @@
         "options": {}
       },
       "id": "create-drive-folder",
-      "name": "Create/Get Drive Folder",
+      "name": "Create Drive Folder",
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [1100, 200],
@@ -416,11 +385,10 @@
     {
       "parameters": {
         "operation": "upload",
-        "authentication": "oAuth2",
-        "name": "={{ $json.vendor }}_{{ $now.format('yyyy-MM-dd_HHmmss') }}",
+        "name": "={{ $json.vendor || 'expense' }}_{{ $now.format('yyyy-MM-dd_HHmmss') }}",
         "folderId": {
           "__rl": true,
-          "value": "={{ $('Create/Get Drive Folder').item.json.id }}",
+          "value": "={{ $('Create Drive Folder').item.json.id }}",
           "mode": "id"
         },
         "options": {}
@@ -440,102 +408,14 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "row-id",
-              "name": "rowId",
-              "value": "={{ $now.format('yyyyMMddHHmmss') + '-' + Math.random().toString(36).substr(2, 9) }}",
-              "type": "string"
-            },
-            {
-              "id": "date",
-              "name": "date",
-              "value": "={{ $('Parse Extraction JSON').item.json.date }}",
-              "type": "string"
-            },
-            {
-              "id": "vendor",
-              "name": "vendor",
-              "value": "={{ $('Parse Extraction JSON').item.json.vendor }}",
-              "type": "string"
-            },
-            {
-              "id": "concept",
-              "name": "concept",
-              "value": "={{ $('Parse Extraction JSON').item.json.concept }}",
-              "type": "string"
-            },
-            {
-              "id": "amount",
-              "name": "amount",
-              "value": "={{ $('Parse Extraction JSON').item.json.amount }}",
-              "type": "number"
-            },
-            {
-              "id": "currency",
-              "name": "currency",
-              "value": "={{ $('Parse Extraction JSON').item.json.currency }}",
-              "type": "string"
-            },
-            {
-              "id": "category",
-              "name": "category",
-              "value": "={{ $('Parse Extraction JSON').item.json.category }}",
-              "type": "string"
-            },
-            {
-              "id": "document-type",
-              "name": "documentType",
-              "value": "={{ $('Parse Extraction JSON').item.json.documentType }}",
-              "type": "string"
-            },
-            {
-              "id": "drive-link",
-              "name": "driveLink",
-              "value": "={{ $('Upload to Google Drive').item.json?.webViewLink || 'No file attached' }}",
-              "type": "string"
-            },
-            {
-              "id": "status",
-              "name": "status",
-              "value": "Pending Validation",
-              "type": "string"
-            },
-            {
-              "id": "payment-method",
-              "name": "paymentMethod",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "payment-date",
-              "name": "paymentDate",
-              "value": "",
-              "type": "string"
-            },
-            {
-              "id": "created-at",
-              "name": "createdAt",
-              "value": "={{ $now.toISO() }}",
-              "type": "string"
-            },
-            {
-              "id": "chat-id",
-              "name": "chatId",
-              "value": "={{ $('Telegram Trigger').item.json.message?.chat?.id || $('Telegram Trigger').item.json.callback_query?.message?.chat?.id }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "jsCode": "// Prepare data for Google Sheets\nconst parsed = $('Parse Extraction JSON').first().json;\nconst upload = $('Upload to Google Drive').first().json;\nconst trigger = $('Telegram Trigger').first().json;\n\nreturn [{\n  json: {\n    rowId: $now.format('yyyyMMddHHmmss') + '-' + Math.random().toString(36).substr(2, 9),\n    date: parsed.date || $now.format('yyyy-MM-dd'),\n    vendor: parsed.vendor || 'Unknown',\n    concept: parsed.concept || 'Unknown',\n    amount: parsed.amount || 0,\n    currency: parsed.currency || 'USD',\n    category: parsed.category || 'Other',\n    documentType: parsed.documentType || 'Other',\n    driveLink: upload?.webViewLink || 'No file attached',\n    status: 'Pending Validation',\n    paymentMethod: '',\n    paymentDate: '',\n    createdAt: $now.toISO(),\n    chatId: trigger.message?.chat?.id || trigger.callback_query?.message?.chat?.id || ''\n  }\n}];"
       },
       "id": "prepare-sheet-data",
       "name": "Prepare Sheet Data",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [1540, 300],
-      "notes": "Prepares all data fields for Google Sheets insertion including unique Row ID"
+      "notes": "Prepares all data fields for Google Sheets insertion"
     },
     {
       "parameters": {
@@ -582,15 +462,13 @@
           "name": "Google Sheets OAuth2"
         }
       },
-      "notes": "Adds a new row to the Expense Register sheet with all extracted data"
+      "notes": "Adds a new row to the Expense Register sheet"
     },
     {
       "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message?.chat?.id }}",
-        "text": "✅ **Expense Recorded**\n\n📅 Date: {{ $('Prepare Sheet Data').item.json.date }}\n🏢 Vendor: {{ $('Prepare Sheet Data').item.json.vendor }}\n📝 Concept: {{ $('Prepare Sheet Data').item.json.concept }}\n💰 Amount: {{ $('Prepare Sheet Data').item.json.amount }} {{ $('Prepare Sheet Data').item.json.currency }}\n📁 Category: {{ $('Prepare Sheet Data').item.json.category }}\n\n**Status: Pending Validation**\n\nUse /validate to review and approve expenses.",
-        "additionalFields": {
-          "parse_mode": "Markdown"
-        }
+        "text": "=Expense Recorded!\n\nDate: {{ $('Prepare Sheet Data').item.json.date }}\nVendor: {{ $('Prepare Sheet Data').item.json.vendor }}\nConcept: {{ $('Prepare Sheet Data').item.json.concept }}\nAmount: {{ $('Prepare Sheet Data').item.json.amount }} {{ $('Prepare Sheet Data').item.json.currency }}\nCategory: {{ $('Prepare Sheet Data').item.json.category }}\n\nStatus: Pending Validation\n\nUse /validate to review and approve expenses.",
+        "additionalFields": {}
       },
       "id": "send-expense-confirmation",
       "name": "Send Expense Confirmation",
@@ -603,7 +481,7 @@
           "name": "Telegram Bot API"
         }
       },
-      "notes": "Sends confirmation message to user after expense is recorded"
+      "notes": "Sends confirmation message to user"
     },
     {
       "parameters": {
@@ -639,7 +517,7 @@
           "name": "Google Sheets OAuth2"
         }
       },
-      "notes": "Retrieves all expenses with 'Pending Validation' status for review"
+      "notes": "Retrieves all expenses with 'Pending Validation' status"
     },
     {
       "parameters": {
@@ -651,32 +529,34 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [660, 500],
-      "notes": "Iterates through pending expenses to send individual validation messages"
+      "notes": "Iterates through pending expenses"
     },
     {
       "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message?.chat?.id }}",
-        "text": "📋 **Expense Validation Required**\n\n🆔 ID: {{ $json['Row ID'] }}\n📅 Date: {{ $json.Date }}\n🏢 Vendor: {{ $json.Vendor }}\n📝 Concept: {{ $json.Concept }}\n💰 Amount: {{ $json.Amount }} {{ $json.Currency }}\n📁 Category: {{ $json.Category }}\n📎 Document: {{ $json['Drive Link'] }}\n\nPlease review and select an action:",
+        "text": "=Expense Validation Required\n\nID: {{ $json['Row ID'] }}\nDate: {{ $json.Date }}\nVendor: {{ $json.Vendor }}\nConcept: {{ $json.Concept }}\nAmount: {{ $json.Amount }} {{ $json.Currency }}\nCategory: {{ $json.Category }}\nDocument: {{ $json['Drive Link'] }}\n\nPlease review and select an action:",
         "additionalFields": {
-          "parse_mode": "Markdown",
-          "reply_markup": {
-            "inline_keyboard": [
-              [
-                {
-                  "text": "✅ Approve",
-                  "callback_data": "approve_{{ $json['Row ID'] }}"
-                },
-                {
-                  "text": "❌ Reject",
-                  "callback_data": "reject_{{ $json['Row ID'] }}"
+          "replyMarkup": "inlineKeyboard",
+          "inlineKeyboard": {
+            "rows": [
+              {
+                "row": {
+                  "buttons": [
+                    {
+                      "text": "Approve",
+                      "additionalFields": {
+                        "callbackData": "=approve_{{ $json['Row ID'] }}"
+                      }
+                    },
+                    {
+                      "text": "Reject",
+                      "additionalFields": {
+                        "callbackData": "=reject_{{ $json['Row ID'] }}"
+                      }
+                    }
+                  ]
                 }
-              ],
-              [
-                {
-                  "text": "✏️ Edit",
-                  "callback_data": "edit_{{ $json['Row ID'] }}"
-                }
-              ]
+              }
             ]
           }
         }
@@ -692,15 +572,14 @@
           "name": "Telegram Bot API"
         }
       },
-      "notes": "Sends expense details with inline buttons for Approve, Reject, or Edit actions"
+      "notes": "Sends expense details with inline buttons"
     },
     {
       "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
+            "leftValue": ""
           },
           "conditions": [
             {
@@ -719,7 +598,7 @@
       "id": "check-approve-callback",
       "name": "Is Approve?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
+      "typeVersion": 2,
       "position": [440, -100],
       "notes": "Checks if the callback is an approval action"
     },
@@ -728,8 +607,7 @@
         "conditions": {
           "options": {
             "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
+            "leftValue": ""
           },
           "conditions": [
             {
@@ -748,7 +626,7 @@
       "id": "check-reject-callback",
       "name": "Is Reject?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
+      "typeVersion": 2,
       "position": [660, -100],
       "notes": "Checks if the callback is a rejection action"
     },
@@ -757,14 +635,13 @@
         "conditions": {
           "options": {
             "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
+            "leftValue": ""
           },
           "conditions": [
             {
               "id": "condition-pay",
               "leftValue": "={{ $json.callback_query.data }}",
-              "rightValue": "pay_",
+              "rightValue": "method_",
               "operator": {
                 "type": "string",
                 "operation": "startsWith"
@@ -775,48 +652,20 @@
         }
       },
       "id": "check-pay-callback",
-      "name": "Is Pay?",
+      "name": "Is Payment Method?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
+      "typeVersion": 2,
       "position": [880, -100],
-      "notes": "Checks if the callback is a payment action"
+      "notes": "Checks if the callback is a payment method selection"
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "extract-row-id",
-              "name": "extractedRowId",
-              "value": "={{ $json.callback_query.data.replace('approve_', '').replace('reject_', '').replace('pay_', '').replace('method_', '').split('_')[0] }}",
-              "type": "string"
-            },
-            {
-              "id": "action-type",
-              "name": "actionType",
-              "value": "={{ $json.callback_query.data.split('_')[0] }}",
-              "type": "string"
-            },
-            {
-              "id": "chat-id",
-              "name": "chatId",
-              "value": "={{ $json.callback_query.message.chat.id }}",
-              "type": "string"
-            },
-            {
-              "id": "message-id",
-              "name": "messageId",
-              "value": "={{ $json.callback_query.message.message_id }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "jsCode": "// Extract callback data\nconst data = $input.first().json.callback_query.data;\nconst parts = data.split('_');\n\nreturn [{\n  json: {\n    extractedRowId: data.replace('approve_', '').replace('reject_', '').replace('method_check_', '').replace('method_transfer_', '').replace('method_cash_', ''),\n    actionType: parts[0],\n    paymentMethod: parts[1] ? parts[1].charAt(0).toUpperCase() + parts[1].slice(1) : '',\n    chatId: $input.first().json.callback_query.message.chat.id,\n    messageId: $input.first().json.callback_query.message.message_id\n  }\n}];"
       },
       "id": "extract-callback-data",
       "name": "Extract Callback Data",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [440, -200],
       "notes": "Extracts Row ID and action type from callback data"
     },
@@ -860,7 +709,7 @@
           "name": "Google Sheets OAuth2"
         }
       },
-      "notes": "Updates expense status to 'Validated - Pending Payment' upon approval"
+      "notes": "Updates expense status to 'Validated - Pending Payment'"
     },
     {
       "parameters": {
@@ -902,15 +751,13 @@
           "name": "Google Sheets OAuth2"
         }
       },
-      "notes": "Updates expense status to 'Rejected' upon rejection"
+      "notes": "Updates expense status to 'Rejected'"
     },
     {
       "parameters": {
         "chatId": "={{ $('Extract Callback Data').item.json.chatId }}",
-        "text": "✅ Expense **APPROVED** and marked as Pending Payment.\n\nUse /pay to record payment.",
-        "additionalFields": {
-          "parse_mode": "Markdown"
-        }
+        "text": "Expense APPROVED and marked as Pending Payment.\n\nUse /pay to record payment.",
+        "additionalFields": {}
       },
       "id": "confirm-approval",
       "name": "Confirm Approval",
@@ -928,10 +775,8 @@
     {
       "parameters": {
         "chatId": "={{ $('Extract Callback Data').item.json.chatId }}",
-        "text": "❌ Expense **REJECTED** and removed from pending queue.",
-        "additionalFields": {
-          "parse_mode": "Markdown"
-        }
+        "text": "Expense REJECTED and removed from pending queue.",
+        "additionalFields": {}
       },
       "id": "confirm-rejection",
       "name": "Confirm Rejection",
@@ -980,7 +825,7 @@
           "name": "Google Sheets OAuth2"
         }
       },
-      "notes": "Retrieves expenses ready for payment (Validated - Pending Payment)"
+      "notes": "Retrieves expenses ready for payment"
     },
     {
       "parameters": {
@@ -992,32 +837,46 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [660, 700],
-      "notes": "Iterates through validated expenses for payment selection"
+      "notes": "Iterates through validated expenses"
     },
     {
       "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message?.chat?.id }}",
-        "text": "💳 **Ready for Payment**\n\n🆔 ID: {{ $json['Row ID'] }}\n📅 Date: {{ $json.Date }}\n🏢 Vendor: {{ $json.Vendor }}\n💰 Amount: {{ $json.Amount }} {{ $json.Currency }}\n\nSelect payment method:",
+        "text": "=Ready for Payment\n\nID: {{ $json['Row ID'] }}\nDate: {{ $json.Date }}\nVendor: {{ $json.Vendor }}\nAmount: {{ $json.Amount }} {{ $json.Currency }}\n\nSelect payment method:",
         "additionalFields": {
-          "parse_mode": "Markdown",
-          "reply_markup": {
-            "inline_keyboard": [
-              [
-                {
-                  "text": "🏦 Check",
-                  "callback_data": "method_check_{{ $json['Row ID'] }}"
-                },
-                {
-                  "text": "💸 Transfer",
-                  "callback_data": "method_transfer_{{ $json['Row ID'] }}"
+          "replyMarkup": "inlineKeyboard",
+          "inlineKeyboard": {
+            "rows": [
+              {
+                "row": {
+                  "buttons": [
+                    {
+                      "text": "Check",
+                      "additionalFields": {
+                        "callbackData": "=method_check_{{ $json['Row ID'] }}"
+                      }
+                    },
+                    {
+                      "text": "Transfer",
+                      "additionalFields": {
+                        "callbackData": "=method_transfer_{{ $json['Row ID'] }}"
+                      }
+                    }
+                  ]
                 }
-              ],
-              [
-                {
-                  "text": "💵 Cash",
-                  "callback_data": "method_cash_{{ $json['Row ID'] }}"
+              },
+              {
+                "row": {
+                  "buttons": [
+                    {
+                      "text": "Cash",
+                      "additionalFields": {
+                        "callbackData": "=method_cash_{{ $json['Row ID'] }}"
+                      }
+                    }
+                  ]
                 }
-              ]
+              }
             ]
           }
         }
@@ -1037,64 +896,13 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "check-payment-method",
-              "leftValue": "={{ $json.callback_query.data }}",
-              "rightValue": "method_",
-              "operator": {
-                "type": "string",
-                "operation": "startsWith"
-              }
-            }
-          ],
-          "combinator": "and"
-        }
-      },
-      "id": "is-payment-method",
-      "name": "Is Payment Method?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [1100, -100],
-      "notes": "Checks if callback is a payment method selection"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "payment-row-id",
-              "name": "paymentRowId",
-              "value": "={{ $json.callback_query.data.split('_')[2] }}",
-              "type": "string"
-            },
-            {
-              "id": "payment-method",
-              "name": "paymentMethod",
-              "value": "={{ $json.callback_query.data.split('_')[1].charAt(0).toUpperCase() + $json.callback_query.data.split('_')[1].slice(1) }}",
-              "type": "string"
-            },
-            {
-              "id": "payment-chat-id",
-              "name": "chatId",
-              "value": "={{ $json.callback_query.message.chat.id }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "jsCode": "// Extract payment data from callback\nconst data = $input.first().json.callback_query.data;\nconst parts = data.split('_');\n\nreturn [{\n  json: {\n    paymentRowId: parts[2] || '',\n    paymentMethod: parts[1] ? parts[1].charAt(0).toUpperCase() + parts[1].slice(1) : '',\n    chatId: $input.first().json.callback_query.message.chat.id\n  }\n}];"
       },
       "id": "extract-payment-data",
       "name": "Extract Payment Data",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [1320, -100],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, -100],
       "notes": "Extracts payment method and row ID from callback"
     },
     {
@@ -1132,57 +940,41 @@
       "name": "Update Payment Status",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [1540, -100],
+      "position": [1320, -100],
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "google-sheets-credentials",
           "name": "Google Sheets OAuth2"
         }
       },
-      "notes": "Updates expense to Paid status with payment method and date"
+      "notes": "Updates expense to Paid status"
     },
     {
       "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
+            "leftValue": ""
           },
           "conditions": [
             {
               "id": "check-transfer",
               "leftValue": "={{ $('Extract Payment Data').item.json.paymentMethod }}",
-              "rightValue": "Check",
+              "rightValue": "Cash",
               "operator": {
                 "type": "string",
-                "operation": "equals"
+                "operation": "notEquals"
               }
             }
           ],
-          "combinator": "or"
-        },
-        "combineConditions": "any",
-        "looseTypeValidation": true,
-        "secondConditions": {
-          "conditions": [
-            {
-              "id": "check-transfer-2",
-              "leftValue": "={{ $('Extract Payment Data').item.json.paymentMethod }}",
-              "rightValue": "Transfer",
-              "operator": {
-                "type": "string",
-                "operation": "equals"
-              }
-            }
-          ]
+          "combinator": "and"
         }
       },
       "id": "is-check-or-transfer",
       "name": "Is Check/Transfer?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [1760, -100],
+      "typeVersion": 2,
+      "position": [1540, -100],
       "notes": "Checks if payment method requires proof dispatch via email"
     },
     {
@@ -1212,96 +1004,84 @@
       "name": "Lookup Vendor Email",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [1980, -200],
+      "position": [1760, -200],
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "google-sheets-credentials",
           "name": "Google Sheets OAuth2"
         }
       },
-      "notes": "Looks up vendor email from Contacts sheet for payment proof dispatch"
+      "notes": "Looks up vendor email from Contacts sheet"
     },
     {
       "parameters": {
         "chatId": "={{ $('Extract Payment Data').item.json.chatId }}",
-        "text": "📎 Please upload the payment proof (image or PDF) for this expense.\n\nThis will be sent to the vendor automatically.",
+        "text": "Please upload the payment proof (image or PDF) for this expense.\n\nThis will be sent to the vendor automatically.",
         "additionalFields": {}
       },
       "id": "request-payment-proof",
       "name": "Request Payment Proof",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [2200, -200],
+      "position": [1980, -200],
       "credentials": {
         "telegramApi": {
           "id": "telegram-credentials",
           "name": "Telegram Bot API"
         }
       },
-      "notes": "Requests user to upload payment proof for Check/Transfer payments"
+      "notes": "Requests user to upload payment proof"
     },
     {
       "parameters": {
         "sendTo": "={{ $('Lookup Vendor Email').item.json.Email }}",
-        "subject": "Payment Confirmation - {{ $('Update Payment Status').item.json.Vendor }}",
-        "message": "Dear {{ $('Update Payment Status').item.json.Vendor }},\n\nWe are pleased to confirm that payment has been processed for the following:\n\nReference: {{ $('Update Payment Status').item.json['Row ID'] }}\nConcept: {{ $('Update Payment Status').item.json.Concept }}\nAmount: {{ $('Update Payment Status').item.json.Amount }} {{ $('Update Payment Status').item.json.Currency }}\nPayment Method: {{ $('Extract Payment Data').item.json.paymentMethod }}\nPayment Date: {{ $now.format('yyyy-MM-dd') }}\n\nPlease find the payment proof attached.\n\nBest regards,\nFinancial Assistant Bot",
-        "options": {
-          "attachmentsUi": {
-            "attachmentsBinary": [
-              {
-                "property": "data"
-              }
-            ]
-          }
-        }
+        "subject": "=Payment Confirmation - {{ $('Update Payment Status').item.json.Vendor }}",
+        "message": "=Dear {{ $('Update Payment Status').item.json.Vendor }},\n\nWe are pleased to confirm that payment has been processed for the following:\n\nReference: {{ $('Update Payment Status').item.json['Row ID'] }}\nConcept: {{ $('Update Payment Status').item.json.Concept }}\nAmount: {{ $('Update Payment Status').item.json.Amount }} {{ $('Update Payment Status').item.json.Currency }}\nPayment Method: {{ $('Extract Payment Data').item.json.paymentMethod }}\nPayment Date: {{ $now.format('yyyy-MM-dd') }}\n\nPlease find the payment proof attached.\n\nBest regards,\nFinancial Assistant Bot",
+        "options": {}
       },
       "id": "send-payment-email",
       "name": "Send Payment Proof Email",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
-      "position": [2420, -200],
+      "position": [2200, -200],
       "credentials": {
         "gmailOAuth2": {
           "id": "gmail-credentials",
           "name": "Gmail OAuth2"
         }
       },
-      "notes": "Sends payment confirmation email with proof attachment to vendor"
+      "notes": "Sends payment confirmation email to vendor"
     },
     {
       "parameters": {
         "chatId": "={{ $('Extract Payment Data').item.json.chatId }}",
-        "text": "✅ **Payment Recorded & Proof Sent**\n\n💳 Method: {{ $('Extract Payment Data').item.json.paymentMethod }}\n📧 Proof sent to: {{ $('Lookup Vendor Email').item.json.Email }}\n📅 Date: {{ $now.format('yyyy-MM-dd') }}",
-        "additionalFields": {
-          "parse_mode": "Markdown"
-        }
+        "text": "=Payment Recorded & Proof Sent\n\nMethod: {{ $('Extract Payment Data').item.json.paymentMethod }}\nProof sent to: {{ $('Lookup Vendor Email').item.json.Email }}\nDate: {{ $now.format('yyyy-MM-dd') }}",
+        "additionalFields": {}
       },
       "id": "confirm-payment-email-sent",
       "name": "Confirm Payment & Email",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [2640, -200],
+      "position": [2420, -200],
       "credentials": {
         "telegramApi": {
           "id": "telegram-credentials",
           "name": "Telegram Bot API"
         }
       },
-      "notes": "Confirms payment recording and email dispatch to user"
+      "notes": "Confirms payment recording and email dispatch"
     },
     {
       "parameters": {
         "chatId": "={{ $('Extract Payment Data').item.json.chatId }}",
-        "text": "✅ **Cash Payment Recorded**\n\n💵 Method: Cash\n📅 Date: {{ $now.format('yyyy-MM-dd') }}\n\nNo proof dispatch required for cash payments.",
-        "additionalFields": {
-          "parse_mode": "Markdown"
-        }
+        "text": "=Cash Payment Recorded\n\nMethod: Cash\nDate: {{ $now.format('yyyy-MM-dd') }}\n\nNo proof dispatch required for cash payments.",
+        "additionalFields": {}
       },
       "id": "confirm-cash-payment",
       "name": "Confirm Cash Payment",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1980, 0],
+      "position": [1760, 0],
       "credentials": {
         "telegramApi": {
           "id": "telegram-credentials",
@@ -1336,7 +1116,7 @@
           "name": "Google Sheets OAuth2"
         }
       },
-      "notes": "Reads recurring expense configurations from sheet"
+      "notes": "Reads recurring expense configurations"
     },
     {
       "parameters": {
@@ -1352,64 +1132,12 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "recurring-row-id",
-              "name": "rowId",
-              "value": "={{ 'REC-' + $now.format('yyyyMM') + '-' + Math.random().toString(36).substr(2, 9) }}",
-              "type": "string"
-            },
-            {
-              "id": "recurring-date",
-              "name": "date",
-              "value": "={{ $now.format('yyyy-MM') + '-01' }}",
-              "type": "string"
-            },
-            {
-              "id": "recurring-vendor",
-              "name": "vendor",
-              "value": "={{ $json.Service }}",
-              "type": "string"
-            },
-            {
-              "id": "recurring-concept",
-              "name": "concept",
-              "value": "={{ $json.Concept }} - {{ $now.format('MMMM yyyy') }}",
-              "type": "string"
-            },
-            {
-              "id": "recurring-amount",
-              "name": "amount",
-              "value": "={{ $json.Amount }}",
-              "type": "number"
-            },
-            {
-              "id": "recurring-currency",
-              "name": "currency",
-              "value": "={{ $json.Currency || 'USD' }}",
-              "type": "string"
-            },
-            {
-              "id": "recurring-category",
-              "name": "category",
-              "value": "={{ $json.Category }}",
-              "type": "string"
-            },
-            {
-              "id": "recurring-status",
-              "name": "status",
-              "value": "={{ $json.AutoValidate === 'true' || $json.AutoValidate === true ? 'Validated - Pending Payment' : 'Pending Validation' }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "jsCode": "// Prepare recurring expense data\nconst item = $input.first().json;\n\nreturn [{\n  json: {\n    rowId: 'REC-' + $now.format('yyyyMM') + '-' + Math.random().toString(36).substr(2, 9),\n    date: $now.format('yyyy-MM') + '-01',\n    vendor: item.Service || '',\n    concept: (item.Concept || '') + ' - ' + $now.format('MMMM yyyy'),\n    amount: item.Amount || 0,\n    currency: item.Currency || 'USD',\n    category: item.Category || 'Other',\n    status: (item.AutoValidate === 'true' || item.AutoValidate === true) ? 'Validated - Pending Payment' : 'Pending Validation'\n  }\n}];"
       },
       "id": "prepare-recurring-data",
       "name": "Prepare Recurring Data",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [660, 900],
       "notes": "Prepares recurring expense data for current month"
     },
@@ -1462,28 +1190,15 @@
     },
     {
       "parameters": {
-        "errorMessage": "={{ 'Failed to process expense: ' + $json.error?.message || 'Unknown error' }}"
-      },
-      "id": "error-handler",
-      "name": "Error Handler",
-      "type": "n8n-nodes-base.stopAndError",
-      "typeVersion": 1,
-      "position": [1100, 500],
-      "notes": "Handles errors in the workflow execution"
-    },
-    {
-      "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message?.chat?.id || $('Telegram Trigger').item.json.callback_query?.message?.chat?.id }}",
-        "text": "❌ **Error Processing Request**\n\nSomething went wrong while processing your expense. Please try again or check the format of your submission.\n\nSupported formats:\n• Text: \"Coffee at Starbucks $5.50\"\n• Voice note describing the expense\n• Photo/Image of receipt\n• PDF document",
-        "additionalFields": {
-          "parse_mode": "Markdown"
-        }
+        "text": "Error Processing Request\n\nSomething went wrong while processing your expense. Please try again.\n\nSupported formats:\n- Text: \"Coffee at Starbucks $5.50\"\n- Voice note describing the expense\n- Photo/Image of receipt\n- PDF document",
+        "additionalFields": {}
       },
       "id": "send-error-message",
       "name": "Send Error Message",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1320, 500],
+      "position": [1100, 500],
       "credentials": {
         "telegramApi": {
           "id": "telegram-credentials",
@@ -1495,9 +1210,8 @@
     {
       "parameters": {
         "chatId": "={{ $json.callback_query.message.chat.id }}",
-        "messageId": "={{ $json.callback_query.message.message_id }}",
-        "replyMarkup": "none",
-        "text": "✅ Action completed"
+        "text": "Action completed",
+        "additionalFields": {}
       },
       "id": "answer-callback-query",
       "name": "Answer Callback Query",
@@ -1510,15 +1224,14 @@
           "name": "Telegram Bot API"
         }
       },
-      "notes": "Acknowledges the callback query to remove loading state"
+      "notes": "Acknowledges the callback query"
     },
     {
       "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
+            "leftValue": ""
           },
           "conditions": [
             {
@@ -1526,7 +1239,7 @@
               "leftValue": "={{ $json }}",
               "rightValue": "",
               "operator": {
-                "type": "array",
+                "type": "object",
                 "operation": "empty"
               }
             }
@@ -1537,14 +1250,14 @@
       "id": "check-has-pending",
       "name": "Has Pending?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
+      "typeVersion": 2,
       "position": [660, 600],
-      "notes": "Checks if there are any pending expenses to validate"
+      "notes": "Checks if there are any pending expenses"
     },
     {
       "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message?.chat?.id }}",
-        "text": "✅ No pending expenses to validate. All caught up!",
+        "text": "No pending expenses to validate. All caught up!",
         "additionalFields": {}
       },
       "id": "no-pending-message",
@@ -1565,8 +1278,7 @@
         "conditions": {
           "options": {
             "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
+            "leftValue": ""
           },
           "conditions": [
             {
@@ -1574,7 +1286,7 @@
               "leftValue": "={{ $json }}",
               "rightValue": "",
               "operator": {
-                "type": "array",
+                "type": "object",
                 "operation": "empty"
               }
             }
@@ -1585,14 +1297,14 @@
       "id": "check-has-validated",
       "name": "Has Validated?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
+      "typeVersion": 2,
       "position": [660, 800],
       "notes": "Checks if there are expenses ready for payment"
     },
     {
       "parameters": {
         "chatId": "={{ $('Telegram Trigger').item.json.message?.chat?.id }}",
-        "text": "💳 No validated expenses ready for payment.\n\nUse /validate first to approve pending expenses.",
+        "text": "No validated expenses ready for payment.\n\nUse /validate first to approve pending expenses.",
         "additionalFields": {}
       },
       "id": "no-validated-message",
@@ -1610,22 +1322,12 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "merge-text",
-              "name": "text",
-              "value": "={{ $json.text || $json.transcription || '' }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "jsCode": "// Normalize transcribed text for AI processing\nconst text = $input.first().json.text || $input.first().json.transcription || '';\nreturn [{ json: { text: text } }];"
       },
       "id": "prepare-text-input",
       "name": "Prepare Text Input",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [880, 100],
       "notes": "Normalizes transcribed text for AI processing"
     }
@@ -1776,14 +1478,14 @@
       "main": [
         [
           {
-            "node": "Create/Get Drive Folder",
+            "node": "Create Drive Folder",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Create/Get Drive Folder": {
+    "Create Drive Folder": {
       "main": [
         [
           {
@@ -1878,24 +1580,6 @@
         ],
         [
           {
-            "node": "Is Pay?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Is Pay?": {
-      "main": [
-        [
-          {
-            "node": "Get Validated Expenses",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
             "node": "Is Payment Method?",
             "type": "main",
             "index": 0
@@ -1941,14 +1625,14 @@
       "main": [
         [
           {
-            "node": "Check Has Pending?",
+            "node": "Has Pending?",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Check Has Pending?": {
+    "Has Pending?": {
       "main": [
         [
           {
@@ -1993,14 +1677,14 @@
       "main": [
         [
           {
-            "node": "Check Has Validated?",
+            "node": "Has Validated?",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Check Has Validated?": {
+    "Has Validated?": {
       "main": [
         [
           {
@@ -2174,8 +1858,7 @@
   "settings": {
     "executionOrder": "v1",
     "saveManualExecutions": true,
-    "callerPolicy": "workflowsFromSameOwner",
-    "errorWorkflow": ""
+    "callerPolicy": "workflowsFromSameOwner"
   },
   "staticData": null,
   "tags": [
