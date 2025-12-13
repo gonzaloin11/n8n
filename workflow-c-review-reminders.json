@@ -12,206 +12,56 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [0, 400],
-      "webhookId": "expense-reminders-webhook"
+      "webhookId": "expense-reminders"
     },
     {
       "parameters": {
         "rule": {
-          "interval": [
-            {
-              "field": "hours",
-              "hoursInterval": 6
-            }
-          ]
+          "interval": [{"field": "hours", "hoursInterval": 6}]
         }
       },
       "id": "schedule-trigger",
-      "name": "Schedule Trigger (Every 6 Hours)",
+      "name": "Schedule (Every 6 Hours)",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [0, 200]
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "trigger-source",
-              "name": "triggerSource",
-              "value": "={{ $node['Webhook Trigger'].json ? 'webhook' : 'schedule' }}",
-              "type": "string"
-            },
-            {
-              "id": "action-type",
-              "name": "actionType",
-              "value": "={{ $node['Webhook Trigger'].json?.action || 'all' }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "merge-triggers",
-      "name": "Merge Triggers",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [220, 300]
-    },
-    {
-      "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT DISTINCT chat_id FROM chat_state WHERE chat_id IS NOT NULL"
+        "query": "SELECT DISTINCT chat_id FROM chat_state WHERE chat_id IS NOT NULL LIMIT 1"
       },
       "id": "get-active-chats",
       "name": "Get Active Chats",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [440, 300],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "rules": {
-          "rules": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": false,
-                  "leftValue": "",
-                  "typeValidation": "loose"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $('Merge Triggers').first().json.actionType }}",
-                    "rightValue": "all|review",
-                    "operator": {
-                      "type": "string",
-                      "operation": "regex"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputLabel": "Review Pending"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": false,
-                  "leftValue": "",
-                  "typeValidation": "loose"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $('Merge Triggers').first().json.actionType }}",
-                    "rightValue": "all|payment",
-                    "operator": {
-                      "type": "string",
-                      "operation": "regex"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputLabel": "Payment Pending"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": false,
-                  "leftValue": "",
-                  "typeValidation": "loose"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $('Merge Triggers').first().json.actionType }}",
-                    "rightValue": "all|receipt",
-                    "operator": {
-                      "type": "string",
-                      "operation": "regex"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputLabel": "Receipt Upload"
-            }
-          ]
-        },
-        "options": {
-          "allMatchingOutputs": true
-        }
-      },
-      "id": "action-router",
-      "name": "Route Actions",
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3,
-      "position": [660, 300]
+      "position": [300, 300]
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT * FROM expense_records WHERE (vista_por_usuario IS NULL OR vista_por_usuario = false) AND id_transaccion IS NOT NULL ORDER BY fecha_creacion DESC LIMIT 20"
+        "query": "SELECT * FROM expense_records WHERE (vista_por_usuario IS NULL OR vista_por_usuario = false) AND id_transaccion IS NOT NULL ORDER BY fecha_creacion DESC LIMIT 10"
       },
       "id": "get-pending-reviews",
       "name": "Get Pending Reviews",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [940, 100],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
+      "position": [520, 200]
     },
     {
       "parameters": {
         "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "has-pending-reviews",
-              "leftValue": "={{ $json.length }}",
-              "rightValue": 0,
-              "operator": {
-                "type": "number",
-                "operation": "gt"
-              }
-            }
-          ],
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [{"id": "has-items", "leftValue": "={{ $json.length }}", "rightValue": 0, "operator": {"type": "number", "operation": "gt"}}],
           "combinator": "and"
         },
         "options": {}
       },
       "id": "has-pending-reviews",
-      "name": "Has Pending Reviews?",
+      "name": "Has Pending?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1160, 100]
-    },
-    {
-      "parameters": {
-        "fieldToSplitOut": "=",
-        "options": {}
-      },
-      "id": "split-reviews",
-      "name": "Split Reviews",
-      "type": "n8n-nodes-base.splitOut",
-      "typeVersion": 1,
-      "position": [1380, 0]
+      "position": [740, 200]
     },
     {
       "parameters": {
@@ -222,30 +72,16 @@
       "name": "Loop Reviews",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [1600, 0]
+      "position": [960, 150]
     },
     {
       "parameters": {
         "chatId": "={{ $('Get Active Chats').first().json[0]?.chat_id || $json.chat_id }}",
-        "text": "=Gasto pendiente de revision:\n\n- Servicio: {{ $json.servicio_comercio }}\n- Importe: ${{ $json.importe }}\n- Fecha: {{ $json.fecha_cobro }}\n- ID: {{ $json.id_transaccion }}\n- Link: {{ $json.link_archivo || 'N/A' }}\n\nToca el boton para marcar como visto.",
+        "text": "Gasto pendiente de revision:\n\n- Servicio: {{ $json.servicio_comercio }}\n- Importe: ${{ $json.importe }}\n- ID: {{ $json.id_transaccion }}\n\nToca para marcar como visto:",
         "additionalFields": {
-          "appendAttribution": false,
           "replyMarkup": "inlineKeyboard",
           "inlineKeyboard": {
-            "rows": [
-              {
-                "row": {
-                  "buttons": [
-                    {
-                      "text": "Marcar como visto",
-                      "additionalFields": {
-                        "callbackData": "=visto:{{ $json.id_transaccion }}"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "rows": [{"row": {"buttons": [{"text": "Marcar como visto", "additionalFields": {"callbackData": "visto:{{ $json.id_transaccion }}"}}]}}]
           }
         }
       },
@@ -253,79 +89,45 @@
       "name": "Send Review Reminder",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1820, 0],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
+      "position": [1180, 150]
     },
     {
       "parameters": {
         "chatId": "={{ $('Get Active Chats').first().json[0]?.chat_id }}",
         "text": "No hay gastos pendientes de revision.",
-        "additionalFields": {
-          "appendAttribution": false
-        }
+        "additionalFields": {}
       },
       "id": "no-pending-reviews",
       "name": "No Pending Reviews",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1380, 200],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
+      "position": [960, 300]
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT * FROM expense_records WHERE (forma_pago IS NULL OR forma_pago = '') AND id_transaccion IS NOT NULL ORDER BY fecha_creacion DESC LIMIT 20"
+        "query": "SELECT * FROM expense_records WHERE (forma_pago IS NULL OR forma_pago = '') AND id_transaccion IS NOT NULL ORDER BY fecha_creacion DESC LIMIT 10"
       },
       "id": "get-pending-payments",
       "name": "Get Pending Payments",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [940, 300],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
+      "position": [520, 400]
     },
     {
       "parameters": {
         "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "has-pending-payments",
-              "leftValue": "={{ $json.length }}",
-              "rightValue": 0,
-              "operator": {
-                "type": "number",
-                "operation": "gt"
-              }
-            }
-          ],
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [{"id": "has-payments", "leftValue": "={{ $json.length }}", "rightValue": 0, "operator": {"type": "number", "operation": "gt"}}],
           "combinator": "and"
         },
         "options": {}
       },
       "id": "has-pending-payments",
-      "name": "Has Pending Payments?",
+      "name": "Has Payments?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1160, 300]
+      "position": [740, 400]
     },
     {
       "parameters": {
@@ -336,53 +138,18 @@
       "name": "Loop Payments",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [1600, 300]
+      "position": [960, 350]
     },
     {
       "parameters": {
         "chatId": "={{ $('Get Active Chats').first().json[0]?.chat_id || $json.chat_id }}",
-        "text": "=Gasto pendiente de forma de pago:\n\n- Servicio: {{ $json.servicio_comercio }}\n- Importe: ${{ $json.importe }}\n- Fecha: {{ $json.fecha_cobro }}\n- ID: {{ $json.id_transaccion }}\n\nSelecciona la forma de pago:",
+        "text": "Gasto sin forma de pago:\n\n- Servicio: {{ $json.servicio_comercio }}\n- Importe: ${{ $json.importe }}\n- ID: {{ $json.id_transaccion }}\n\nSelecciona forma de pago:",
         "additionalFields": {
-          "appendAttribution": false,
           "replyMarkup": "inlineKeyboard",
           "inlineKeyboard": {
             "rows": [
-              {
-                "row": {
-                  "buttons": [
-                    {
-                      "text": "Transferencia",
-                      "additionalFields": {
-                        "callbackData": "=metodo:Transferencia|{{ $json.id_transaccion }}"
-                      }
-                    },
-                    {
-                      "text": "Cheque",
-                      "additionalFields": {
-                        "callbackData": "=metodo:Cheque|{{ $json.id_transaccion }}"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "row": {
-                  "buttons": [
-                    {
-                      "text": "Efectivo",
-                      "additionalFields": {
-                        "callbackData": "=metodo:Efectivo|{{ $json.id_transaccion }}"
-                      }
-                    },
-                    {
-                      "text": "Tarjeta",
-                      "additionalFields": {
-                        "callbackData": "=metodo:Tarjeta|{{ $json.id_transaccion }}"
-                      }
-                    }
-                  ]
-                }
-              }
+              {"row": {"buttons": [{"text": "Transferencia", "additionalFields": {"callbackData": "metodo:Transferencia|{{ $json.id_transaccion }}"}}, {"text": "Cheque", "additionalFields": {"callbackData": "metodo:Cheque|{{ $json.id_transaccion }}"}}]}},
+              {"row": {"buttons": [{"text": "Efectivo", "additionalFields": {"callbackData": "metodo:Efectivo|{{ $json.id_transaccion }}"}}, {"text": "Tarjeta", "additionalFields": {"callbackData": "metodo:Tarjeta|{{ $json.id_transaccion }}"}}]}}
             ]
           }
         }
@@ -391,545 +158,62 @@
       "name": "Send Payment Reminder",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1820, 300],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
+      "position": [1180, 350]
     },
     {
       "parameters": {
         "chatId": "={{ $('Get Active Chats').first().json[0]?.chat_id }}",
         "text": "No hay gastos pendientes de forma de pago.",
-        "additionalFields": {
-          "appendAttribution": false
-        }
+        "additionalFields": {}
       },
       "id": "no-pending-payments",
       "name": "No Pending Payments",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1380, 400],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "SELECT * FROM expense_records WHERE requiere_comprobante = true AND (comprobante_cargado IS NULL OR comprobante_cargado = false) AND (enviado IS NULL OR enviado = false) AND id_transaccion IS NOT NULL ORDER BY fecha_creacion DESC LIMIT 20"
-      },
-      "id": "get-pending-receipts",
-      "name": "Get Pending Receipts",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [940, 500],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "has-pending-receipts",
-              "leftValue": "={{ $json.length }}",
-              "rightValue": 0,
-              "operator": {
-                "type": "number",
-                "operation": "gt"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "id": "has-pending-receipts",
-      "name": "Has Pending Receipts?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [1160, 500]
-    },
-    {
-      "parameters": {
-        "batchSize": 1,
-        "options": {}
-      },
-      "id": "loop-receipts",
-      "name": "Loop Receipts",
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [1600, 500]
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Get Active Chats').first().json[0]?.chat_id || $json.chat_id }}",
-        "text": "=Factura pendiente de comprobante:\n\n- Servicio: {{ $json.servicio_comercio }}\n- Importe: ${{ $json.importe }}\n- Fecha: {{ $json.fecha_cobro }}\n- ID: {{ $json.id_transaccion }}\n- Link: {{ $json.link_archivo || 'N/A' }}\n\nToca el boton para cargar el comprobante.",
-        "additionalFields": {
-          "appendAttribution": false,
-          "replyMarkup": "inlineKeyboard",
-          "inlineKeyboard": {
-            "rows": [
-              {
-                "row": {
-                  "buttons": [
-                    {
-                      "text": "Cargar comprobante",
-                      "additionalFields": {
-                        "callbackData": "=comp_file|{{ $json.id_transaccion }}"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        }
-      },
-      "id": "send-receipt-reminder",
-      "name": "Send Receipt Reminder",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [1820, 500],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Get Active Chats').first().json[0]?.chat_id }}",
-        "text": "No hay mas pendientes de envio de comprobante.",
-        "additionalFields": {
-          "appendAttribution": false
-        }
-      },
-      "id": "no-pending-receipts",
-      "name": "No Pending Receipts",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [1380, 600],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "tableId": "chat_state",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "chat_id",
-              "keyValue": "={{ $('Get Active Chats').first().json[0]?.chat_id }}"
-            }
-          ]
-        },
-        "dataToSend": "defineBelow",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldName": "last_reminder_sent",
-              "fieldValue": "={{ $now.toISO() }}"
-            }
-          ]
-        }
-      },
-      "id": "update-reminder-status",
-      "name": "Update Reminder Status",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [2040, 300],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
+      "position": [960, 500]
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={\n  \"success\": true,\n  \"timestamp\": \"{{ $now.toISO() }}\",\n  \"message\": \"Reminders sent successfully\"\n}",
+        "responseBody": "={\"success\": true, \"message\": \"Reminders processed\"}",
         "options": {}
       },
       "id": "webhook-response",
       "name": "Webhook Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [2260, 400]
-    },
-    {
-      "parameters": {
-        "operation": "read",
-        "documentId": {
-          "__rl": true,
-          "value": "",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "REGISTRO DE GASTOS",
-          "mode": "list",
-          "cachedResultName": "REGISTRO DE GASTOS"
-        },
-        "filtersUI": {
-          "values": [
-            {
-              "lookupColumn": "Visto por Ine",
-              "lookupValue": ""
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "read-sheets-reviews",
-      "name": "Read Sheets (Reviews)",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.4,
-      "position": [940, 700],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "",
-          "name": "Google Sheets Account"
-        }
-      },
-      "disabled": true
-    },
-    {
-      "parameters": {
-        "operation": "read",
-        "documentId": {
-          "__rl": true,
-          "value": "",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "REGISTRO DE GASTOS",
-          "mode": "list",
-          "cachedResultName": "REGISTRO DE GASTOS"
-        },
-        "filtersUI": {
-          "values": [
-            {
-              "lookupColumn": "Forma de pago",
-              "lookupValue": ""
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "read-sheets-payments",
-      "name": "Read Sheets (Payments)",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.4,
-      "position": [940, 850],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "",
-          "name": "Google Sheets Account"
-        }
-      },
-      "disabled": true
+      "position": [1400, 400]
     }
   ],
   "connections": {
-    "Webhook Trigger": {
-      "main": [
-        [
-          {
-            "node": "Merge Triggers",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Schedule Trigger (Every 6 Hours)": {
-      "main": [
-        [
-          {
-            "node": "Merge Triggers",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Merge Triggers": {
-      "main": [
-        [
-          {
-            "node": "Get Active Chats",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Active Chats": {
-      "main": [
-        [
-          {
-            "node": "Route Actions",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Route Actions": {
-      "main": [
-        [
-          {
-            "node": "Get Pending Reviews",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Get Pending Payments",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Get Pending Receipts",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Pending Reviews": {
-      "main": [
-        [
-          {
-            "node": "Has Pending Reviews?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Has Pending Reviews?": {
-      "main": [
-        [
-          {
-            "node": "Loop Reviews",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "No Pending Reviews",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Loop Reviews": {
-      "main": [
-        [
-          {
-            "node": "Send Review Reminder",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Update Reminder Status",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send Review Reminder": {
-      "main": [
-        [
-          {
-            "node": "Loop Reviews",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Pending Payments": {
-      "main": [
-        [
-          {
-            "node": "Has Pending Payments?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Has Pending Payments?": {
-      "main": [
-        [
-          {
-            "node": "Loop Payments",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "No Pending Payments",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Loop Payments": {
-      "main": [
-        [
-          {
-            "node": "Send Payment Reminder",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Update Reminder Status",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send Payment Reminder": {
-      "main": [
-        [
-          {
-            "node": "Loop Payments",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Pending Receipts": {
-      "main": [
-        [
-          {
-            "node": "Has Pending Receipts?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Has Pending Receipts?": {
-      "main": [
-        [
-          {
-            "node": "Loop Receipts",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "No Pending Receipts",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Loop Receipts": {
-      "main": [
-        [
-          {
-            "node": "Send Receipt Reminder",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Update Reminder Status",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send Receipt Reminder": {
-      "main": [
-        [
-          {
-            "node": "Loop Receipts",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Update Reminder Status": {
-      "main": [
-        [
-          {
-            "node": "Webhook Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
+    "Webhook Trigger": {"main": [[{"node": "Get Active Chats", "type": "main", "index": 0}]]},
+    "Schedule (Every 6 Hours)": {"main": [[{"node": "Get Active Chats", "type": "main", "index": 0}]]},
+    "Get Active Chats": {"main": [
+      [{"node": "Get Pending Reviews", "type": "main", "index": 0}],
+      [{"node": "Get Pending Payments", "type": "main", "index": 0}]
+    ]},
+    "Get Pending Reviews": {"main": [[{"node": "Has Pending?", "type": "main", "index": 0}]]},
+    "Has Pending?": {"main": [
+      [{"node": "Loop Reviews", "type": "main", "index": 0}],
+      [{"node": "No Pending Reviews", "type": "main", "index": 0}]
+    ]},
+    "Loop Reviews": {"main": [
+      [{"node": "Send Review Reminder", "type": "main", "index": 0}],
+      [{"node": "Webhook Response", "type": "main", "index": 0}]
+    ]},
+    "Send Review Reminder": {"main": [[{"node": "Loop Reviews", "type": "main", "index": 0}]]},
+    "Get Pending Payments": {"main": [[{"node": "Has Payments?", "type": "main", "index": 0}]]},
+    "Has Payments?": {"main": [
+      [{"node": "Loop Payments", "type": "main", "index": 0}],
+      [{"node": "No Pending Payments", "type": "main", "index": 0}]
+    ]},
+    "Loop Payments": {"main": [
+      [{"node": "Send Payment Reminder", "type": "main", "index": 0}],
+      [{"node": "Webhook Response", "type": "main", "index": 0}]
+    ]},
+    "Send Payment Reminder": {"main": [[{"node": "Loop Payments", "type": "main", "index": 0}]]}
   },
-  "settings": {
-    "executionOrder": "v1",
-    "saveManualExecutions": true,
-    "callerPolicy": "workflowsFromSameOwner",
-    "errorWorkflow": ""
-  },
-  "staticData": null,
-  "tags": [
-    {
-      "name": "expense-management",
-      "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
-    },
-    {
-      "name": "reminders",
-      "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
-    }
-  ],
-  "triggerCount": 2,
-  "updatedAt": "2024-12-10T00:00:00.000Z",
-  "versionId": "1"
+  "settings": {"executionOrder": "v1"},
+  "pinData": {},
+  "meta": {"instanceId": ""}
 }

@@ -1,25 +1,16 @@
 {
-  "name": "Workflow B - Telegram Bot & Expense Recorder",
+  "name": "Workflow B - Telegram Bot Expense Recorder",
   "nodes": [
     {
       "parameters": {
-        "updates": [
-          "message",
-          "callback_query"
-        ]
+        "updates": ["message", "callback_query"]
       },
       "id": "telegram-trigger",
       "name": "Telegram Trigger",
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.1,
       "position": [0, 600],
-      "webhookId": "telegram-expense-bot",
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
+      "webhookId": "telegram-expense-bot"
     },
     {
       "parameters": {
@@ -27,21 +18,8 @@
           "rules": [
             {
               "conditions": {
-                "options": {
-                  "caseSensitive": false,
-                  "leftValue": "",
-                  "typeValidation": "loose"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.callback_query?.data }}",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "string",
-                      "operation": "exists"
-                    }
-                  }
-                ],
+                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "loose"},
+                "conditions": [{"leftValue": "={{ $json.callback_query?.data }}", "rightValue": "", "operator": {"type": "string", "operation": "exists"}}],
                 "combinator": "and"
               },
               "renameOutput": true,
@@ -49,21 +27,8 @@
             },
             {
               "conditions": {
-                "options": {
-                  "caseSensitive": false,
-                  "leftValue": "",
-                  "typeValidation": "loose"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.message?.photo || $json.message?.document?.mime_type?.startsWith('image/') }}",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "boolean",
-                      "operation": "true"
-                    }
-                  }
-                ],
+                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "loose"},
+                "conditions": [{"leftValue": "={{ $json.message?.photo }}", "rightValue": "", "operator": {"type": "string", "operation": "exists"}}],
                 "combinator": "and"
               },
               "renameOutput": true,
@@ -71,21 +36,8 @@
             },
             {
               "conditions": {
-                "options": {
-                  "caseSensitive": false,
-                  "leftValue": "",
-                  "typeValidation": "loose"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.message?.document?.mime_type }}",
-                    "rightValue": "application/pdf",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
+                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "loose"},
+                "conditions": [{"leftValue": "={{ $json.message?.document?.mime_type }}", "rightValue": "application/pdf", "operator": {"type": "string", "operation": "equals"}}],
                 "combinator": "and"
               },
               "renameOutput": true,
@@ -93,21 +45,8 @@
             },
             {
               "conditions": {
-                "options": {
-                  "caseSensitive": false,
-                  "leftValue": "",
-                  "typeValidation": "loose"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.message?.voice || $json.message?.audio }}",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "string",
-                      "operation": "exists"
-                    }
-                  }
-                ],
+                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "loose"},
+                "conditions": [{"leftValue": "={{ $json.message?.voice }}", "rightValue": "", "operator": {"type": "string", "operation": "exists"}}],
                 "combinator": "and"
               },
               "renameOutput": true,
@@ -115,28 +54,10 @@
             },
             {
               "conditions": {
-                "options": {
-                  "caseSensitive": false,
-                  "leftValue": "",
-                  "typeValidation": "loose"
-                },
+                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "loose"},
                 "conditions": [
-                  {
-                    "leftValue": "={{ $json.message?.text }}",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "string",
-                      "operation": "exists"
-                    }
-                  },
-                  {
-                    "leftValue": "={{ $json.message?.text }}",
-                    "rightValue": "/start",
-                    "operator": {
-                      "type": "string",
-                      "operation": "notEquals"
-                    }
-                  }
+                  {"leftValue": "={{ $json.message?.text }}", "rightValue": "", "operator": {"type": "string", "operation": "exists"}},
+                  {"leftValue": "={{ $json.message?.text }}", "rightValue": "/start", "operator": {"type": "string", "operation": "notEquals"}}
                 ],
                 "combinator": "and"
               },
@@ -145,21 +66,8 @@
             },
             {
               "conditions": {
-                "options": {
-                  "caseSensitive": false,
-                  "leftValue": "",
-                  "typeValidation": "loose"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.message?.text }}",
-                    "rightValue": "/start",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
+                "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "loose"},
+                "conditions": [{"leftValue": "={{ $json.message?.text }}", "rightValue": "/start", "operator": {"type": "string", "operation": "equals"}}],
                 "combinator": "and"
               },
               "renameOutput": true,
@@ -167,9 +75,7 @@
             }
           ]
         },
-        "options": {
-          "fallbackOutput": "extra"
-        }
+        "options": {"fallbackOutput": "extra"}
       },
       "id": "message-router",
       "name": "Route Message Type",
@@ -179,13 +85,13 @@
     },
     {
       "parameters": {
-        "jsCode": "// Parse callback data to determine action type\nconst callbackData = $input.first().json.callback_query?.data || '';\nconst chatId = $input.first().json.callback_query?.message?.chat?.id;\nconst messageId = $input.first().json.callback_query?.message?.message_id;\nconst callbackId = $input.first().json.callback_query?.id;\n\nlet action = '';\nlet transactionId = '';\nlet extraData = '';\n\n// Parse different callback patterns\nif (callbackData.startsWith('metodo:')) {\n  // Format: metodo:METHOD|ID\n  action = 'set_payment_method';\n  const parts = callbackData.replace('metodo:', '').split('|');\n  extraData = parts[0]; // Payment method\n  transactionId = parts[1] || '';\n} else if (callbackData.startsWith('visto:')) {\n  // Format: visto:ID\n  action = 'mark_viewed';\n  transactionId = callbackData.replace('visto:', '');\n} else if (callbackData.startsWith('pago:')) {\n  // Format: pago:ID\n  action = 'request_payment_method';\n  transactionId = callbackData.replace('pago:', '');\n} else if (callbackData.startsWith('comp_file|')) {\n  // Format: comp_file|ID\n  action = 'request_receipt_upload';\n  transactionId = callbackData.replace('comp_file|', '');\n} else if (callbackData.startsWith('comprobante_si:')) {\n  action = 'confirm_receipt_yes';\n  transactionId = callbackData.replace('comprobante_si:', '');\n} else if (callbackData.startsWith('comprobante_no:')) {\n  action = 'confirm_receipt_no';\n  transactionId = callbackData.replace('comprobante_no:', '');\n}\n\nreturn {\n  json: {\n    action,\n    transactionId,\n    extraData,\n    chatId,\n    messageId,\n    callbackId,\n    rawData: callbackData\n  }\n};"
+        "jsCode": "const callbackData = $input.first().json.callback_query?.data || '';\nconst chatId = $input.first().json.callback_query?.message?.chat?.id;\nconst callbackId = $input.first().json.callback_query?.id;\n\nlet action = '';\nlet transactionId = '';\nlet extraData = '';\n\nif (callbackData.startsWith('metodo:')) {\n  action = 'set_payment_method';\n  const parts = callbackData.replace('metodo:', '').split('|');\n  extraData = parts[0];\n  transactionId = parts[1] || '';\n} else if (callbackData.startsWith('visto:')) {\n  action = 'mark_viewed';\n  transactionId = callbackData.replace('visto:', '');\n} else if (callbackData.startsWith('pago:')) {\n  action = 'request_payment_method';\n  transactionId = callbackData.replace('pago:', '');\n} else if (callbackData.startsWith('comp_file|')) {\n  action = 'request_receipt_upload';\n  transactionId = callbackData.replace('comp_file|', '');\n}\n\nreturn {\n  json: { action, transactionId, extraData, chatId, callbackId, rawData: callbackData }\n};"
       },
       "id": "parse-callback",
       "name": "Parse Callback Data",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [500, 0]
+      "position": [500, 100]
     },
     {
       "parameters": {
@@ -193,43 +99,17 @@
           "rules": [
             {
               "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.action }}",
-                    "rightValue": "set_payment_method",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
+                "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+                "conditions": [{"leftValue": "={{ $json.action }}", "rightValue": "set_payment_method", "operator": {"type": "string", "operation": "equals"}}],
                 "combinator": "and"
               },
               "renameOutput": true,
-              "outputLabel": "Set Payment Method"
+              "outputLabel": "Set Payment"
             },
             {
               "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.action }}",
-                    "rightValue": "mark_viewed",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
+                "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+                "conditions": [{"leftValue": "={{ $json.action }}", "rightValue": "mark_viewed", "operator": {"type": "string", "operation": "equals"}}],
                 "combinator": "and"
               },
               "renameOutput": true,
@@ -237,297 +117,85 @@
             },
             {
               "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.action }}",
-                    "rightValue": "request_payment_method",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
+                "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+                "conditions": [{"leftValue": "={{ $json.action }}", "rightValue": "request_payment_method", "operator": {"type": "string", "operation": "equals"}}],
                 "combinator": "and"
               },
               "renameOutput": true,
-              "outputLabel": "Request Payment Method"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict"
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.action }}",
-                    "rightValue": "request_receipt_upload",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputLabel": "Request Receipt Upload"
+              "outputLabel": "Request Payment"
             }
           ]
         },
-        "options": {
-          "fallbackOutput": "extra"
-        }
+        "options": {"fallbackOutput": "extra"}
       },
-      "id": "callback-action-router",
+      "id": "callback-router",
       "name": "Route Callback Action",
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3,
-      "position": [720, 0]
+      "position": [720, 100]
     },
     {
       "parameters": {
         "operation": "update",
         "tableId": "expense_records",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "id_transaccion",
-              "keyValue": "={{ $json.transactionId }}"
-            }
-          ]
-        },
+        "filters": {"conditions": [{"keyName": "id_transaccion", "keyValue": "={{ $json.transactionId }}"}]},
         "dataToSend": "defineBelow",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldName": "forma_pago",
-              "fieldValue": "={{ $json.extraData }}"
-            },
-            {
-              "fieldName": "fecha_pago",
-              "fieldValue": "={{ $now.toISO() }}"
-            }
-          ]
-        }
+        "fieldsUi": {"fieldValues": [{"fieldName": "forma_pago", "fieldValue": "={{ $json.extraData }}"}]}
       },
-      "id": "update-payment-method-db",
-      "name": "Update Payment Method (DB)",
+      "id": "update-payment-db",
+      "name": "Update Payment (DB)",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [1000, -200],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "documentId": {
-          "__rl": true,
-          "value": "",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "REGISTRO DE GASTOS",
-          "mode": "list",
-          "cachedResultName": "REGISTRO DE GASTOS"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Forma de pago": "={{ $('Parse Callback Data').first().json.extraData }}"
-          },
-          "matchingColumns": [
-            "ID INTERNO (NO TOCAR)"
-          ],
-          "schema": []
-        },
-        "options": {}
-      },
-      "id": "update-payment-method-sheet",
-      "name": "Update Payment Method (Sheet)",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.4,
-      "position": [1220, -200],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "",
-          "name": "Google Sheets Account"
-        }
-      }
+      "position": [1000, 0]
     },
     {
       "parameters": {
         "chatId": "={{ $('Parse Callback Data').first().json.chatId }}",
-        "text": "=Pago marcado como: {{ $('Parse Callback Data').first().json.extraData }}\nID: {{ $('Parse Callback Data').first().json.transactionId }}",
-        "additionalFields": {
-          "appendAttribution": false
-        }
+        "text": "Pago marcado como: {{ $('Parse Callback Data').first().json.extraData }}\nID: {{ $('Parse Callback Data').first().json.transactionId }}",
+        "additionalFields": {}
       },
-      "id": "confirm-payment-method",
-      "name": "Confirm Payment Method",
+      "id": "confirm-payment",
+      "name": "Confirm Payment",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1440, -200],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
+      "position": [1220, 0]
     },
     {
       "parameters": {
         "operation": "update",
         "tableId": "expense_records",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "id_transaccion",
-              "keyValue": "={{ $json.transactionId }}"
-            }
-          ]
-        },
+        "filters": {"conditions": [{"keyName": "id_transaccion", "keyValue": "={{ $json.transactionId }}"}]},
         "dataToSend": "defineBelow",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldName": "vista_por_usuario",
-              "fieldValue": "true"
-            },
-            {
-              "fieldName": "fecha_vista",
-              "fieldValue": "={{ $now.toISO() }}"
-            }
-          ]
-        }
+        "fieldsUi": {"fieldValues": [{"fieldName": "vista_por_usuario", "fieldValue": "true"}]}
       },
       "id": "mark-viewed-db",
       "name": "Mark Viewed (DB)",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [1000, -50],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "documentId": {
-          "__rl": true,
-          "value": "",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "REGISTRO DE GASTOS",
-          "mode": "list",
-          "cachedResultName": "REGISTRO DE GASTOS"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Visto por Ine": "={{ $now.format('dd/MM/yyyy HH:mm') }}"
-          },
-          "matchingColumns": [
-            "ID INTERNO (NO TOCAR)"
-          ],
-          "schema": []
-        },
-        "options": {}
-      },
-      "id": "mark-viewed-sheet",
-      "name": "Mark Viewed (Sheet)",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.4,
-      "position": [1220, -50],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "",
-          "name": "Google Sheets Account"
-        }
-      }
+      "position": [1000, 150]
     },
     {
       "parameters": {
         "chatId": "={{ $('Parse Callback Data').first().json.chatId }}",
-        "text": "=Marcado como visto\nID: {{ $('Parse Callback Data').first().json.transactionId }}",
-        "additionalFields": {
-          "appendAttribution": false
-        }
+        "text": "Marcado como visto\nID: {{ $('Parse Callback Data').first().json.transactionId }}",
+        "additionalFields": {}
       },
       "id": "confirm-viewed",
       "name": "Confirm Viewed",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1440, -50],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
+      "position": [1220, 150]
     },
     {
       "parameters": {
         "chatId": "={{ $json.chatId }}",
-        "text": "=Selecciona la forma de pago para el ID: {{ $json.transactionId }}",
+        "text": "Selecciona la forma de pago para ID: {{ $json.transactionId }}",
         "additionalFields": {
-          "appendAttribution": false,
           "replyMarkup": "inlineKeyboard",
           "inlineKeyboard": {
             "rows": [
-              {
-                "row": {
-                  "buttons": [
-                    {
-                      "text": "Transferencia",
-                      "additionalFields": {
-                        "callbackData": "=metodo:Transferencia|{{ $json.transactionId }}"
-                      }
-                    },
-                    {
-                      "text": "Cheque",
-                      "additionalFields": {
-                        "callbackData": "=metodo:Cheque|{{ $json.transactionId }}"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "row": {
-                  "buttons": [
-                    {
-                      "text": "Efectivo",
-                      "additionalFields": {
-                        "callbackData": "=metodo:Efectivo|{{ $json.transactionId }}"
-                      }
-                    },
-                    {
-                      "text": "Tarjeta",
-                      "additionalFields": {
-                        "callbackData": "=metodo:Tarjeta|{{ $json.transactionId }}"
-                      }
-                    }
-                  ]
-                }
-              }
+              {"row": {"buttons": [{"text": "Transferencia", "additionalFields": {"callbackData": "metodo:Transferencia|{{ $json.transactionId }}"}}, {"text": "Cheque", "additionalFields": {"callbackData": "metodo:Cheque|{{ $json.transactionId }}"}}]}},
+              {"row": {"buttons": [{"text": "Efectivo", "additionalFields": {"callbackData": "metodo:Efectivo|{{ $json.transactionId }}"}}, {"text": "Tarjeta", "additionalFields": {"callbackData": "metodo:Tarjeta|{{ $json.transactionId }}"}}]}}
             ]
           }
         }
@@ -536,74 +204,7 @@
       "name": "Send Payment Options",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1000, 100],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "tableId": "chat_state",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "chat_id",
-              "keyValue": "={{ $json.chatId }}"
-            }
-          ]
-        },
-        "dataToSend": "defineBelow",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldName": "awaiting_receipt_for",
-              "fieldValue": "={{ $json.transactionId }}"
-            },
-            {
-              "fieldName": "updated_at",
-              "fieldValue": "={{ $now.toISO() }}"
-            }
-          ]
-        },
-        "options": {
-          "upsert": true
-        }
-      },
-      "id": "set-awaiting-receipt",
-      "name": "Set Awaiting Receipt State",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [1000, 250],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Parse Callback Data').first().json.chatId }}",
-        "text": "=Por favor, envia el comprobante (imagen o PDF) para el ID: {{ $('Parse Callback Data').first().json.transactionId }}",
-        "additionalFields": {
-          "appendAttribution": false
-        }
-      },
-      "id": "request-receipt-message",
-      "name": "Request Receipt Message",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [1220, 250],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
+      "position": [1000, 300]
     },
     {
       "parameters": {
@@ -615,634 +216,184 @@
       "name": "Get Image File",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [500, 300],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "=SELECT awaiting_receipt_for FROM chat_state WHERE chat_id = '{{ $('Telegram Trigger').first().json.message?.chat?.id }}' LIMIT 1"
-      },
-      "id": "check-awaiting-receipt",
-      "name": "Check Awaiting Receipt",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [720, 300],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
+      "position": [500, 400]
     },
     {
       "parameters": {
         "operation": "upload",
-        "name": "=receipt_{{ $now.format('yyyyMMdd_HHmmss') }}.{{ $('Get Image File').first().json.file_path?.split('.').pop() || 'jpg' }}",
-        "folderId": {
-          "__rl": true,
-          "value": "",
-          "mode": "id"
-        },
+        "name": "=receipt_{{ $now.format('yyyyMMdd_HHmmss') }}.jpg",
+        "driveId": {"__rl": true, "mode": "list", "value": "My Drive"},
+        "folderId": {"__rl": true, "mode": "list", "value": "root"},
         "options": {}
       },
       "id": "upload-image-drive",
-      "name": "Upload Image to Drive",
+      "name": "Upload to Drive",
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
-      "position": [940, 300],
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "",
-          "name": "Google Drive Account"
-        }
-      }
+      "position": [720, 400]
     },
     {
       "parameters": {
-        "resource": "chat",
-        "options": {
-          "maxTokens": 2048,
-          "temperature": 0.3
-        },
+        "modelId": "gpt-4o-mini",
         "messages": {
-          "values": [
-            {
-              "content": "=Eres un experto en contabilidad digital. Analiza la imagen del comprobante y extrae datos financieros.\n\nDevuelve SOLO un objeto JSON valido con estos campos exactos:\n{\n\"FECHA DEL COBRO\": \"DD/MM/YYYY\",\n\"SERVICIO / COMERCIO\": \"\",\n\"CONCEPTO\": \"\",\n\"IMPORTE\": \"solo numero con coma decimal\",\n\"ID DE TRANSACCION\": \"\",\n\"CATEGORIA\": \"una de: Servicios Publicos, Transporte y Vehiculos, Seguros, Impuestos y Tasas, Personal y Educacion, Salud y Bienestar, Consumo y Alimentos, Otros Gastos, Vivienda y Comunidad\",\n\"TIPO DE GASTO\": \"Unico o Recurrente\",\n\"ORIGEN DEL COBRO\": \"\"\n}\n\nSi un dato no esta disponible, deja el campo vacio (\"\"). Solo devuelve el JSON, sin texto adicional."
-            },
-            {
-              "type": "image",
-              "binaryData": true,
-              "inputDataFieldName": "data"
-            }
-          ]
+          "values": [{"content": "Analiza la imagen del comprobante. Devuelve SOLO JSON:\n{\"FECHA DEL COBRO\": \"DD/MM/YYYY\", \"SERVICIO / COMERCIO\": \"\", \"CONCEPTO\": \"\", \"IMPORTE\": \"\", \"CATEGORIA\": \"\", \"TIPO DE GASTO\": \"Unico o Recurrente\"}"}]
         },
-        "modelId": {
-          "__rl": true,
-          "value": "gpt-4o-mini",
-          "mode": "list",
-          "cachedResultName": "gpt-4o-mini"
-        }
+        "options": {"maxTokens": 1024, "temperature": 0.3}
       },
-      "id": "openai-analyze-telegram-image",
+      "id": "openai-image",
       "name": "OpenAI Analyze Image",
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.4,
-      "position": [1160, 300],
-      "credentials": {
-        "openAiApi": {
-          "id": "",
-          "name": "OpenAI Account"
-        }
-      }
+      "position": [940, 400]
     },
     {
       "parameters": {
-        "jsCode": "// Parse OpenAI response and generate transaction ID\nconst response = $input.first().json.message?.content || $input.first().json.text || '';\nconst chatId = $('Telegram Trigger').first().json.message?.chat?.id;\nconst driveData = $('Upload Image to Drive').first().json;\nconst awaitingData = $('Check Awaiting Receipt').first().json;\n\nlet parsedData;\ntry {\n  const jsonMatch = response.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    parsedData = JSON.parse(jsonMatch[0]);\n  } else {\n    throw new Error('No JSON found');\n  }\n} catch (error) {\n  parsedData = {\n    \"FECHA DEL COBRO\": \"\",\n    \"SERVICIO / COMERCIO\": \"\",\n    \"CONCEPTO\": \"\",\n    \"IMPORTE\": \"\",\n    \"ID DE TRANSACCION\": \"\",\n    \"CATEGORIA\": \"\",\n    \"TIPO DE GASTO\": \"\",\n    \"ORIGEN DEL COBRO\": \"\",\n    \"parseError\": true\n  };\n}\n\n// Generate ID: YYYYMMDD + Amount (9 digits)\nlet transactionId = parsedData[\"ID DE TRANSACCION\"] || '';\nif (!transactionId) {\n  const fecha = parsedData[\"FECHA DEL COBRO\"] || '';\n  const importe = parsedData[\"IMPORTE\"] || '0';\n  \n  let dateStr = '';\n  if (fecha) {\n    const parts = fecha.split('/');\n    if (parts.length === 3) {\n      dateStr = parts[2] + parts[1].padStart(2, '0') + parts[0].padStart(2, '0');\n    }\n  }\n  if (!dateStr) {\n    const now = new Date();\n    dateStr = now.getFullYear().toString() + \n              (now.getMonth() + 1).toString().padStart(2, '0') + \n              now.getDate().toString().padStart(2, '0');\n  }\n  \n  const normalizedAmount = importe.replace(/[^0-9]/g, '').padStart(9, '0').slice(-9);\n  transactionId = dateStr + normalizedAmount;\n}\n\n// Check if this is a receipt upload for existing transaction\nconst isReceiptUpload = awaitingData?.awaiting_receipt_for ? true : false;\nconst linkedTransactionId = awaitingData?.awaiting_receipt_for || null;\n\nreturn {\n  json: {\n    ...parsedData,\n    \"ID_INTERNO\": transactionId,\n    \"FECHA_CREACION\": new Date().toISOString(),\n    \"driveFileId\": driveData.id,\n    \"driveWebLink\": driveData.webViewLink,\n    \"chatId\": chatId,\n    \"origen\": \"telegram\",\n    \"isReceiptUpload\": isReceiptUpload,\n    \"linkedTransactionId\": linkedTransactionId\n  }\n};"
+        "jsCode": "const response = $input.first().json.message?.content || '';\nconst chatId = $('Telegram Trigger').first().json.message?.chat?.id;\nconst driveData = $('Upload to Drive').first().json;\n\nlet parsedData;\ntry {\n  const jsonMatch = response.match(/\\{[\\s\\S]*\\}/);\n  parsedData = jsonMatch ? JSON.parse(jsonMatch[0]) : {};\n} catch (e) {\n  parsedData = {\"CONCEPTO\": \"Error parsing\"};\n}\n\nconst fecha = parsedData[\"FECHA DEL COBRO\"] || '';\nconst importe = parsedData[\"IMPORTE\"] || '0';\nlet dateStr = '';\nif (fecha) {\n  const parts = fecha.split('/');\n  if (parts.length === 3) dateStr = parts[2] + parts[1].padStart(2,'0') + parts[0].padStart(2,'0');\n}\nif (!dateStr) {\n  const now = new Date();\n  dateStr = now.getFullYear() + (now.getMonth()+1).toString().padStart(2,'0') + now.getDate().toString().padStart(2,'0');\n}\nconst transactionId = dateStr + importe.replace(/[^0-9]/g,'').padStart(9,'0').slice(-9);\n\nreturn {\n  json: {...parsedData, ID_INTERNO: transactionId, driveWebLink: driveData.webViewLink, chatId, origen: 'telegram'}\n};"
       },
       "id": "parse-image-response",
       "name": "Parse Image Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1380, 300]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "is-receipt-upload",
-              "leftValue": "={{ $json.isReceiptUpload }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "equals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "id": "is-receipt-upload-check",
-      "name": "Is Receipt Upload?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [1600, 300]
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "tableId": "expense_records",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "id_transaccion",
-              "keyValue": "={{ $json.linkedTransactionId }}"
-            }
-          ]
-        },
-        "dataToSend": "defineBelow",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldName": "comprobante_link",
-              "fieldValue": "={{ $json.driveWebLink }}"
-            },
-            {
-              "fieldName": "comprobante_cargado",
-              "fieldValue": "true"
-            },
-            {
-              "fieldName": "enviado",
-              "fieldValue": "true"
-            }
-          ]
-        }
-      },
-      "id": "update-receipt-db",
-      "name": "Update Receipt in DB",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [1820, 200],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
+      "position": [1160, 400]
     },
     {
       "parameters": {
         "operation": "insert",
         "tableId": "expense_records",
         "dataToSend": "defineBelow",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldName": "id_transaccion",
-              "fieldValue": "={{ $json.ID_INTERNO }}"
-            },
-            {
-              "fieldName": "fecha_cobro",
-              "fieldValue": "={{ $json['FECHA DEL COBRO'] }}"
-            },
-            {
-              "fieldName": "servicio_comercio",
-              "fieldValue": "={{ $json['SERVICIO / COMERCIO'] }}"
-            },
-            {
-              "fieldName": "concepto",
-              "fieldValue": "={{ $json.CONCEPTO }}"
-            },
-            {
-              "fieldName": "importe",
-              "fieldValue": "={{ $json.IMPORTE }}"
-            },
-            {
-              "fieldName": "categoria",
-              "fieldValue": "={{ $json.CATEGORIA }}"
-            },
-            {
-              "fieldName": "tipo_gasto",
-              "fieldValue": "={{ $json['TIPO DE GASTO'] }}"
-            },
-            {
-              "fieldName": "link_archivo",
-              "fieldValue": "={{ $json.driveWebLink }}"
-            },
-            {
-              "fieldName": "chat_id",
-              "fieldValue": "={{ $json.chatId }}"
-            },
-            {
-              "fieldName": "fecha_creacion",
-              "fieldValue": "={{ $now.toISO() }}"
-            },
-            {
-              "fieldName": "origen_registro",
-              "fieldValue": "telegram_image"
-            }
-          ]
-        }
+        "fieldsUi": {"fieldValues": [
+          {"fieldName": "id_transaccion", "fieldValue": "={{ $json.ID_INTERNO }}"},
+          {"fieldName": "servicio_comercio", "fieldValue": "={{ $json['SERVICIO / COMERCIO'] }}"},
+          {"fieldName": "importe", "fieldValue": "={{ $json.IMPORTE }}"},
+          {"fieldName": "categoria", "fieldValue": "={{ $json.CATEGORIA }}"},
+          {"fieldName": "link_archivo", "fieldValue": "={{ $json.driveWebLink }}"},
+          {"fieldName": "chat_id", "fieldValue": "={{ $json.chatId }}"},
+          {"fieldName": "origen_registro", "fieldValue": "telegram_image"}
+        ]}
       },
-      "id": "insert-new-expense-image",
-      "name": "Insert New Expense (Image)",
+      "id": "insert-image-expense",
+      "name": "Insert Expense (Image)",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [1820, 400],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "append",
-        "documentId": {
-          "__rl": true,
-          "value": "",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "REGISTRO DE GASTOS",
-          "mode": "list",
-          "cachedResultName": "REGISTRO DE GASTOS"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "FECHA DEL COBRO": "={{ $('Parse Image Response').first().json['FECHA DEL COBRO'] }}",
-            "SERVICIO / COMERCIO": "={{ $('Parse Image Response').first().json['SERVICIO / COMERCIO'] }}",
-            "CONCEPTO": "={{ $('Parse Image Response').first().json.CONCEPTO }}",
-            "IMPORTE": "={{ $('Parse Image Response').first().json.IMPORTE }}",
-            "ID INTERNO (NO TOCAR)": "={{ $('Parse Image Response').first().json.ID_INTERNO }}",
-            "CATEGORIA": "={{ $('Parse Image Response').first().json.CATEGORIA }}",
-            "TIPO DE GASTO": "={{ $('Parse Image Response').first().json['TIPO DE GASTO'] }}",
-            "Link de archivo": "={{ $('Parse Image Response').first().json.driveWebLink }}",
-            "Usuario Ingreso": "Telegram"
-          },
-          "matchingColumns": [],
-          "schema": []
-        },
-        "options": {}
-      },
-      "id": "add-to-sheets-image",
-      "name": "Add to Sheets (Image)",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.4,
-      "position": [2040, 400],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "",
-          "name": "Google Sheets Account"
-        }
-      }
+      "position": [1380, 400]
     },
     {
       "parameters": {
         "chatId": "={{ $('Parse Image Response').first().json.chatId }}",
-        "text": "=Gasto registrado:\n\nComercio: {{ $('Parse Image Response').first().json['SERVICIO / COMERCIO'] }}\nImporte: ${{ $('Parse Image Response').first().json.IMPORTE }}\nCategoria: {{ $('Parse Image Response').first().json.CATEGORIA }}\nID: {{ $('Parse Image Response').first().json.ID_INTERNO }}\n\nArchivo: {{ $('Parse Image Response').first().json.driveWebLink }}",
-        "additionalFields": {
-          "appendAttribution": false
-        }
+        "text": "Gasto registrado:\nComercio: {{ $('Parse Image Response').first().json['SERVICIO / COMERCIO'] }}\nImporte: ${{ $('Parse Image Response').first().json.IMPORTE }}\nID: {{ $('Parse Image Response').first().json.ID_INTERNO }}",
+        "additionalFields": {}
       },
       "id": "confirm-image-expense",
       "name": "Confirm Image Expense",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [2260, 400],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
+      "position": [1600, 400]
     },
     {
       "parameters": {
         "resource": "file",
         "operation": "get",
-        "fileId": "={{ $json.message?.document?.file_id }}"
-      },
-      "id": "get-pdf-file",
-      "name": "Get PDF File",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [500, 500],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://api.pdf.co/v1/pdf/convert/to/jpg",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"url\": \"{{ $binary.data ? 'data:application/pdf;base64,' + $binary.data.toString('base64') : '' }}\",\n  \"pages\": \"1\",\n  \"async\": false\n}",
-        "options": {}
-      },
-      "id": "pdf-to-image-telegram",
-      "name": "PDF to Image (Telegram)",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [720, 500],
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "",
-          "name": "PDF.co API Key"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "GET",
-        "url": "={{ $json.urls[0] }}",
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "file"
-            }
-          }
-        }
-      },
-      "id": "download-pdf-image",
-      "name": "Download PDF Image",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [940, 500]
-    },
-    {
-      "parameters": {
-        "resource": "file",
-        "operation": "get",
-        "fileId": "={{ $json.message?.voice?.file_id || $json.message?.audio?.file_id }}"
+        "fileId": "={{ $json.message?.voice?.file_id }}"
       },
       "id": "get-audio-file",
       "name": "Get Audio File",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [500, 700],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
+      "position": [500, 600]
     },
     {
       "parameters": {
         "resource": "audio",
         "operation": "transcribe",
-        "options": {
-          "language": "es"
-        }
+        "options": {"language": "es"}
       },
       "id": "whisper-transcribe",
       "name": "Whisper Transcribe",
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.4,
-      "position": [720, 700],
-      "credentials": {
-        "openAiApi": {
-          "id": "",
-          "name": "OpenAI Account"
-        }
-      }
+      "position": [720, 600]
     },
     {
       "parameters": {
-        "resource": "chat",
-        "options": {
-          "maxTokens": 1024,
-          "temperature": 0.3
-        },
-        "messages": {
-          "values": [
-            {
-              "content": "=Eres un asistente de contabilidad. El usuario ha dictado informacion sobre un gasto. Analiza el texto y extrae la informacion estructurada.\n\nTexto transcrito: \"{{ $json.text }}\"\n\nDevuelve SOLO un objeto JSON valido con estos campos:\n{\n\"FECHA DEL COBRO\": \"DD/MM/YYYY (usa la fecha actual si no se menciona)\",\n\"SERVICIO / COMERCIO\": \"\",\n\"CONCEPTO\": \"\",\n\"IMPORTE\": \"solo numero con coma decimal\",\n\"CATEGORIA\": \"una de: Servicios Publicos, Transporte y Vehiculos, Seguros, Impuestos y Tasas, Personal y Educacion, Salud y Bienestar, Consumo y Alimentos, Otros Gastos\",\n\"TIPO DE GASTO\": \"Unico o Recurrente\"\n}\n\nSolo devuelve el JSON, sin texto adicional."
-            }
-          ]
-        },
-        "modelId": {
-          "__rl": true,
-          "value": "gpt-4o-mini",
-          "mode": "list",
-          "cachedResultName": "gpt-4o-mini"
-        }
+        "modelId": "gpt-4o-mini",
+        "messages": {"values": [{"content": "Analiza este texto sobre un gasto: \"{{ $json.text }}\"\nDevuelve JSON: {\"SERVICIO / COMERCIO\": \"\", \"IMPORTE\": \"\", \"CATEGORIA\": \"\"}"}]},
+        "options": {"maxTokens": 512}
       },
-      "id": "openai-structure-audio",
+      "id": "openai-audio",
       "name": "OpenAI Structure Audio",
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.4,
-      "position": [940, 700],
-      "credentials": {
-        "openAiApi": {
-          "id": "",
-          "name": "OpenAI Account"
-        }
-      }
+      "position": [940, 600]
     },
     {
       "parameters": {
-        "jsCode": "// Parse audio transcription response and generate ID\nconst response = $input.first().json.message?.content || $input.first().json.text || '';\nconst chatId = $('Telegram Trigger').first().json.message?.chat?.id;\nconst transcribedText = $('Whisper Transcribe').first().json.text;\n\nlet parsedData;\ntry {\n  const jsonMatch = response.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    parsedData = JSON.parse(jsonMatch[0]);\n  } else {\n    throw new Error('No JSON found');\n  }\n} catch (error) {\n  parsedData = {\n    \"FECHA DEL COBRO\": new Date().toLocaleDateString('es-AR'),\n    \"SERVICIO / COMERCIO\": \"\",\n    \"CONCEPTO\": transcribedText,\n    \"IMPORTE\": \"0\",\n    \"CATEGORIA\": \"Otros Gastos\",\n    \"TIPO DE GASTO\": \"Unico\"\n  };\n}\n\n// Generate ID: YYYYMMDD + Amount (9 digits)\nconst fecha = parsedData[\"FECHA DEL COBRO\"] || '';\nconst importe = parsedData[\"IMPORTE\"] || '0';\n\nlet dateStr = '';\nif (fecha) {\n  const parts = fecha.split('/');\n  if (parts.length === 3) {\n    dateStr = parts[2] + parts[1].padStart(2, '0') + parts[0].padStart(2, '0');\n  }\n}\nif (!dateStr) {\n  const now = new Date();\n  dateStr = now.getFullYear().toString() + \n            (now.getMonth() + 1).toString().padStart(2, '0') + \n            now.getDate().toString().padStart(2, '0');\n}\n\nconst normalizedAmount = importe.replace(/[^0-9]/g, '').padStart(9, '0').slice(-9);\nconst transactionId = dateStr + normalizedAmount;\n\nreturn {\n  json: {\n    ...parsedData,\n    \"ID_INTERNO\": transactionId,\n    \"FECHA_CREACION\": new Date().toISOString(),\n    \"chatId\": chatId,\n    \"transcribedText\": transcribedText,\n    \"origen\": \"telegram_audio\"\n  }\n};"
+        "jsCode": "const response = $input.first().json.message?.content || '';\nconst chatId = $('Telegram Trigger').first().json.message?.chat?.id;\nconst text = $('Whisper Transcribe').first().json.text;\n\nlet parsedData;\ntry {\n  const jsonMatch = response.match(/\\{[\\s\\S]*\\}/);\n  parsedData = jsonMatch ? JSON.parse(jsonMatch[0]) : {};\n} catch(e) { parsedData = {}; }\n\nconst now = new Date();\nconst dateStr = now.getFullYear() + (now.getMonth()+1).toString().padStart(2,'0') + now.getDate().toString().padStart(2,'0');\nconst importe = parsedData.IMPORTE || '0';\nconst transactionId = dateStr + importe.replace(/[^0-9]/g,'').padStart(9,'0').slice(-9);\n\nreturn {json: {...parsedData, ID_INTERNO: transactionId, chatId, transcribedText: text}};"
       },
       "id": "parse-audio-response",
       "name": "Parse Audio Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1160, 700]
+      "position": [1160, 600]
     },
     {
       "parameters": {
         "operation": "insert",
         "tableId": "expense_records",
         "dataToSend": "defineBelow",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldName": "id_transaccion",
-              "fieldValue": "={{ $json.ID_INTERNO }}"
-            },
-            {
-              "fieldName": "fecha_cobro",
-              "fieldValue": "={{ $json['FECHA DEL COBRO'] }}"
-            },
-            {
-              "fieldName": "servicio_comercio",
-              "fieldValue": "={{ $json['SERVICIO / COMERCIO'] }}"
-            },
-            {
-              "fieldName": "concepto",
-              "fieldValue": "={{ $json.CONCEPTO }}"
-            },
-            {
-              "fieldName": "importe",
-              "fieldValue": "={{ $json.IMPORTE }}"
-            },
-            {
-              "fieldName": "categoria",
-              "fieldValue": "={{ $json.CATEGORIA }}"
-            },
-            {
-              "fieldName": "tipo_gasto",
-              "fieldValue": "={{ $json['TIPO DE GASTO'] }}"
-            },
-            {
-              "fieldName": "chat_id",
-              "fieldValue": "={{ $json.chatId }}"
-            },
-            {
-              "fieldName": "fecha_creacion",
-              "fieldValue": "={{ $now.toISO() }}"
-            },
-            {
-              "fieldName": "origen_registro",
-              "fieldValue": "telegram_audio"
-            },
-            {
-              "fieldName": "notas",
-              "fieldValue": "={{ $json.transcribedText }}"
-            }
-          ]
-        }
+        "fieldsUi": {"fieldValues": [
+          {"fieldName": "id_transaccion", "fieldValue": "={{ $json.ID_INTERNO }}"},
+          {"fieldName": "servicio_comercio", "fieldValue": "={{ $json['SERVICIO / COMERCIO'] }}"},
+          {"fieldName": "importe", "fieldValue": "={{ $json.IMPORTE }}"},
+          {"fieldName": "chat_id", "fieldValue": "={{ $json.chatId }}"},
+          {"fieldName": "notas", "fieldValue": "={{ $json.transcribedText }}"},
+          {"fieldName": "origen_registro", "fieldValue": "telegram_audio"}
+        ]}
       },
       "id": "insert-audio-expense",
-      "name": "Insert Audio Expense",
+      "name": "Insert Expense (Audio)",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [1380, 700],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "append",
-        "documentId": {
-          "__rl": true,
-          "value": "",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "REGISTRO DE GASTOS",
-          "mode": "list",
-          "cachedResultName": "REGISTRO DE GASTOS"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "FECHA DEL COBRO": "={{ $('Parse Audio Response').first().json['FECHA DEL COBRO'] }}",
-            "SERVICIO / COMERCIO": "={{ $('Parse Audio Response').first().json['SERVICIO / COMERCIO'] }}",
-            "CONCEPTO": "={{ $('Parse Audio Response').first().json.CONCEPTO }}",
-            "IMPORTE": "={{ $('Parse Audio Response').first().json.IMPORTE }}",
-            "ID INTERNO (NO TOCAR)": "={{ $('Parse Audio Response').first().json.ID_INTERNO }}",
-            "CATEGORIA": "={{ $('Parse Audio Response').first().json.CATEGORIA }}",
-            "TIPO DE GASTO": "={{ $('Parse Audio Response').first().json['TIPO DE GASTO'] }}",
-            "Usuario Ingreso": "Telegram Audio"
-          },
-          "matchingColumns": [],
-          "schema": []
-        },
-        "options": {}
-      },
-      "id": "add-to-sheets-audio",
-      "name": "Add to Sheets (Audio)",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.4,
-      "position": [1600, 700],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "",
-          "name": "Google Sheets Account"
-        }
-      }
+      "position": [1380, 600]
     },
     {
       "parameters": {
         "chatId": "={{ $('Parse Audio Response').first().json.chatId }}",
-        "text": "=Gasto registrado por audio:\n\nComercio: {{ $('Parse Audio Response').first().json['SERVICIO / COMERCIO'] }}\nConcepto: {{ $('Parse Audio Response').first().json.CONCEPTO }}\nImporte: ${{ $('Parse Audio Response').first().json.IMPORTE }}\nCategoria: {{ $('Parse Audio Response').first().json.CATEGORIA }}\nID: {{ $('Parse Audio Response').first().json.ID_INTERNO }}\n\nTexto detectado: \"{{ $('Parse Audio Response').first().json.transcribedText }}\"",
-        "additionalFields": {
-          "appendAttribution": false
-        }
+        "text": "Gasto por audio registrado:\nComercio: {{ $('Parse Audio Response').first().json['SERVICIO / COMERCIO'] }}\nImporte: ${{ $('Parse Audio Response').first().json.IMPORTE }}\nTexto: {{ $('Parse Audio Response').first().json.transcribedText }}",
+        "additionalFields": {}
       },
-      "id": "confirm-audio-expense",
+      "id": "confirm-audio",
       "name": "Confirm Audio Expense",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1820, 700],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
+      "position": [1600, 600]
     },
     {
       "parameters": {
-        "resource": "chat",
-        "options": {
-          "maxTokens": 1024,
-          "temperature": 0.3
-        },
-        "messages": {
-          "values": [
-            {
-              "content": "=Eres un asistente de contabilidad. El usuario ha enviado informacion sobre un gasto. Analiza el texto y extrae la informacion estructurada.\n\nTexto del usuario: \"{{ $json.message?.text }}\"\n\nDevuelve SOLO un objeto JSON valido con estos campos:\n{\n\"FECHA DEL COBRO\": \"DD/MM/YYYY (usa la fecha actual si no se menciona)\",\n\"SERVICIO / COMERCIO\": \"\",\n\"CONCEPTO\": \"\",\n\"IMPORTE\": \"solo numero con coma decimal (0 si no se menciona)\",\n\"CATEGORIA\": \"una de: Servicios Publicos, Transporte y Vehiculos, Seguros, Impuestos y Tasas, Personal y Educacion, Salud y Bienestar, Consumo y Alimentos, Otros Gastos\",\n\"TIPO DE GASTO\": \"Unico o Recurrente\",\n\"ES_GASTO_VALIDO\": true o false\n}\n\nSi el mensaje no parece ser sobre un gasto o factura, establece ES_GASTO_VALIDO como false.\nSolo devuelve el JSON, sin texto adicional."
-            }
-          ]
-        },
-        "modelId": {
-          "__rl": true,
-          "value": "gpt-4o-mini",
-          "mode": "list",
-          "cachedResultName": "gpt-4o-mini"
-        }
+        "modelId": "gpt-4o-mini",
+        "messages": {"values": [{"content": "Analiza este texto: \"{{ $json.message?.text }}\"\nDevuelve JSON: {\"SERVICIO / COMERCIO\": \"\", \"IMPORTE\": \"\", \"CATEGORIA\": \"\", \"ES_GASTO_VALIDO\": true/false}"}]},
+        "options": {"maxTokens": 512}
       },
-      "id": "openai-analyze-text",
+      "id": "openai-text",
       "name": "OpenAI Analyze Text",
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.4,
-      "position": [500, 900],
-      "credentials": {
-        "openAiApi": {
-          "id": "",
-          "name": "OpenAI Account"
-        }
-      }
+      "position": [500, 800]
     },
     {
       "parameters": {
-        "jsCode": "// Parse text response and generate ID\nconst response = $input.first().json.message?.content || $input.first().json.text || '';\nconst chatId = $('Telegram Trigger').first().json.message?.chat?.id;\nconst originalText = $('Telegram Trigger').first().json.message?.text;\n\nlet parsedData;\ntry {\n  const jsonMatch = response.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    parsedData = JSON.parse(jsonMatch[0]);\n  } else {\n    throw new Error('No JSON found');\n  }\n} catch (error) {\n  parsedData = {\n    \"FECHA DEL COBRO\": new Date().toLocaleDateString('es-AR'),\n    \"SERVICIO / COMERCIO\": \"\",\n    \"CONCEPTO\": originalText,\n    \"IMPORTE\": \"0\",\n    \"CATEGORIA\": \"Otros Gastos\",\n    \"TIPO DE GASTO\": \"Unico\",\n    \"ES_GASTO_VALIDO\": false\n  };\n}\n\n// Check if it's a valid expense\nif (!parsedData.ES_GASTO_VALIDO) {\n  return {\n    json: {\n      isValidExpense: false,\n      chatId: chatId,\n      originalText: originalText\n    }\n  };\n}\n\n// Generate ID: YYYYMMDD + Amount (9 digits)\nconst fecha = parsedData[\"FECHA DEL COBRO\"] || '';\nconst importe = parsedData[\"IMPORTE\"] || '0';\n\nlet dateStr = '';\nif (fecha) {\n  const parts = fecha.split('/');\n  if (parts.length === 3) {\n    dateStr = parts[2] + parts[1].padStart(2, '0') + parts[0].padStart(2, '0');\n  }\n}\nif (!dateStr) {\n  const now = new Date();\n  dateStr = now.getFullYear().toString() + \n            (now.getMonth() + 1).toString().padStart(2, '0') + \n            now.getDate().toString().padStart(2, '0');\n}\n\nconst normalizedAmount = importe.replace(/[^0-9]/g, '').padStart(9, '0').slice(-9);\nconst transactionId = dateStr + normalizedAmount;\n\nreturn {\n  json: {\n    ...parsedData,\n    \"ID_INTERNO\": transactionId,\n    \"FECHA_CREACION\": new Date().toISOString(),\n    \"chatId\": chatId,\n    \"originalText\": originalText,\n    \"origen\": \"telegram_text\",\n    \"isValidExpense\": true\n  }\n};"
+        "jsCode": "const response = $input.first().json.message?.content || '';\nconst chatId = $('Telegram Trigger').first().json.message?.chat?.id;\nconst originalText = $('Telegram Trigger').first().json.message?.text;\n\nlet parsedData;\ntry {\n  const jsonMatch = response.match(/\\{[\\s\\S]*\\}/);\n  parsedData = jsonMatch ? JSON.parse(jsonMatch[0]) : {ES_GASTO_VALIDO: false};\n} catch(e) { parsedData = {ES_GASTO_VALIDO: false}; }\n\nif (!parsedData.ES_GASTO_VALIDO) return {json: {isValid: false, chatId, originalText}};\n\nconst now = new Date();\nconst dateStr = now.getFullYear() + (now.getMonth()+1).toString().padStart(2,'0') + now.getDate().toString().padStart(2,'0');\nconst importe = parsedData.IMPORTE || '0';\nconst transactionId = dateStr + importe.replace(/[^0-9]/g,'').padStart(9,'0').slice(-9);\n\nreturn {json: {...parsedData, ID_INTERNO: transactionId, chatId, originalText, isValid: true}};"
       },
       "id": "parse-text-response",
       "name": "Parse Text Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [720, 900]
+      "position": [720, 800]
     },
     {
       "parameters": {
         "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "is-valid-expense",
-              "leftValue": "={{ $json.isValidExpense }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "equals"
-              }
-            }
-          ],
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [{"id": "valid", "leftValue": "={{ $json.isValid }}", "rightValue": true, "operator": {"type": "boolean", "operation": "equals"}}],
           "combinator": "and"
         },
         "options": {}
@@ -1251,771 +402,102 @@
       "name": "Is Valid Expense?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [940, 900]
+      "position": [940, 800]
     },
     {
       "parameters": {
         "operation": "insert",
         "tableId": "expense_records",
         "dataToSend": "defineBelow",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldName": "id_transaccion",
-              "fieldValue": "={{ $json.ID_INTERNO }}"
-            },
-            {
-              "fieldName": "fecha_cobro",
-              "fieldValue": "={{ $json['FECHA DEL COBRO'] }}"
-            },
-            {
-              "fieldName": "servicio_comercio",
-              "fieldValue": "={{ $json['SERVICIO / COMERCIO'] }}"
-            },
-            {
-              "fieldName": "concepto",
-              "fieldValue": "={{ $json.CONCEPTO }}"
-            },
-            {
-              "fieldName": "importe",
-              "fieldValue": "={{ $json.IMPORTE }}"
-            },
-            {
-              "fieldName": "categoria",
-              "fieldValue": "={{ $json.CATEGORIA }}"
-            },
-            {
-              "fieldName": "tipo_gasto",
-              "fieldValue": "={{ $json['TIPO DE GASTO'] }}"
-            },
-            {
-              "fieldName": "chat_id",
-              "fieldValue": "={{ $json.chatId }}"
-            },
-            {
-              "fieldName": "fecha_creacion",
-              "fieldValue": "={{ $now.toISO() }}"
-            },
-            {
-              "fieldName": "origen_registro",
-              "fieldValue": "telegram_text"
-            },
-            {
-              "fieldName": "notas",
-              "fieldValue": "={{ $json.originalText }}"
-            }
-          ]
-        }
+        "fieldsUi": {"fieldValues": [
+          {"fieldName": "id_transaccion", "fieldValue": "={{ $json.ID_INTERNO }}"},
+          {"fieldName": "servicio_comercio", "fieldValue": "={{ $json['SERVICIO / COMERCIO'] }}"},
+          {"fieldName": "importe", "fieldValue": "={{ $json.IMPORTE }}"},
+          {"fieldName": "chat_id", "fieldValue": "={{ $json.chatId }}"},
+          {"fieldName": "notas", "fieldValue": "={{ $json.originalText }}"},
+          {"fieldName": "origen_registro", "fieldValue": "telegram_text"}
+        ]}
       },
       "id": "insert-text-expense",
-      "name": "Insert Text Expense",
+      "name": "Insert Expense (Text)",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [1160, 800],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "append",
-        "documentId": {
-          "__rl": true,
-          "value": "",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "REGISTRO DE GASTOS",
-          "mode": "list",
-          "cachedResultName": "REGISTRO DE GASTOS"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "FECHA DEL COBRO": "={{ $('Parse Text Response').first().json['FECHA DEL COBRO'] }}",
-            "SERVICIO / COMERCIO": "={{ $('Parse Text Response').first().json['SERVICIO / COMERCIO'] }}",
-            "CONCEPTO": "={{ $('Parse Text Response').first().json.CONCEPTO }}",
-            "IMPORTE": "={{ $('Parse Text Response').first().json.IMPORTE }}",
-            "ID INTERNO (NO TOCAR)": "={{ $('Parse Text Response').first().json.ID_INTERNO }}",
-            "CATEGORIA": "={{ $('Parse Text Response').first().json.CATEGORIA }}",
-            "TIPO DE GASTO": "={{ $('Parse Text Response').first().json['TIPO DE GASTO'] }}",
-            "Usuario Ingreso": "Telegram Text"
-          },
-          "matchingColumns": [],
-          "schema": []
-        },
-        "options": {}
-      },
-      "id": "add-to-sheets-text",
-      "name": "Add to Sheets (Text)",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.4,
-      "position": [1380, 800],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "",
-          "name": "Google Sheets Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "content": "=# {{ $('Parse Text Response').first().json.CONCEPTO || 'Nota de gasto' }}\n\n**Fecha:** {{ $('Parse Text Response').first().json['FECHA DEL COBRO'] }}\n**Comercio:** {{ $('Parse Text Response').first().json['SERVICIO / COMERCIO'] }}\n**Importe:** ${{ $('Parse Text Response').first().json.IMPORTE }}\n**Categoria:** {{ $('Parse Text Response').first().json.CATEGORIA }}\n\n---\n\n## Texto Original\n{{ $('Parse Text Response').first().json.originalText }}",
-        "name": "=Gasto_{{ $('Parse Text Response').first().json.ID_INTERNO }}",
-        "folderId": "YOUR_GOOGLE_DRIVE_FOLDER_ID"
-      },
-      "id": "create-google-doc",
-      "name": "Create Google Doc",
-      "type": "n8n-nodes-base.googleDocs",
-      "typeVersion": 2,
-      "position": [1380, 900],
-      "credentials": {
-        "googleDocsOAuth2Api": {
-          "id": "",
-          "name": "Google Docs Account"
-        }
-      }
+      "position": [1160, 750]
     },
     {
       "parameters": {
         "chatId": "={{ $('Parse Text Response').first().json.chatId }}",
-        "text": "=Gasto registrado por texto:\n\nComercio: {{ $('Parse Text Response').first().json['SERVICIO / COMERCIO'] }}\nConcepto: {{ $('Parse Text Response').first().json.CONCEPTO }}\nImporte: ${{ $('Parse Text Response').first().json.IMPORTE }}\nCategoria: {{ $('Parse Text Response').first().json.CATEGORIA }}\nID: {{ $('Parse Text Response').first().json.ID_INTERNO }}\n\nDocumento: {{ $('Create Google Doc').first().json.documentId ? 'https://docs.google.com/document/d/' + $('Create Google Doc').first().json.documentId : 'N/A' }}",
-        "additionalFields": {
-          "appendAttribution": false
-        }
+        "text": "Gasto registrado:\nComercio: {{ $('Parse Text Response').first().json['SERVICIO / COMERCIO'] }}\nImporte: ${{ $('Parse Text Response').first().json.IMPORTE }}",
+        "additionalFields": {}
       },
-      "id": "confirm-text-expense",
+      "id": "confirm-text",
       "name": "Confirm Text Expense",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1600, 800],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
+      "position": [1380, 750]
     },
     {
       "parameters": {
         "chatId": "={{ $json.chatId }}",
-        "text": "No pude identificar informacion de gasto en tu mensaje. Por favor, envia:\n- Una imagen/foto de un recibo o factura\n- Un audio describiendo el gasto\n- Un texto con formato: \"[comercio] [monto] [concepto]\"",
-        "additionalFields": {
-          "appendAttribution": false
-        }
+        "text": "No pude identificar un gasto. Envia imagen, audio o texto con formato: comercio monto concepto",
+        "additionalFields": {}
       },
-      "id": "invalid-text-response",
+      "id": "invalid-text",
       "name": "Invalid Text Response",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [1160, 1000],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
+      "position": [1160, 900]
     },
     {
       "parameters": {
         "chatId": "={{ $json.message?.chat?.id }}",
-        "text": "=Bienvenido al Bot de Registro de Gastos\n\nPuedes enviarme:\n- Fotos de recibos o facturas\n- Archivos PDF de comprobantes\n- Notas de voz describiendo gastos\n- Mensajes de texto con detalles del gasto\n\nTodos los gastos seran procesados automaticamente y registrados en tu hoja de calculo.",
-        "additionalFields": {
-          "appendAttribution": false,
-          "replyMarkup": "inlineKeyboard",
-          "inlineKeyboard": {
-            "rows": [
-              {
-                "row": {
-                  "buttons": [
-                    {
-                      "text": "Ver gastos pendientes",
-                      "additionalFields": {
-                        "callbackData": "ver_pendientes"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        }
+        "text": "Bienvenido al Bot de Gastos!\n\nEnvia:\n- Fotos de recibos\n- PDFs\n- Notas de voz\n- Texto describiendo gastos",
+        "additionalFields": {}
       },
-      "id": "start-welcome",
+      "id": "welcome-message",
       "name": "Welcome Message",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
-      "position": [500, 1100],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "insert",
-        "tableId": "chat_state",
-        "dataToSend": "defineBelow",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldName": "chat_id",
-              "fieldValue": "={{ $json.message?.chat?.id }}"
-            },
-            {
-              "fieldName": "created_at",
-              "fieldValue": "={{ $now.toISO() }}"
-            }
-          ]
-        },
-        "options": {
-          "upsert": true
-        }
-      },
-      "id": "register-chat",
-      "name": "Register Chat",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [720, 1100],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Parse Image Response').first().json.chatId }}",
-        "text": "=Comprobante cargado exitosamente para el ID: {{ $('Parse Image Response').first().json.linkedTransactionId }}\n\nArchivo: {{ $('Parse Image Response').first().json.driveWebLink }}",
-        "additionalFields": {
-          "appendAttribution": false
-        }
-      },
-      "id": "confirm-receipt-upload",
-      "name": "Confirm Receipt Upload",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [2040, 200],
-      "credentials": {
-        "telegramApi": {
-          "id": "",
-          "name": "Telegram Bot"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "tableId": "chat_state",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "chat_id",
-              "keyValue": "={{ $('Parse Image Response').first().json.chatId }}"
-            }
-          ]
-        },
-        "dataToSend": "defineBelow",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldName": "awaiting_receipt_for",
-              "fieldValue": ""
-            }
-          ]
-        }
-      },
-      "id": "clear-awaiting-state",
-      "name": "Clear Awaiting State",
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [2260, 200],
-      "credentials": {
-        "supabaseApi": {
-          "id": "",
-          "name": "Supabase Account"
-        }
-      }
+      "position": [500, 1000]
     }
   ],
   "connections": {
-    "Telegram Trigger": {
-      "main": [
-        [
-          {
-            "node": "Route Message Type",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Route Message Type": {
-      "main": [
-        [
-          {
-            "node": "Parse Callback Data",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Get Image File",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Get PDF File",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Get Audio File",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "OpenAI Analyze Text",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Welcome Message",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Parse Callback Data": {
-      "main": [
-        [
-          {
-            "node": "Route Callback Action",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Route Callback Action": {
-      "main": [
-        [
-          {
-            "node": "Update Payment Method (DB)",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Mark Viewed (DB)",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Send Payment Options",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Set Awaiting Receipt State",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Update Payment Method (DB)": {
-      "main": [
-        [
-          {
-            "node": "Update Payment Method (Sheet)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Update Payment Method (Sheet)": {
-      "main": [
-        [
-          {
-            "node": "Confirm Payment Method",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Mark Viewed (DB)": {
-      "main": [
-        [
-          {
-            "node": "Mark Viewed (Sheet)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Mark Viewed (Sheet)": {
-      "main": [
-        [
-          {
-            "node": "Confirm Viewed",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Set Awaiting Receipt State": {
-      "main": [
-        [
-          {
-            "node": "Request Receipt Message",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Image File": {
-      "main": [
-        [
-          {
-            "node": "Check Awaiting Receipt",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Check Awaiting Receipt": {
-      "main": [
-        [
-          {
-            "node": "Upload Image to Drive",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Upload Image to Drive": {
-      "main": [
-        [
-          {
-            "node": "OpenAI Analyze Image",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "OpenAI Analyze Image": {
-      "main": [
-        [
-          {
-            "node": "Parse Image Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Parse Image Response": {
-      "main": [
-        [
-          {
-            "node": "Is Receipt Upload?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Is Receipt Upload?": {
-      "main": [
-        [
-          {
-            "node": "Update Receipt in DB",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Insert New Expense (Image)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Update Receipt in DB": {
-      "main": [
-        [
-          {
-            "node": "Confirm Receipt Upload",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Confirm Receipt Upload": {
-      "main": [
-        [
-          {
-            "node": "Clear Awaiting State",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Insert New Expense (Image)": {
-      "main": [
-        [
-          {
-            "node": "Add to Sheets (Image)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Add to Sheets (Image)": {
-      "main": [
-        [
-          {
-            "node": "Confirm Image Expense",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get PDF File": {
-      "main": [
-        [
-          {
-            "node": "PDF to Image (Telegram)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "PDF to Image (Telegram)": {
-      "main": [
-        [
-          {
-            "node": "Download PDF Image",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Download PDF Image": {
-      "main": [
-        [
-          {
-            "node": "Upload Image to Drive",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Audio File": {
-      "main": [
-        [
-          {
-            "node": "Whisper Transcribe",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Whisper Transcribe": {
-      "main": [
-        [
-          {
-            "node": "OpenAI Structure Audio",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "OpenAI Structure Audio": {
-      "main": [
-        [
-          {
-            "node": "Parse Audio Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Parse Audio Response": {
-      "main": [
-        [
-          {
-            "node": "Insert Audio Expense",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Insert Audio Expense": {
-      "main": [
-        [
-          {
-            "node": "Add to Sheets (Audio)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Add to Sheets (Audio)": {
-      "main": [
-        [
-          {
-            "node": "Confirm Audio Expense",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "OpenAI Analyze Text": {
-      "main": [
-        [
-          {
-            "node": "Parse Text Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Parse Text Response": {
-      "main": [
-        [
-          {
-            "node": "Is Valid Expense?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Is Valid Expense?": {
-      "main": [
-        [
-          {
-            "node": "Insert Text Expense",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Invalid Text Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Insert Text Expense": {
-      "main": [
-        [
-          {
-            "node": "Add to Sheets (Text)",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Create Google Doc",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Add to Sheets (Text)": {
-      "main": [
-        [
-          {
-            "node": "Confirm Text Expense",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Welcome Message": {
-      "main": [
-        [
-          {
-            "node": "Register Chat",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
+    "Telegram Trigger": {"main": [[{"node": "Route Message Type", "type": "main", "index": 0}]]},
+    "Route Message Type": {"main": [
+      [{"node": "Parse Callback Data", "type": "main", "index": 0}],
+      [{"node": "Get Image File", "type": "main", "index": 0}],
+      [{"node": "Get Image File", "type": "main", "index": 0}],
+      [{"node": "Get Audio File", "type": "main", "index": 0}],
+      [{"node": "OpenAI Analyze Text", "type": "main", "index": 0}],
+      [{"node": "Welcome Message", "type": "main", "index": 0}]
+    ]},
+    "Parse Callback Data": {"main": [[{"node": "Route Callback Action", "type": "main", "index": 0}]]},
+    "Route Callback Action": {"main": [
+      [{"node": "Update Payment (DB)", "type": "main", "index": 0}],
+      [{"node": "Mark Viewed (DB)", "type": "main", "index": 0}],
+      [{"node": "Send Payment Options", "type": "main", "index": 0}]
+    ]},
+    "Update Payment (DB)": {"main": [[{"node": "Confirm Payment", "type": "main", "index": 0}]]},
+    "Mark Viewed (DB)": {"main": [[{"node": "Confirm Viewed", "type": "main", "index": 0}]]},
+    "Get Image File": {"main": [[{"node": "Upload to Drive", "type": "main", "index": 0}]]},
+    "Upload to Drive": {"main": [[{"node": "OpenAI Analyze Image", "type": "main", "index": 0}]]},
+    "OpenAI Analyze Image": {"main": [[{"node": "Parse Image Response", "type": "main", "index": 0}]]},
+    "Parse Image Response": {"main": [[{"node": "Insert Expense (Image)", "type": "main", "index": 0}]]},
+    "Insert Expense (Image)": {"main": [[{"node": "Confirm Image Expense", "type": "main", "index": 0}]]},
+    "Get Audio File": {"main": [[{"node": "Whisper Transcribe", "type": "main", "index": 0}]]},
+    "Whisper Transcribe": {"main": [[{"node": "OpenAI Structure Audio", "type": "main", "index": 0}]]},
+    "OpenAI Structure Audio": {"main": [[{"node": "Parse Audio Response", "type": "main", "index": 0}]]},
+    "Parse Audio Response": {"main": [[{"node": "Insert Expense (Audio)", "type": "main", "index": 0}]]},
+    "Insert Expense (Audio)": {"main": [[{"node": "Confirm Audio Expense", "type": "main", "index": 0}]]},
+    "OpenAI Analyze Text": {"main": [[{"node": "Parse Text Response", "type": "main", "index": 0}]]},
+    "Parse Text Response": {"main": [[{"node": "Is Valid Expense?", "type": "main", "index": 0}]]},
+    "Is Valid Expense?": {"main": [
+      [{"node": "Insert Expense (Text)", "type": "main", "index": 0}],
+      [{"node": "Invalid Text Response", "type": "main", "index": 0}]
+    ]},
+    "Insert Expense (Text)": {"main": [[{"node": "Confirm Text Expense", "type": "main", "index": 0}]]}
   },
-  "settings": {
-    "executionOrder": "v1",
-    "saveManualExecutions": true,
-    "callerPolicy": "workflowsFromSameOwner",
-    "errorWorkflow": ""
-  },
-  "staticData": null,
-  "tags": [
-    {
-      "name": "expense-management",
-      "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
-    },
-    {
-      "name": "telegram-bot",
-      "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
-    }
-  ],
-  "triggerCount": 1,
-  "updatedAt": "2024-12-10T00:00:00.000Z",
-  "versionId": "1"
+  "settings": {"executionOrder": "v1"},
+  "pinData": {},
+  "meta": {"instanceId": ""}
 }
