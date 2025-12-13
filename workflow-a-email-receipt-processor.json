@@ -1,0 +1,798 @@
+{
+  "name": "Workflow A - Email Receipt Processor",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "readStatus": "unread",
+          "receivedAfter": "={{ $now.minus({hours: 24}).toISO() }}"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "id": "email-trigger",
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "credentials": {
+        "imap": {
+          "id": "IMAP_CREDENTIAL_ID",
+          "name": "Email IMAP Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "attachment-check",
+              "leftValue": "={{ $json.attachments.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-attachments",
+      "name": "Has Attachments?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "attachments",
+        "options": {}
+      },
+      "id": "split-attachments",
+      "name": "Split Attachments",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [440, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "is-image-pdf",
+              "leftValue": "={{ $json.attachments.mimeType }}",
+              "rightValue": "image/|application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "filter-file-types",
+      "name": "Is Image/PDF?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [660, 200]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "name": "={{ $json.attachments.filename || 'receipt_' + $now.format('yyyyMMdd_HHmmss') }}",
+        "folderId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_DRIVE_FOLDER_ID",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "upload-drive",
+      "name": "Upload to Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [880, 100],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "GOOGLE_DRIVE_CREDENTIAL_ID",
+          "name": "Google Drive Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/pdf"
+            }
+          }
+        }
+      },
+      "id": "get-drive-file",
+      "name": "Get File from Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [1100, 100],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "GOOGLE_DRIVE_CREDENTIAL_ID",
+          "name": "Google Drive Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "is-pdf",
+              "leftValue": "={{ $json.mimeType }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-pdf",
+      "name": "Is PDF?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1320, 100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pdf.co/v1/pdf/convert/to/jpg",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.webViewLink }}\",\n  \"pages\": \"1\",\n  \"async\": false\n}",
+        "options": {}
+      },
+      "id": "pdf-to-image",
+      "name": "PDF.co Convert to Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 0],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "PDFCO_CREDENTIAL_ID",
+          "name": "PDF.co API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "options": {
+          "maxTokens": 2048,
+          "temperature": 0.3
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Eres un experto en contabilidad digital y tu trabajo es analizar la imagen de un comprobante (factura, ticket, recibo, etc.) para extraer datos financieros relevantes. Tu objetivo es identificar cualquier tipo de gasto o cobro.\n\nAnaliza la imagen y devuelve **SOLO un objeto JSON valido**. Si algun dato no esta disponible, deja el campo vacio (\"\"), sin usar \"null\", \"N/A\" ni otros marcadores. El JSON debe estar perfectamente estructurado y **sin etiquetas adicionales como \"json\" ni comillas invertidas (backticks).**\n\n**El JSON debe contener exactamente los siguientes campos, en espanol neutro:**\n\n{\n\"FECHA DEL COBRO\": \"\",\n\"SERVICIO / COMERCIO\": \"\",\n\"CONCEPTO\": \"\",\n\"IMPORTE\": \"\",\n\"ID DE TRANSACCION\": \"\",\n\"CATEGORIA\": \"\",\n\"TIPO DE GASTO\": \"\",\n\"ORIGEN DEL COBRO\": \"\"\n}\n\n**Instrucciones especificas para cada campo:**\n\n1.  **\"FECHA DEL COBRO\":** Extrae la fecha del cobro del documento en formato \"DD/MM/YYYY\". Prioriza la fecha mas relevante al cobro.\n2.  **\"SERVICIO / COMERCIO\":** Nombre de la empresa, comercio, proveedor o plataforma que realizo el cobro.\n3.  **\"CONCEPTO\":** Breve descripcion del producto o servicio especifico por el que se realizo el cobro.\n4.  **\"IMPORTE\":** Valor numerico total del cargo. Solo el valor numerico con coma como separador decimal.\n5.  **\"ID DE TRANSACCION\":** Si aparece un numero de referencia, codigo, ID de transaccion o similar en el documento.\n6.  **\"CATEGORIA\":** Clasifica el gasto en: Servicios Publicos, Transporte y Vehiculos, Seguros, Impuestos y Tasas, Personal y Educacion, Salud y Bienestar, Consumo y Alimentos, Otros Gastos, Vivienda y Comunidad.\n7.  **\"TIPO DE GASTO\":** Define si es un gasto \"Unico\" o \"Recurrente\". Las suscripciones son \"Recurrente\".\n8.  **\"ORIGEN DEL COBRO\":** Metodo de cobro (tarjeta, transferencia, etc.) si es visible.\n\nEl output debe ser un unico objeto JSON plano sin texto adicional."
+            },
+            {
+              "type": "image",
+              "binaryData": true,
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        }
+      },
+      "id": "openai-analyze-image",
+      "name": "OpenAI Analyze Receipt (Image)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [1760, 100],
+      "credentials": {
+        "openAiApi": {
+          "id": "OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the OpenAI response to extract JSON\nconst response = $input.first().json.message?.content || $input.first().json.text || '';\n\nlet parsedData;\ntry {\n  // Try to extract JSON from the response\n  const jsonMatch = response.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    parsedData = JSON.parse(jsonMatch[0]);\n  } else {\n    throw new Error('No JSON found in response');\n  }\n} catch (error) {\n  // Return empty structure if parsing fails\n  parsedData = {\n    \"FECHA DEL COBRO\": \"\",\n    \"SERVICIO / COMERCIO\": \"\",\n    \"CONCEPTO\": \"\",\n    \"IMPORTE\": \"\",\n    \"ID DE TRANSACCION\": \"\",\n    \"CATEGORIA\": \"\",\n    \"TIPO DE GASTO\": \"\",\n    \"ORIGEN DEL COBRO\": \"\",\n    \"parseError\": error.message\n  };\n}\n\n// Generate deterministic Transaction ID: YYYYMMDD + Amount (normalized to 9 digits)\nlet transactionId = parsedData[\"ID DE TRANSACCION\"] || '';\nif (!transactionId) {\n  const fecha = parsedData[\"FECHA DEL COBRO\"] || '';\n  const importe = parsedData[\"IMPORTE\"] || '0';\n  \n  // Parse date to YYYYMMDD format\n  let dateStr = '';\n  if (fecha) {\n    const parts = fecha.split('/');\n    if (parts.length === 3) {\n      dateStr = parts[2] + parts[1].padStart(2, '0') + parts[0].padStart(2, '0');\n    }\n  }\n  if (!dateStr) {\n    const now = new Date();\n    dateStr = now.getFullYear().toString() + \n              (now.getMonth() + 1).toString().padStart(2, '0') + \n              now.getDate().toString().padStart(2, '0');\n  }\n  \n  // Normalize amount to integer (remove decimals and non-numeric chars)\n  const normalizedAmount = importe.replace(/[^0-9]/g, '').padStart(9, '0').slice(-9);\n  \n  transactionId = dateStr + normalizedAmount;\n}\n\nreturn {\n  json: {\n    ...parsedData,\n    \"ID_INTERNO\": transactionId,\n    \"FECHA_CREACION\": new Date().toISOString(),\n    \"driveFileId\": $('Upload to Google Drive').first().json.id,\n    \"driveWebLink\": $('Upload to Google Drive').first().json.webViewLink,\n    \"sourceEmail\": $('Email Trigger (IMAP)').first().json.from?.value?.[0]?.address || 'unknown'\n  }\n};"
+      },
+      "id": "parse-json-response",
+      "name": "Parse JSON & Generate ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1980, 100]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT * FROM expense_records WHERE id_transaccion = '{{ $json.ID_INTERNO }}' LIMIT 1"
+      },
+      "id": "check-duplicate-db",
+      "name": "Check Duplicate in Database",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [2200, 100],
+      "credentials": {
+        "supabaseApi": {
+          "id": "SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "is-new",
+              "leftValue": "={{ $json.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "is-new-record",
+      "name": "Is New Record?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2420, 100]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "expense_records",
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldName": "id_transaccion",
+              "fieldValue": "={{ $('Parse JSON & Generate ID').first().json.ID_INTERNO }}"
+            },
+            {
+              "fieldName": "fecha_cobro",
+              "fieldValue": "={{ $('Parse JSON & Generate ID').first().json['FECHA DEL COBRO'] }}"
+            },
+            {
+              "fieldName": "servicio_comercio",
+              "fieldValue": "={{ $('Parse JSON & Generate ID').first().json['SERVICIO / COMERCIO'] }}"
+            },
+            {
+              "fieldName": "concepto",
+              "fieldValue": "={{ $('Parse JSON & Generate ID').first().json.CONCEPTO }}"
+            },
+            {
+              "fieldName": "importe",
+              "fieldValue": "={{ $('Parse JSON & Generate ID').first().json.IMPORTE }}"
+            },
+            {
+              "fieldName": "categoria",
+              "fieldValue": "={{ $('Parse JSON & Generate ID').first().json.CATEGORIA }}"
+            },
+            {
+              "fieldName": "tipo_gasto",
+              "fieldValue": "={{ $('Parse JSON & Generate ID').first().json['TIPO DE GASTO'] }}"
+            },
+            {
+              "fieldName": "origen_cobro",
+              "fieldValue": "={{ $('Parse JSON & Generate ID').first().json['ORIGEN DEL COBRO'] }}"
+            },
+            {
+              "fieldName": "link_archivo",
+              "fieldValue": "={{ $('Parse JSON & Generate ID').first().json.driveWebLink }}"
+            },
+            {
+              "fieldName": "fecha_creacion",
+              "fieldValue": "={{ $now.toISO() }}"
+            },
+            {
+              "fieldName": "origen_registro",
+              "fieldValue": "email"
+            },
+            {
+              "fieldName": "vista_por_usuario",
+              "fieldValue": "false"
+            },
+            {
+              "fieldName": "enviado",
+              "fieldValue": "false"
+            }
+          ]
+        }
+      },
+      "id": "insert-to-database",
+      "name": "Insert to Database",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [2640, 0],
+      "credentials": {
+        "supabaseApi": {
+          "id": "SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "REGISTRO DE GASTOS",
+          "mode": "list",
+          "cachedResultName": "REGISTRO DE GASTOS"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "FECHA DEL COBRO": "={{ $('Parse JSON & Generate ID').first().json['FECHA DEL COBRO'] }}",
+            "SERVICIO / COMERCIO": "={{ $('Parse JSON & Generate ID').first().json['SERVICIO / COMERCIO'] }}",
+            "CONCEPTO": "={{ $('Parse JSON & Generate ID').first().json.CONCEPTO }}",
+            "IMPORTE": "={{ $('Parse JSON & Generate ID').first().json.IMPORTE }}",
+            "ID INTERNO (NO TOCAR)": "={{ $('Parse JSON & Generate ID').first().json.ID_INTERNO }}",
+            "ESTADO": "Pendiente",
+            "CATEGORIA": "={{ $('Parse JSON & Generate ID').first().json.CATEGORIA }}",
+            "ID DE TRANSACCION": "={{ $('Parse JSON & Generate ID').first().json['ID DE TRANSACCION'] }}",
+            "TIPO DE GASTO": "={{ $('Parse JSON & Generate ID').first().json['TIPO DE GASTO'] }}",
+            "Link de archivo": "={{ $('Parse JSON & Generate ID').first().json.driveWebLink }}",
+            "Usuario Ingreso": "Email",
+            "Visto por Ine": "",
+            "Fecha de Vencimiento": "",
+            "Forma de pago": ""
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "FECHA DEL COBRO",
+              "displayName": "FECHA DEL COBRO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SERVICIO / COMERCIO",
+              "displayName": "SERVICIO / COMERCIO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "add-to-sheets",
+      "name": "Add to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [2860, 0],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Email Trigger (IMAP)').first().json.from?.value?.[0]?.address }}",
+        "subject": "=Gasto Registrado: {{ $('Parse JSON & Generate ID').first().json['SERVICIO / COMERCIO'] }} - ${{ $('Parse JSON & Generate ID').first().json.IMPORTE }}",
+        "emailType": "html",
+        "message": "=<html>\n<body style=\"font-family: Arial, sans-serif; padding: 20px;\">\n<h2 style=\"color: #2e7d32;\">Gasto Registrado Exitosamente</h2>\n<table style=\"border-collapse: collapse; width: 100%; max-width: 600px;\">\n<tr style=\"background-color: #f5f5f5;\">\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Fecha:</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Parse JSON & Generate ID').first().json['FECHA DEL COBRO'] }}</td>\n</tr>\n<tr>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Comercio:</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Parse JSON & Generate ID').first().json['SERVICIO / COMERCIO'] }}</td>\n</tr>\n<tr style=\"background-color: #f5f5f5;\">\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Concepto:</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Parse JSON & Generate ID').first().json.CONCEPTO }}</td>\n</tr>\n<tr>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Importe:</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>${{ $('Parse JSON & Generate ID').first().json.IMPORTE }}</strong></td>\n</tr>\n<tr style=\"background-color: #f5f5f5;\">\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Categoria:</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Parse JSON & Generate ID').first().json.CATEGORIA }}</td>\n</tr>\n<tr>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>ID Transaccion:</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Parse JSON & Generate ID').first().json.ID_INTERNO }}</td>\n</tr>\n<tr style=\"background-color: #f5f5f5;\">\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Archivo:</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><a href=\"{{ $('Parse JSON & Generate ID').first().json.driveWebLink }}\">Ver en Drive</a></td>\n</tr>\n</table>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "send-confirmation-email",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [3080, 0],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GMAIL_CREDENTIAL_ID",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Email Trigger (IMAP)').first().json.from?.value?.[0]?.address }}",
+        "subject": "=Gasto Duplicado Detectado: {{ $('Parse JSON & Generate ID').first().json['SERVICIO / COMERCIO'] }}",
+        "emailType": "html",
+        "message": "=<html>\n<body style=\"font-family: Arial, sans-serif; padding: 20px;\">\n<h2 style=\"color: #f57c00;\">Registro Duplicado Detectado</h2>\n<p>El siguiente gasto ya existe en el sistema:</p>\n<table style=\"border-collapse: collapse; width: 100%; max-width: 600px;\">\n<tr style=\"background-color: #fff3e0;\">\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Comercio:</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Parse JSON & Generate ID').first().json['SERVICIO / COMERCIO'] }}</td>\n</tr>\n<tr>\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>Importe:</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\">${{ $('Parse JSON & Generate ID').first().json.IMPORTE }}</td>\n</tr>\n<tr style=\"background-color: #fff3e0;\">\n<td style=\"padding: 10px; border: 1px solid #ddd;\"><strong>ID Transaccion:</strong></td>\n<td style=\"padding: 10px; border: 1px solid #ddd;\">{{ $('Parse JSON & Generate ID').first().json.ID_INTERNO }}</td>\n</tr>\n</table>\n<p style=\"color: #666;\">No se ha creado un nuevo registro.</p>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "send-duplicate-email",
+      "name": "Send Duplicate Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [2640, 200],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GMAIL_CREDENTIAL_ID",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Email Trigger (IMAP)').first().json.from?.value?.[0]?.address }}",
+        "subject": "Error al Procesar Imagen de Gasto",
+        "emailType": "html",
+        "message": "=<html>\n<body style=\"font-family: Arial, sans-serif; padding: 20px;\">\n<h2 style=\"color: #c62828;\">Error al Procesar Imagen</h2>\n<p>No pudimos extraer informacion del comprobante adjunto. Posibles causas:</p>\n<ul>\n<li>La imagen no es clara o esta borrosa</li>\n<li>El formato del documento no es reconocido</li>\n<li>El archivo esta corrupto</li>\n</ul>\n<p>Por favor, intente enviar nuevamente con una imagen mas clara o en mejor resolucion.</p>\n<p style=\"color: #666;\">Archivo original: {{ $('Email Trigger (IMAP)').first().json.attachments?.[0]?.filename || 'Sin nombre' }}</p>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "send-error-email",
+      "name": "Send Error Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [2200, 400],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GMAIL_CREDENTIAL_ID",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-parse-error",
+              "leftValue": "={{ $json.parseError }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-parse-error",
+      "name": "Parse Error?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2200, 300]
+    },
+    {
+      "parameters": {},
+      "id": "no-attachments-end",
+      "name": "No Attachments - End",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [440, 400]
+    },
+    {
+      "parameters": {},
+      "id": "non-receipt-end",
+      "name": "Non-Receipt File - End",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [880, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.urls[0] }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "download-converted-pdf",
+      "name": "Download Converted Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 100]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "merge-data",
+              "name": "data",
+              "value": "={{ $binary.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "merge-branches",
+      "name": "Merge Branches",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1760, 0]
+    }
+  ],
+  "connections": {
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "Has Attachments?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Attachments?": {
+      "main": [
+        [
+          {
+            "node": "Split Attachments",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Attachments - End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Attachments": {
+      "main": [
+        [
+          {
+            "node": "Is Image/PDF?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Image/PDF?": {
+      "main": [
+        [
+          {
+            "node": "Upload to Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Non-Receipt File - End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Get File from Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get File from Drive": {
+      "main": [
+        [
+          {
+            "node": "Is PDF?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is PDF?": {
+      "main": [
+        [
+          {
+            "node": "PDF.co Convert to Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI Analyze Receipt (Image)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF.co Convert to Image": {
+      "main": [
+        [
+          {
+            "node": "Download Converted Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Converted Image": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Analyze Receipt (Image)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Analyze Receipt (Image)": {
+      "main": [
+        [
+          {
+            "node": "Parse JSON & Generate ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse JSON & Generate ID": {
+      "main": [
+        [
+          {
+            "node": "Check Duplicate in Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Duplicate in Database": {
+      "main": [
+        [
+          {
+            "node": "Is New Record?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is New Record?": {
+      "main": [
+        [
+          {
+            "node": "Insert to Database",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Duplicate Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert to Database": {
+      "main": [
+        [
+          {
+            "node": "Add to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "expense-management",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-12-10T00:00:00.000Z",
+  "versionId": "1"
+}
