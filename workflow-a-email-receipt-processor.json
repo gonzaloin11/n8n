@@ -26,7 +26,7 @@
       "position": [0, 300],
       "credentials": {
         "imap": {
-          "id": "IMAP_CREDENTIAL_ID",
+          "id": "",
           "name": "Email IMAP Account"
         }
       }
@@ -106,7 +106,7 @@
         "name": "={{ $json.attachments.filename || 'receipt_' + $now.format('yyyyMMdd_HHmmss') }}",
         "folderId": {
           "__rl": true,
-          "value": "YOUR_GOOGLE_DRIVE_FOLDER_ID",
+          "value": "",
           "mode": "id"
         },
         "options": {}
@@ -118,7 +118,7 @@
       "position": [880, 100],
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "GOOGLE_DRIVE_CREDENTIAL_ID",
+          "id": "",
           "name": "Google Drive Account"
         }
       }
@@ -146,7 +146,7 @@
       "position": [1100, 100],
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "GOOGLE_DRIVE_CREDENTIAL_ID",
+          "id": "",
           "name": "Google Drive Account"
         }
       }
@@ -198,7 +198,7 @@
       "position": [1540, 0],
       "credentials": {
         "httpHeaderAuth": {
-          "id": "PDFCO_CREDENTIAL_ID",
+          "id": "",
           "name": "PDF.co API Key"
         }
       }
@@ -236,7 +236,7 @@
       "position": [1760, 100],
       "credentials": {
         "openAiApi": {
-          "id": "OPENAI_CREDENTIAL_ID",
+          "id": "",
           "name": "OpenAI Account"
         }
       }
@@ -263,7 +263,7 @@
       "position": [2200, 100],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -366,7 +366,7 @@
       "position": [2640, 0],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -376,7 +376,7 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "YOUR_GOOGLE_SHEET_ID",
+          "value": "",
           "mode": "id"
         },
         "sheetName": {
@@ -434,7 +434,7 @@
       "position": [2860, 0],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "id": "",
           "name": "Google Sheets Account"
         }
       }
@@ -454,7 +454,7 @@
       "position": [3080, 0],
       "credentials": {
         "gmailOAuth2": {
-          "id": "GMAIL_CREDENTIAL_ID",
+          "id": "",
           "name": "Gmail Account"
         }
       }
@@ -474,7 +474,7 @@
       "position": [2640, 200],
       "credentials": {
         "gmailOAuth2": {
-          "id": "GMAIL_CREDENTIAL_ID",
+          "id": "",
           "name": "Gmail Account"
         }
       }
@@ -494,7 +494,7 @@
       "position": [2200, 400],
       "credentials": {
         "gmailOAuth2": {
-          "id": "GMAIL_CREDENTIAL_ID",
+          "id": "",
           "name": "Gmail Account"
         }
       }
