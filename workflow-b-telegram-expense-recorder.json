@@ -16,7 +16,7 @@
       "webhookId": "telegram-expense-bot",
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -324,7 +324,7 @@
       "position": [1000, -200],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -334,7 +334,7 @@
         "operation": "update",
         "documentId": {
           "__rl": true,
-          "value": "YOUR_GOOGLE_SHEET_ID",
+          "value": "",
           "mode": "id"
         },
         "sheetName": {
@@ -362,7 +362,7 @@
       "position": [1220, -200],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "id": "",
           "name": "Google Sheets Account"
         }
       }
@@ -382,7 +382,7 @@
       "position": [1440, -200],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -420,7 +420,7 @@
       "position": [1000, -50],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -430,7 +430,7 @@
         "operation": "update",
         "documentId": {
           "__rl": true,
-          "value": "YOUR_GOOGLE_SHEET_ID",
+          "value": "",
           "mode": "id"
         },
         "sheetName": {
@@ -458,7 +458,7 @@
       "position": [1220, -50],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "id": "",
           "name": "Google Sheets Account"
         }
       }
@@ -478,7 +478,7 @@
       "position": [1440, -50],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -539,7 +539,7 @@
       "position": [1000, 100],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -580,7 +580,7 @@
       "position": [1000, 250],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -600,7 +600,7 @@
       "position": [1220, 250],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -618,7 +618,7 @@
       "position": [500, 300],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -635,7 +635,7 @@
       "position": [720, 300],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -646,7 +646,7 @@
         "name": "=receipt_{{ $now.format('yyyyMMdd_HHmmss') }}.{{ $('Get Image File').first().json.file_path?.split('.').pop() || 'jpg' }}",
         "folderId": {
           "__rl": true,
-          "value": "YOUR_GOOGLE_DRIVE_FOLDER_ID",
+          "value": "",
           "mode": "id"
         },
         "options": {}
@@ -658,7 +658,7 @@
       "position": [940, 300],
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "GOOGLE_DRIVE_CREDENTIAL_ID",
+          "id": "",
           "name": "Google Drive Account"
         }
       }
@@ -696,7 +696,7 @@
       "position": [1160, 300],
       "credentials": {
         "openAiApi": {
-          "id": "OPENAI_CREDENTIAL_ID",
+          "id": "",
           "name": "OpenAI Account"
         }
       }
@@ -777,7 +777,7 @@
       "position": [1820, 200],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -843,7 +843,7 @@
       "position": [1820, 400],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -853,7 +853,7 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "YOUR_GOOGLE_SHEET_ID",
+          "value": "",
           "mode": "id"
         },
         "sheetName": {
@@ -887,7 +887,7 @@
       "position": [2040, 400],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "id": "",
           "name": "Google Sheets Account"
         }
       }
@@ -907,7 +907,7 @@
       "position": [2260, 400],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -925,7 +925,7 @@
       "position": [500, 500],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -948,7 +948,7 @@
       "position": [720, 500],
       "credentials": {
         "httpHeaderAuth": {
-          "id": "PDFCO_CREDENTIAL_ID",
+          "id": "",
           "name": "PDF.co API Key"
         }
       }
@@ -984,7 +984,7 @@
       "position": [500, 700],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -1004,7 +1004,7 @@
       "position": [720, 700],
       "credentials": {
         "openAiApi": {
-          "id": "OPENAI_CREDENTIAL_ID",
+          "id": "",
           "name": "OpenAI Account"
         }
       }
@@ -1037,7 +1037,7 @@
       "position": [940, 700],
       "credentials": {
         "openAiApi": {
-          "id": "OPENAI_CREDENTIAL_ID",
+          "id": "",
           "name": "OpenAI Account"
         }
       }
@@ -1113,7 +1113,7 @@
       "position": [1380, 700],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -1123,7 +1123,7 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "YOUR_GOOGLE_SHEET_ID",
+          "value": "",
           "mode": "id"
         },
         "sheetName": {
@@ -1156,7 +1156,7 @@
       "position": [1600, 700],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "id": "",
           "name": "Google Sheets Account"
         }
       }
@@ -1176,7 +1176,7 @@
       "position": [1820, 700],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -1209,7 +1209,7 @@
       "position": [500, 900],
       "credentials": {
         "openAiApi": {
-          "id": "OPENAI_CREDENTIAL_ID",
+          "id": "",
           "name": "OpenAI Account"
         }
       }
@@ -1314,7 +1314,7 @@
       "position": [1160, 800],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -1324,7 +1324,7 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "YOUR_GOOGLE_SHEET_ID",
+          "value": "",
           "mode": "id"
         },
         "sheetName": {
@@ -1357,7 +1357,7 @@
       "position": [1380, 800],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "id": "",
           "name": "Google Sheets Account"
         }
       }
@@ -1375,7 +1375,7 @@
       "position": [1380, 900],
       "credentials": {
         "googleDocsOAuth2Api": {
-          "id": "GOOGLE_DOCS_CREDENTIAL_ID",
+          "id": "",
           "name": "Google Docs Account"
         }
       }
@@ -1395,7 +1395,7 @@
       "position": [1600, 800],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -1415,7 +1415,7 @@
       "position": [1160, 1000],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -1452,7 +1452,7 @@
       "position": [500, 1100],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -1485,7 +1485,7 @@
       "position": [720, 1100],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -1505,7 +1505,7 @@
       "position": [2040, 200],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -1539,7 +1539,7 @@
       "position": [2260, 200],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }

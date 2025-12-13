@@ -69,7 +69,7 @@
       "position": [440, 300],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -168,7 +168,7 @@
       "position": [940, 100],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -256,7 +256,7 @@
       "position": [1820, 0],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -276,7 +276,7 @@
       "position": [1380, 200],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -293,7 +293,7 @@
       "position": [940, 300],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -394,7 +394,7 @@
       "position": [1820, 300],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -414,7 +414,7 @@
       "position": [1380, 400],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -431,7 +431,7 @@
       "position": [940, 500],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -508,7 +508,7 @@
       "position": [1820, 500],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -528,7 +528,7 @@
       "position": [1380, 600],
       "credentials": {
         "telegramApi": {
-          "id": "TELEGRAM_CREDENTIAL_ID",
+          "id": "",
           "name": "Telegram Bot"
         }
       }
@@ -562,7 +562,7 @@
       "position": [2040, 300],
       "credentials": {
         "supabaseApi": {
-          "id": "SUPABASE_CREDENTIAL_ID",
+          "id": "",
           "name": "Supabase Account"
         }
       }
@@ -584,7 +584,7 @@
         "operation": "read",
         "documentId": {
           "__rl": true,
-          "value": "YOUR_GOOGLE_SHEET_ID",
+          "value": "",
           "mode": "id"
         },
         "sheetName": {
@@ -610,7 +610,7 @@
       "position": [940, 700],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "id": "",
           "name": "Google Sheets Account"
         }
       },
@@ -621,7 +621,7 @@
         "operation": "read",
         "documentId": {
           "__rl": true,
-          "value": "YOUR_GOOGLE_SHEET_ID",
+          "value": "",
           "mode": "id"
         },
         "sheetName": {
@@ -647,7 +647,7 @@
       "position": [940, 850],
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "GOOGLE_SHEETS_CREDENTIAL_ID",
+          "id": "",
           "name": "Google Sheets Account"
         }
       },
