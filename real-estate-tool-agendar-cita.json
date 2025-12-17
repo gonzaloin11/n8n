@@ -1,0 +1,257 @@
+{
+  "name": "Tool: Agendar Cita (Real Estate)",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [-600, 0],
+      "id": "workflow-trigger-cita-001",
+      "name": "Execute Workflow Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Conversación con el cliente:\n{{ $json.conversacion }}\n\nDatos del cliente:\n- Nombre: {{ $json.nombre }}\n- Email: {{ $json.email }}\n- Teléfono: {{ $json.telefono }}\n- Proyecto de interés: {{ $json.proyecto }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Sos un asistente que resume conversaciones de ventas inmobiliarias.\n\nTu tarea es generar un resumen conciso y profesional de la conversación que incluya:\n1. Interés principal del cliente\n2. Necesidades detectadas (inversión vs. vivienda, cantidad de ambientes, ubicación preferida)\n3. Presupuesto mencionado (si aplica)\n4. Nivel de urgencia o timeline\n5. Cualquier objeción o preocupación expresada\n6. Próximos pasos acordados\n\nEl resumen debe ser útil para el asesor comercial que contactará al cliente.\nMáximo 200 palabras."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [-200, 0],
+      "id": "summarize-conversation-001",
+      "name": "Resumir Conversación"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [-300, 220],
+      "id": "openai-summarize-001",
+      "name": "OpenAI Chat Model (Summary)"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"resumen\": \"El cliente Juan está interesado en invertir en Reconquista Proyectos, buscando un departamento de 3 ambientes para renta. Presupuesto aproximado de USD 100.000. Urgencia media, planea decidir en los próximos 30 días.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [-100, 220],
+      "id": "output-parser-summary-001",
+      "name": "Structured Output Parser (Summary)"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Datos del lead:\n- Nombre: {{ $('Execute Workflow Trigger').item.json.nombre }}\n- Email: {{ $('Execute Workflow Trigger').item.json.email }}\n- Teléfono: {{ $('Execute Workflow Trigger').item.json.telefono }}\n- Proyecto: {{ $('Execute Workflow Trigger').item.json.proyecto }}\n\nResumen de conversación:\n{{ $json.output.resumen }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Sos un experto en calificación de leads inmobiliarios.\n\nTu tarea es calificar al lead del 1 al 5 estrellas basándote en:\n\n**5 estrellas - Lead HOT:**\n- Tiene presupuesto definido y alineado con los proyectos\n- Timeline de decisión corto (menos de 30 días)\n- Proporcionó todos los datos de contacto\n- Mostró interés concreto en un proyecto específico\n- Hizo preguntas detalladas sobre financiación/proceso de compra\n\n**4 estrellas - Lead caliente:**\n- Presupuesto aproximado conocido\n- Interés claro en un tipo de propiedad\n- Datos de contacto completos\n- Timeline de 1-3 meses\n\n**3 estrellas - Lead tibio:**\n- Interés general en el mercado inmobiliario\n- Presupuesto no definido claramente\n- Pidió información sin compromiso\n- Timeline de 3-6 meses o indefinido\n\n**2 estrellas - Lead frío:**\n- Solo buscando información general\n- Sin timeline definido\n- Posibles restricciones de presupuesto\n- Comparando muchas opciones\n\n**1 estrella - Lead muy frío:**\n- Curiosidad sin intención real\n- No proporcionó información relevante\n- Objeciones importantes no resueltas\n\nProporciona:\n1. Calificación (1-5 estrellas)\n2. Justificación breve (máximo 50 palabras)"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [100, 0],
+      "id": "rate-lead-001",
+      "name": "Calificar Lead"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [0, 220],
+      "id": "openai-rating-001",
+      "name": "OpenAI Chat Model (Rating)"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"calificacion\": 4,\n  \"justificacion\": \"Lead con presupuesto definido y timeline de 30 días. Interés específico en Reconquista Proyectos.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [200, 220],
+      "id": "output-parser-rating-001",
+      "name": "Structured Output Parser (Rating)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.tokkobroker.com/api/v1/web_contact/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $('Execute Workflow Trigger').item.json.nombre }}\",\n  \"phone\": \"{{ $('Execute Workflow Trigger').item.json.telefono }}\",\n  \"email\": \"{{ $('Execute Workflow Trigger').item.json.email }}\",\n  \"text\": \"{{ $('Resumir Conversación').item.json.output.resumen }}\\n\\nCalificación: {{ $json.output.calificacion }}/5 estrellas\\n{{ $json.output.justificacion }}\",\n  \"tags\": [\"{{ $('Execute Workflow Trigger').item.json.proyecto }}\", \"AI Agent\", \"Rating: {{ $json.output.calificacion }}\"]\n}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [400, 0],
+      "id": "tokko-crm-001",
+      "name": "Tokko Broker CRM"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response-cita",
+              "name": "response",
+              "value": "=Gracias {{ $('Execute Workflow Trigger').item.json.nombre }}, tu cita ha sido agendada exitosamente. Un asesor especializado se va a comunicar con vos a la brevedad para coordinar los detalles. ¡Muchas gracias por tu interés!",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [600, 0],
+      "id": "format-output-cita-001",
+      "name": "Format Output"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Resumir Conversación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resumir Conversación": {
+      "main": [
+        [
+          {
+            "node": "Calificar Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model (Summary)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resumir Conversación",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser (Summary)": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Resumir Conversación",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calificar Lead": {
+      "main": [
+        [
+          {
+            "node": "Tokko Broker CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model (Rating)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Calificar Lead",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser (Rating)": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Calificar Lead",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tokko Broker CRM": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": ""
+  },
+  "tags": [
+    {
+      "name": "Real Estate"
+    },
+    {
+      "name": "Tool"
+    },
+    {
+      "name": "CRM"
+    }
+  ]
+}

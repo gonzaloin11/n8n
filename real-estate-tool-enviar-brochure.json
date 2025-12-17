@@ -1,0 +1,658 @@
+{
+  "name": "Tool: Enviar Brochure (Real Estate)",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [-400, 0],
+      "id": "workflow-trigger-brochure-001",
+      "name": "Execute Workflow Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "reconquista-condition",
+              "leftValue": "={{ $json.proyecto.toLowerCase() }}",
+              "rightValue": "reconquista",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-100, -200],
+      "id": "check-reconquista-001",
+      "name": "Is Reconquista?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "pampas-condition",
+              "leftValue": "={{ $json.proyecto.toLowerCase() }}",
+              "rightValue": "pampas",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-100, 0],
+      "id": "check-pampas-001",
+      "name": "Is Pampas?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "sanluis-condition",
+              "leftValue": "={{ $json.proyecto.toLowerCase() }}",
+              "rightValue": "san luis",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-100, 200],
+      "id": "check-sanluis-001",
+      "name": "Is San Luis?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "calafate-condition",
+              "leftValue": "={{ $json.proyecto.toLowerCase() }}",
+              "rightValue": "calafate",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-100, 400],
+      "id": "check-calafate-001",
+      "name": "Is Calafate?"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.BROCHURE_URL_RECONQUISTA || 'https://your-storage.com/brochures/reconquista-proyectos.pdf' }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [200, -300],
+      "id": "download-reconquista-001",
+      "name": "Download Reconquista Brochure"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.BROCHURE_URL_PAMPAS || 'https://your-storage.com/brochures/pampas-central.pdf' }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [200, -100],
+      "id": "download-pampas-001",
+      "name": "Download Pampas Brochure"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.BROCHURE_URL_SANLUIS || 'https://your-storage.com/brochures/san-luis-viajes.pdf' }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [200, 100],
+      "id": "download-sanluis-001",
+      "name": "Download San Luis Brochure"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.BROCHURE_URL_CALAFATE || 'https://your-storage.com/brochures/calafate-propiedades.pdf' }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [200, 300],
+      "id": "download-calafate-001",
+      "name": "Download Calafate Brochure"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Execute Workflow Trigger').item.json.email }}",
+        "subject": "=Tu brochure de Reconquista Proyectos 🏠",
+        "emailType": "html",
+        "message": "=<html>\n<body style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;\">\n  <h2 style=\"color: #2c3e50;\">¡Hola{{ $('Execute Workflow Trigger').item.json.nombre ? ' ' + $('Execute Workflow Trigger').item.json.nombre : '' }}!</h2>\n  \n  <p>Gracias por tu interés en <strong>Reconquista Proyectos</strong>.</p>\n  \n  <p>Adjunto encontrarás nuestro brochure completo con toda la información sobre:</p>\n  \n  <ul>\n    <li>📍 Ubicación privilegiada en Reconquista, Santa Fe</li>\n    <li>🏢 Departamentos de 2, 3 y 4 ambientes</li>\n    <li>🏊 Amenities: Pileta, SUM, gimnasio, seguridad 24hs</li>\n    <li>💰 Opciones de inversión con rentabilidad del 6-8% anual</li>\n    <li>🗓️ Entrega estimada: 2025</li>\n  </ul>\n  \n  <p>Si tenés alguna consulta o querés agendar una visita, no dudes en responder este email o contactarnos.</p>\n  \n  <p style=\"margin-top: 30px;\">¡Saludos cordiales!</p>\n  <p><strong>Equipo de Ventas</strong><br>\n  Reconquista Proyectos</p>\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "data"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [450, -300],
+      "id": "send-email-reconquista-001",
+      "name": "Send Reconquista Email"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Execute Workflow Trigger').item.json.email }}",
+        "subject": "=Tu brochure de Pampas Central 🏭",
+        "emailType": "html",
+        "message": "=<html>\n<body style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;\">\n  <h2 style=\"color: #2c3e50;\">¡Hola{{ $('Execute Workflow Trigger').item.json.nombre ? ' ' + $('Execute Workflow Trigger').item.json.nombre : '' }}!</h2>\n  \n  <p>Gracias por tu interés en <strong>Pampas Central</strong>.</p>\n  \n  <p>Adjunto encontrarás nuestro brochure completo con toda la información sobre:</p>\n  \n  <ul>\n    <li>📍 Ubicación estratégica en Parque Industrial La Plata</li>\n    <li>🏭 Naves industriales de 500 a 5000 m²</li>\n    <li>⚡ Servicios: Electricidad trifásica, gas industrial, fibra óptica</li>\n    <li>✅ Unidades con entrega inmediata disponibles</li>\n    <li>🚚 Ideal para logística, e-commerce y manufactura</li>\n  </ul>\n  \n  <p>Si tenés alguna consulta o querés coordinar una visita al parque industrial, no dudes en responder este email.</p>\n  \n  <p style=\"margin-top: 30px;\">¡Saludos cordiales!</p>\n  <p><strong>Equipo de Ventas</strong><br>\n  Pampas Central</p>\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "data"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [450, -100],
+      "id": "send-email-pampas-001",
+      "name": "Send Pampas Email"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Execute Workflow Trigger').item.json.email }}",
+        "subject": "=Tu brochure de San Luis Viajes 🏨",
+        "emailType": "html",
+        "message": "=<html>\n<body style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;\">\n  <h2 style=\"color: #2c3e50;\">¡Hola{{ $('Execute Workflow Trigger').item.json.nombre ? ' ' + $('Execute Workflow Trigger').item.json.nombre : '' }}!</h2>\n  \n  <p>Gracias por tu interés en <strong>San Luis Viajes</strong>.</p>\n  \n  <p>Adjunto encontrarás nuestro brochure completo con toda la información sobre:</p>\n  \n  <ul>\n    <li>📍 Ubicación céntrica en San Luis Capital</li>\n    <li>🛍️ Locales comerciales de 30 a 200 m²</li>\n    <li>🏨 Hotel 4 estrellas integrado</li>\n    <li>🅿️ Estacionamiento, food court y cine</li>\n    <li>💰 Inversión desde USD 45.000</li>\n    <li>🗓️ Entrega estimada: 2025</li>\n  </ul>\n  \n  <p>Si tenés alguna consulta o querés conocer más sobre las oportunidades de inversión, no dudes en responder este email.</p>\n  \n  <p style=\"margin-top: 30px;\">¡Saludos cordiales!</p>\n  <p><strong>Equipo de Ventas</strong><br>\n  San Luis Viajes</p>\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "data"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [450, 100],
+      "id": "send-email-sanluis-001",
+      "name": "Send San Luis Email"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Execute Workflow Trigger').item.json.email }}",
+        "subject": "=Tu brochure de Calafate Propiedades ❄️",
+        "emailType": "html",
+        "message": "=<html>\n<body style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;\">\n  <h2 style=\"color: #2c3e50;\">¡Hola{{ $('Execute Workflow Trigger').item.json.nombre ? ' ' + $('Execute Workflow Trigger').item.json.nombre : '' }}!</h2>\n  \n  <p>Gracias por tu interés en <strong>Calafate Propiedades</strong>.</p>\n  \n  <p>Adjunto encontrarás nuestro brochure completo con toda la información sobre:</p>\n  \n  <ul>\n    <li>📍 Ubicación exclusiva en El Calafate, Santa Cruz</li>\n    <li>🏔️ Casas y departamentos de lujo con vista al lago</li>\n    <li>🛥️ Amenities premium: Muelle privado, spa, concierge</li>\n    <li>🔐 Seguridad 24/7</li>\n    <li>💎 Inversión desde USD 350.000</li>\n    <li>🗓️ Entrega estimada: 2026</li>\n  </ul>\n  \n  <p>Si tenés alguna consulta o querés conocer esta oportunidad única de inversión en la Patagonia, no dudes en responder este email.</p>\n  \n  <p style=\"margin-top: 30px;\">¡Saludos cordiales!</p>\n  <p><strong>Equipo de Ventas</strong><br>\n  Calafate Propiedades</p>\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "data"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [450, 300],
+      "id": "send-email-calafate-001",
+      "name": "Send Calafate Email"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response-brochure-reconquista",
+              "name": "response",
+              "value": "=¡Listo! Te acabo de enviar el brochure de Reconquista Proyectos a {{ $('Execute Workflow Trigger').item.json.email }}. Revisá tu bandeja de entrada (y spam por las dudas). ¿Hay algo más en lo que pueda ayudarte?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [700, -300],
+      "id": "format-output-reconquista-001",
+      "name": "Format Output Reconquista"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response-brochure-pampas",
+              "name": "response",
+              "value": "=¡Listo! Te acabo de enviar el brochure de Pampas Central a {{ $('Execute Workflow Trigger').item.json.email }}. Revisá tu bandeja de entrada (y spam por las dudas). ¿Hay algo más en lo que pueda ayudarte?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [700, -100],
+      "id": "format-output-pampas-001",
+      "name": "Format Output Pampas"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response-brochure-sanluis",
+              "name": "response",
+              "value": "=¡Listo! Te acabo de enviar el brochure de San Luis Viajes a {{ $('Execute Workflow Trigger').item.json.email }}. Revisá tu bandeja de entrada (y spam por las dudas). ¿Hay algo más en lo que pueda ayudarte?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [700, 100],
+      "id": "format-output-sanluis-001",
+      "name": "Format Output San Luis"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response-brochure-calafate",
+              "name": "response",
+              "value": "=¡Listo! Te acabo de enviar el brochure de Calafate Propiedades a {{ $('Execute Workflow Trigger').item.json.email }}. Revisá tu bandeja de entrada (y spam por las dudas). ¿Hay algo más en lo que pueda ayudarte?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [700, 300],
+      "id": "format-output-calafate-001",
+      "name": "Format Output Calafate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response-brochure-default",
+              "name": "response",
+              "value": "No pude identificar el proyecto que mencionaste. Los proyectos disponibles son: Reconquista Proyectos, Pampas Central, San Luis Viajes y Calafate Propiedades. ¿Cuál te interesa?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [200, 500],
+      "id": "format-output-default-001",
+      "name": "Format Output Default"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "reconquista",
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "reconquista-route",
+                    "leftValue": "={{ $json.proyecto.toLowerCase() }}",
+                    "rightValue": "reconquista",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "or"
+              }
+            },
+            {
+              "outputKey": "pampas",
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "pampas-route",
+                    "leftValue": "={{ $json.proyecto.toLowerCase() }}",
+                    "rightValue": "pampas",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "or"
+              }
+            },
+            {
+              "outputKey": "sanluis",
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "sanluis-route",
+                    "leftValue": "={{ $json.proyecto.toLowerCase() }}",
+                    "rightValue": "san luis",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "or"
+              }
+            },
+            {
+              "outputKey": "calafate",
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "id": "calafate-route",
+                    "leftValue": "={{ $json.proyecto.toLowerCase() }}",
+                    "rightValue": "calafate",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "or"
+              }
+            }
+          ],
+          "fallbackOutput": "extra"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [-200, 0],
+      "id": "route-project-001",
+      "name": "Route by Project"
+    }
+  ],
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Route by Project",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Project": {
+      "main": [
+        [
+          {
+            "node": "Download Reconquista Brochure",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Pampas Brochure",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download San Luis Brochure",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Calafate Brochure",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Output Default",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Reconquista Brochure": {
+      "main": [
+        [
+          {
+            "node": "Send Reconquista Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Pampas Brochure": {
+      "main": [
+        [
+          {
+            "node": "Send Pampas Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download San Luis Brochure": {
+      "main": [
+        [
+          {
+            "node": "Send San Luis Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Calafate Brochure": {
+      "main": [
+        [
+          {
+            "node": "Send Calafate Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reconquista Email": {
+      "main": [
+        [
+          {
+            "node": "Format Output Reconquista",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Pampas Email": {
+      "main": [
+        [
+          {
+            "node": "Format Output Pampas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send San Luis Email": {
+      "main": [
+        [
+          {
+            "node": "Format Output San Luis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Calafate Email": {
+      "main": [
+        [
+          {
+            "node": "Format Output Calafate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": ""
+  },
+  "tags": [
+    {
+      "name": "Real Estate"
+    },
+    {
+      "name": "Tool"
+    },
+    {
+      "name": "Email"
+    }
+  ]
+}

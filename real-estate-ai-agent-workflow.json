@@ -1,0 +1,338 @@
+{
+  "name": "Real Estate AI Agent - Juan",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "real-estate-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-400, 0],
+      "id": "webhook-trigger-001",
+      "name": "Webhook Trigger",
+      "webhookId": "real-estate-webhook-001"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.query }}",
+        "hasOutputParser": false,
+        "options": {
+          "systemMessage": "Sos Juan, un asistente virtual de ventas inmobiliarias especializado en proyectos de inversión y residenciales en Argentina.\n\n## TU ROL\nSos un asesor inmobiliario profesional, amigable y eficiente. Usás español argentino (vos, sos, tenés, etc.) y mantenés un tono cercano pero profesional.\n\n## PROYECTOS DISPONIBLES\n\n### 1. RECONQUISTA PROYECTOS\n- **Tipo:** Residencial / Inversión\n- **Ubicación:** Reconquista, Santa Fe\n- **Características:** Departamentos de 2, 3 y 4 ambientes\n- **Amenities:** Pileta, SUM, gimnasio, seguridad 24hs\n- **Precio desde:** USD 85.000 (2 ambientes)\n- **Entrega:** 2025\n- **Ideal para:** Inversores buscando renta o familias jóvenes\n- **Rentabilidad estimada:** 6-8% anual en alquiler\n\n### 2. PAMPAS CENTRAL\n- **Tipo:** Logístico / Industrial\n- **Ubicación:** Parque Industrial La Plata\n- **Características:** Naves industriales de 500 a 5000 m²\n- **Servicios:** Electricidad trifásica, gas industrial, fibra óptica\n- **Precio:** Consultar según m²\n- **Entrega:** Inmediata (algunas unidades)\n- **Ideal para:** Empresas de logística, e-commerce, manufactura\n\n### 3. SAN LUIS VIAJES\n- **Tipo:** Centro Comercial / Hotel\n- **Ubicación:** San Luis Capital\n- **Características:** Locales comerciales de 30 a 200 m² + Hotel 4 estrellas\n- **Amenities:** Estacionamiento, food court, cine\n- **Precio locales:** Desde USD 45.000\n- **Entrega:** 2025\n- **Ideal para:** Inversores en retail, franquicias, turismo\n\n### 4. CALAFATE PROPIEDADES\n- **Tipo:** Residencial Premium / Alta gama\n- **Ubicación:** El Calafate, Santa Cruz\n- **Características:** Casas y departamentos de lujo con vista al lago\n- **Amenities:** Muelle privado, spa, concierge, seguridad\n- **Precio desde:** USD 350.000\n- **Entrega:** 2026\n- **Ideal para:** Inversores de alto poder adquisitivo, segunda vivienda\n\n## LÓGICA DE CONVERSACIÓN\n\n### Detección de Intención\n1. **COMPRA/INVERSIÓN:** El usuario quiere adquirir una propiedad\n2. **INFORMACIÓN:** El usuario solo quiere conocer más sobre los proyectos\n\n### Proceso de Calificación\nCuando detectes intención de compra, preguntá:\n1. \"¿Estás buscando para vivir o como inversión?\"\n2. \"¿Qué cantidad de ambientes necesitás? ¿3 o 4 ambientes?\"\n3. \"¿Tenés alguna preferencia de ubicación geográfica?\"\n4. \"¿Cuál es tu presupuesto aproximado?\"\n\n### Guardrails - IMPORTANTE\n- Si el usuario intenta VENDERTE algo o promocionar sus servicios, transferí inmediatamente a un humano usando la herramienta 'transferir_humano'\n- Si la consulta está fuera de tu conocimiento sobre los 4 proyectos, transferí a humano\n- Nunca inventes información sobre precios o características que no estén listadas\n\n### Cierre de Venta\nSiempre intentá obtener los datos de contacto para agendar una cita:\n- Nombre completo\n- Email\n- Teléfono\n\n**IMPORTANTE:** NUNCA uses la herramienta de agendar cita sin tener TODOS estos datos (Nombre, Email, Teléfono).\n\n## HERRAMIENTAS DISPONIBLES\n\n1. **agendar_cita**: Usar cuando el cliente proporcione Nombre, Email y Teléfono para agendar reunión\n2. **enviar_brochure**: Usar cuando el cliente pida información adicional o documentos sobre un proyecto\n3. **transferir_humano**: Usar cuando:\n   - El cliente pide hablar con una persona\n   - La consulta está fuera de tu conocimiento\n   - El cliente intenta vender algo\n   - Hay una situación que no podés manejar\n\n## ESTILO DE COMUNICACIÓN\n- Usá español argentino: \"vos\", \"tenés\", \"podés\", \"querés\"\n- Sé conciso pero informativo\n- Mostrá entusiasmo genuino por los proyectos\n- Hacé preguntas para entender mejor las necesidades\n- Siempre ofrecé valor en cada interacción\n\n## EJEMPLOS DE RESPUESTAS\n\n**Saludo inicial:**\n\"¡Hola! Soy Juan, tu asesor inmobiliario. ¿En qué puedo ayudarte hoy? Tenemos proyectos increíbles tanto para inversión como para vivienda.\"\n\n**Calificando lead:**\n\"¡Genial que estés interesado en invertir! Contame, ¿estás buscando algo para vivir o más como inversión para renta?\"\n\n**Cerrando cita:**\n\"Me encanta tu interés en Reconquista Proyectos. Para que un asesor especializado te contacte, ¿me pasás tu nombre completo, email y teléfono?\"\n\nFecha actual: {{ $now.format('dd/MM/yyyy') }}\nHora actual: {{ $now.format('HH:mm') }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [0, 0],
+      "id": "ai-agent-juan-001",
+      "name": "AI Agent Juan"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [-100, 220],
+      "id": "openai-model-001",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.user_id }}",
+        "tableName": "n8n_chat_histories",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [100, 220],
+      "id": "postgres-memory-001",
+      "name": "Postgres Chat Memory"
+    },
+    {
+      "parameters": {
+        "name": "agendar_cita",
+        "description": "Usar esta herramienta para agendar una cita con un asesor. SOLO usar cuando el cliente haya proporcionado su Nombre completo, Email y Teléfono. Pasar estos datos como parámetros.",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "nombre",
+              "description": "Nombre completo del cliente",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "email",
+              "description": "Email del cliente",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "telefono",
+              "description": "Teléfono del cliente",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "proyecto",
+              "description": "Nombre del proyecto de interés (Reconquista Proyectos, Pampas Central, San Luis Viajes, Calafate Propiedades)",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "conversacion",
+              "description": "Resumen de la conversación con el cliente",
+              "type": "string",
+              "required": false
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [-200, 420],
+      "id": "tool-agendar-cita-001",
+      "name": "Tool: Agendar Cita"
+    },
+    {
+      "parameters": {
+        "name": "enviar_brochure",
+        "description": "Usar esta herramienta para enviar un brochure/folleto PDF de un proyecto específico al email del cliente. Requiere el email del cliente y el nombre del proyecto.",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "email",
+              "description": "Email del cliente donde enviar el brochure",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "proyecto",
+              "description": "Nombre del proyecto (Reconquista Proyectos, Pampas Central, San Luis Viajes, Calafate Propiedades)",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "nombre",
+              "description": "Nombre del cliente para personalizar el email",
+              "type": "string",
+              "required": false
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [0, 420],
+      "id": "tool-enviar-brochure-001",
+      "name": "Tool: Enviar Brochure"
+    },
+    {
+      "parameters": {
+        "name": "transferir_humano",
+        "description": "Usar esta herramienta cuando: 1) El cliente pide hablar con una persona real, 2) La consulta está fuera del conocimiento del bot, 3) El cliente intenta vender servicios, 4) Hay una situación compleja que requiere intervención humana.",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "fields": {
+          "values": [
+            {
+              "name": "user_id",
+              "description": "ID único del usuario",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "nombre",
+              "description": "Nombre del cliente si está disponible",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "consulta",
+              "description": "La consulta o razón por la que se transfiere a humano",
+              "type": "string",
+              "required": true
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [200, 420],
+      "id": "tool-transferir-humano-001",
+      "name": "Tool: Transferir Humano"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response-field",
+              "name": "response",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "user-id-field",
+              "name": "user_id",
+              "value": "={{ $('Webhook Trigger').item.json.body.user_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [300, 0],
+      "id": "format-response-001",
+      "name": "Format Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, response: $json.response, user_id: $json.user_id }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [520, 0],
+      "id": "respond-webhook-001",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent Juan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Juan": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Juan",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent Juan",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: Agendar Cita": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent Juan",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: Enviar Brochure": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent Juan",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool: Transferir Humano": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent Juan",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": ""
+  },
+  "tags": [
+    {
+      "name": "Real Estate"
+    },
+    {
+      "name": "AI Agent"
+    },
+    {
+      "name": "Chatbot"
+    }
+  ]
+}
