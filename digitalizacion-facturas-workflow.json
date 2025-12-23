@@ -1,0 +1,735 @@
+{
+  "name": "Digitalización de facturas",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Escucha GDrive\nActivación al recibir nuevos archivos",
+        "height": 293,
+        "width": 343,
+        "color": 4
+      },
+      "id": "1939ce91-b623-474d-85c5-f6030f8e99ea",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Procesado de datos",
+        "height": 293,
+        "width": 303,
+        "color": 5
+      },
+      "id": "ccd6eedc-0101-4b6d-84c3-b192b86ad33d",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Extracción Inteligente de datos\nPrompt",
+        "height": 293,
+        "width": 643,
+        "color": 6
+      },
+      "id": "792b3e37-61b3-406c-a928-7c7f1dcb9bc5",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Cargar Facturas Excell",
+        "height": 293,
+        "width": 323
+      },
+      "id": "55e2780a-5153-44b3-aefd-9e2a4be7351e",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1344,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "18HlkKRHfTcr7JmTZlUCi8CobbaEbizWp",
+          "mode": "list",
+          "cachedResultName": "pdf facturas testeos n8n",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/18HlkKRHfTcr7JmTZlUCi8CobbaEbizWp"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        48,
+        112
+      ],
+      "id": "3c304f1d-489f-405d-96ec-41931afb57da",
+      "name": "NuevoArchivo",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "laKAnSMnVgASG48V",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        112
+      ],
+      "id": "58701616-b739-4f25-ab6e-059d07f091de",
+      "name": "RecuperarFichero",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "laKAnSMnVgASG48V",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        384,
+        112
+      ],
+      "id": "33920804-6a4f-43e7-92f2-0d08890b76f0",
+      "name": "ExtraerPDF"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  if (item.json.text) {\n    item.json.text = item.json.text\n      .replace(/\\r?\\n|\\r/g, ' ') // Quitar lineas\n      .replace(/\\s+/g, ' ') // Quitar espacios extra\n      .replace(/[^\\p{L}\\p{N}\\s.,]/gu, '') // Quitar caracteres especiales excepto letras, numeros, puntos y comas\n      .trim(); // Quitar espacios iniciales y finales\n  }\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        112
+      ],
+      "id": "c369ad97-14e0-4e0d-ace2-6a5bc183d31f",
+      "name": "Reformatear"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        816,
+        -160
+      ],
+      "id": "0b0d3018-65bc-4fe6-b248-caec19be476b",
+      "name": "ProcesarFIchero1a1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Dada la siguiente factura dentro de las etiquetas XML <factura>, extrae la siguiente información según se indica a continuación.\nSi no puedes encontrar la información para un ítem específico, déjalo en blanco y pasa al siguiente.\n\nDescripción – una breve descripción (1-2 líneas) de la factura, por ejemplo: \"Uso mensual de Elevenlabs\" – OBLIGATORIO\n\nTipo – [OPCIONES: Recurrente Mensual, Recurrente Anual, Pago Único] – OBLIGATORIO\n\nFecha de la factura (fecha en que se recibió la factura) – OBLIGATORIO\n\nFecha de pago (fecha en que se realizará el pago; no siempre es la misma que la de emisión de la factura) – OBLIGATORIO\n\nNúmero de factura – OBLIGATORIO\n\nNúmero de orden de compra\n\nNombre del proveedor\n\nNúmero de identificación fiscal (IVA) del proveedor\n\nArtículos de línea, incluyendo una descripción de los bienes o servicios prestados\n\nPrecio con y sin IVA (sin incluir la moneda)\n\nPrecio total (sin incluir la moneda) – OBLIGATORIO\n\nMoneda (USD, Euro, GBP, ARS) – OBLIGATORIO\n\nInformación adicional que consideres importante y que no esté incluida arriba\n\nInformación adicional importante como:\n\nCondiciones de pago (Transferencia 30 días, pago inmediato, etc.)\n\nMétodos de pago aceptados\n\nDetalles de cuenta bancaria si están disponibles\n\nCondiciones de descuento o incentivos por pago anticipado\n\nPenalizaciones por pagos tardíos o tasas de interés\n\nReferencias de exención de impuestos\n\nReferencias de contrato o acuerdos marco\n\nCondiciones de entrega\n\nInstrucciones especiales\n\nInformación de contacto para consultas de facturación\n\nPolíticas de devoluciones/reembolsos\n\nInformación de garantía si aplica\n\nCertificado de origen si está presente\n\nRequisitos de seguro\n\nInformación aduanera para envíos internacionales\n<factura>{{ $json.text }}</factura>",
+        "hasOutputParser": true
+      },
+      "id": "b39f767c-5b0b-4481-a9c7-a7522813c855",
+      "name": "Modelo extracción de datos",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1040,
+        32
+      ],
+      "typeVersion": 1.4,
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {
+          "prompt": "Instructions:\n--------------\n{instructions}\n--------------\nCompletion:\n--------------\n{completion}\n--------------\n\nAbove, the Completion did not satisfy the constraints given in the Instructions.\nError:\n--------------\n{error}\n--------------\n\nPlease try again. Please only respond with an answer that satisfies the constraints laid out in the Instructions:"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        256
+      ],
+      "id": "0558a70e-7d0e-4a79-b27c-845e64362e55",
+      "name": "Corrector de formatos"
+    },
+    {
+      "parameters": {
+        "jsonSchema": "={\n  \"type\": \"object\",\n  \"required\": [\n    \"Numero de factura\",\n    \"Fecha de la factura\",\n    \"Descripcion\",\n    \"Fecha de pago\",\n    \"Tipo\",\n    \"Precio total\"\n  ],\n  \"properties\": {\n    \"Descripcion\": { \"type\": \"string\" },\n    \n    \"Fecha de la factura\": {\n      \"type\": \"string\",\n      \"format\": \"date\",\n      \"formatDisplay\": \"dd/mm/yyyy\"\n    },\n    \"Fecha de pago\": {\n      \"type\": \"string\",\n      \"format\": \"date\",\n      \"formatDisplay\": \"dd/mm/yyyy\"\n    },\n    \n    \"Tipo\": { \n      \"type\": \"string\",\n      \"enum\": [\"Recurrente Anual\", \"Recurrente Mensual\", \"Pago Unico\"]\n    },\n    \"Numero de factura\": { \"type\": \"string\" },\n    \"Numero de orden de compra\": { \"type\": \"string\" },\n    \"Nombre del proveedor\": { \"type\": \"string\" },\n    \"Direccion del proveedor\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"direccion 1\": { \"type\": \"string\" },\n        \"direccion 2\": { \"type\": \"string\" },\n        \"ciudad\": { \"type\": \"string\" },\n        \"codigo postal\": { \"type\": \"string\" }\n      }\n    },\n    \"Numero de identificacion fiscal del proveedor\": { \"type\": \"string\" },\n    \"Nombre del cliente\": { \"type\": \"string\" },\n    \"Direccion del cliente\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"direccion 1\": { \"type\": \"string\" },\n        \"direccion 2\": { \"type\": \"string\" },\n        \"ciudad\": { \"type\": \"string\" },\n        \"codigo postal\": { \"type\": \"string\" }\n      }\n    },\n    \"Numero de identificacion fiscal del cliente\": { \"type\": \"string\" },\n    \"Direcciones de envio\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"direccion 1\": { \"type\": \"string\" },\n          \"direccion 2\": { \"type\": \"string\" },\n          \"ciudad\": { \"type\": \"string\" },\n          \"codigo postal\": { \"type\": \"string\" }\n        }\n      }\n    },\n    \"Articulos de linea\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"name\": \"string\",\n        \"description\": \"string\",\n        \"price\": \"number\",\n        \"discount\": \"number\"\n      }\n    },\n    \"Subtotal sin IVA\": { \"type\": \"number\" },\n    \"Subtotal con IVA\": { \"type\": \"number\" },\n    \"Precio total\": { \"type\": \"number\" },\n    \"Moneda\": { \"type\": \"string\" },\n    \"Informacion adicional\": { \"type\": \"string\" }\n  }\n}\n"
+      },
+      "id": "6c7567ca-c67f-4fcb-acc3-0f22b642304a",
+      "name": "Parseador de datos",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1136,
+        512
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        528
+      ],
+      "id": "ded82ae6-745d-4888-b8f5-d2f823f9407b",
+      "name": "Modelo OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "BcxPyrU3gHvY2ePY",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Análisis de datos\nJSON Structure",
+        "height": 393,
+        "width": 643,
+        "color": 3
+      },
+      "id": "34b8f681-5590-4a15-bebd-75b0001004e2",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        304
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RRig-o0utrtRaDaMhvEoMeGGa4k8b-PXR0EIcLo7Apc",
+          "mode": "list",
+          "cachedResultName": "Copy of Registro_Gastos_N8N",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RRig-o0utrtRaDaMhvEoMeGGa4k8b-PXR0EIcLo7Apc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 645590874,
+          "mode": "list",
+          "cachedResultName": "N8N_AUTO",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RRig-o0utrtRaDaMhvEoMeGGa4k8b-PXR0EIcLo7Apc/edit#gid=645590874"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha Registro": "={{ $json.output['Fecha de la factura'] }}",
+            "ID": "={{ $json.output['Numero de factura'] }}",
+            "Proveedor": "={{ $json.output['Nombre del proveedor'] }}",
+            "Concepto": "={{ $json.output.Descripcion }}",
+            "Importe": "={{ $json.output['Precio total'] }}",
+            "Categoria": "={{ $json.output['Articulos de linea'][9].descripcion }}",
+            "Fecha Pago": "={{ $json.output['Fecha de pago'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha Registro",
+              "displayName": "Fecha Registro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ID Transaccion",
+              "displayName": "ID Transaccion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha Pago",
+              "displayName": "Fecha Pago",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Proveedor",
+              "displayName": "Proveedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Concepto",
+              "displayName": "Concepto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Importe",
+              "displayName": "Importe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Categoria",
+              "displayName": "Categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo",
+              "displayName": "Tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Origen",
+              "displayName": "Origen",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Forma Pago",
+              "displayName": "Forma Pago",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Chat ID",
+              "displayName": "Chat ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Link Archivo",
+              "displayName": "Link Archivo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Confianza",
+              "displayName": "Confianza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1472,
+        112
+      ],
+      "id": "3f2fcd31-d6ca-40ca-a265-695e7be802e9",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "S0TQ1coDMhnhD2VP",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "NuevoArchivo": [
+      {
+        "json": {
+          "parents": [
+            "18HlkKRHfTcr7JmTZlUCi8CobbaEbizWp"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Gonzalo Insua",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "04298210506467374999",
+            "emailAddress": "gonzalo.insua11@gmail.com",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ4-Qj--AfJBheRxwfme0B7UsvRK1uXqVfv964VDoE_NFffsA=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Gonzalo Insua",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "04298210506467374999",
+              "emailAddress": "gonzalo.insua11@gmail.com",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ4-Qj--AfJBheRxwfme0B7UsvRK1uXqVfv964VDoE_NFffsA=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "anyoneWithLink",
+              "type": "anyone",
+              "role": "reader",
+              "allowFileDiscovery": false
+            },
+            {
+              "kind": "drive#permission",
+              "id": "04298210506467374999",
+              "type": "user",
+              "emailAddress": "gonzalo.insua11@gmail.com",
+              "role": "owner",
+              "displayName": "Gonzalo Insua",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocJ4-Qj--AfJBheRxwfme0B7UsvRK1uXqVfv964VDoE_NFffsA=s64",
+              "deleted": false,
+              "pendingOwner": false
+            },
+            {
+              "kind": "drive#permission",
+              "id": "13643288071023763686",
+              "type": "user",
+              "emailAddress": "automatizacionquara@gmail.com",
+              "role": "writer",
+              "displayName": "automatizacionquara",
+              "photoLink": "https://lh3.googleusercontent.com/a-/ALV-UjWfPeF9vWlSo6yQATM3br_UoJqfzD3v6QNTqKyLtPJUBkpBvw=s64",
+              "deleted": false,
+              "pendingOwner": false
+            },
+            {
+              "kind": "drive#permission",
+              "id": "12176664432814581257",
+              "type": "user",
+              "emailAddress": "argentinavitagel@gmail.com",
+              "role": "writer",
+              "displayName": "argentinavitagel",
+              "photoLink": "https://lh3.googleusercontent.com/a-/ALV-UjX6naS3Fj9CkD6MtLfXjnA1h9_4nZ31fM9y9BZZRvkIYZYpDg=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": true,
+            "canChangeItemDownloadRestriction": true,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": true,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": true,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": true,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "anyoneWithLink",
+            "04298210506467374999",
+            "13643288071023763686",
+            "12176664432814581257"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "1TDdE6EqhqjrHkPwCvkbblriJS1xE9BiR",
+          "name": "file_32.pdf",
+          "mimeType": "application/pdf",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "4",
+          "webContentLink": "https://drive.google.com/uc?id=1TDdE6EqhqjrHkPwCvkbblriJS1xE9BiR&export=download",
+          "webViewLink": "https://drive.google.com/file/d/1TDdE6EqhqjrHkPwCvkbblriJS1xE9BiR/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/pdf",
+          "hasThumbnail": true,
+          "thumbnailLink": "https://lh3.googleusercontent.com/drive-storage/AJQWtBM_NcjP0mbAqkav6N_NYR4qTQp82Kfs8VDNYu4vo7j05FRZffJMNAXkRLLxsVWl0h_1ovrMPD-0RMB4xGMeJzrhVo_G2gDVRqdmIozxpg2gA0Y=s220",
+          "thumbnailVersion": "1",
+          "viewedByMe": false,
+          "createdTime": "2025-12-22T15:13:50.743Z",
+          "modifiedTime": "2025-12-22T15:13:51.801Z",
+          "modifiedByMeTime": "2025-12-22T15:13:51.801Z",
+          "modifiedByMe": true,
+          "shared": true,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "file_32.pdf",
+          "fullFileExtension": "pdf",
+          "fileExtension": "pdf",
+          "md5Checksum": "d68873479594f56f95899e6422467db3",
+          "sha1Checksum": "19fdaa04830d063dd77ed48071cd5c233d2d8959",
+          "sha256Checksum": "f0895460c599f4b40c3a10e7b0d157ea46ae51e6893b5bed1a34a6925be32fd1",
+          "size": "101761",
+          "quotaBytesUsed": "101761",
+          "headRevisionId": "0B7BCEwrmSqsRZUs4Y0VjWmFGS2ZnSVNQemJQa0FCd2dUSDNZPQ",
+          "isAppAuthorized": true,
+          "inheritedPermissionsDisabled": false
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "NuevoArchivo": {
+      "main": [
+        [
+          {
+            "node": "RecuperarFichero",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RecuperarFichero": {
+      "main": [
+        [
+          {
+            "node": "ExtraerPDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ExtraerPDF": {
+      "main": [
+        [
+          {
+            "node": "Reformatear",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reformatear": {
+      "main": [
+        [
+          {
+            "node": "ProcesarFIchero1a1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ProcesarFIchero1a1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Modelo extracción de datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo extracción de datos": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Corrector de formatos": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Modelo extracción de datos",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parseador de datos": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Corrector de formatos",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Modelo extracción de datos",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Corrector de formatos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "ProcesarFIchero1a1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f6180dc5-40ea-4b8f-bdb0-6602c49980c9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "89dbe17b1d6844ebe461860833b924709cd8a3393ba96d7321a2cfeecf1fe85c"
+  },
+  "id": "EqmASrNTs5D4sBro",
+  "tags": []
+}

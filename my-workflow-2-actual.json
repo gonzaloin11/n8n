@@ -1,0 +1,525 @@
+{
+  "name": "My workflow 2-actual",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {}
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "18HlkKRHfTcr7JmTZlUCi8CobbaEbizWp",
+          "mode": "list",
+          "cachedResultName": "pdf facturas testeos n8n",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/18HlkKRHfTcr7JmTZlUCi8CobbaEbizWp"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        560
+      ],
+      "id": "ac464629-8556-407f-a4bc-d2741adddbde",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "laKAnSMnVgASG48V",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        96,
+        544
+      ],
+      "id": "04f2a8eb-b387-4dc9-b45d-feb2ad4f1825",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "laKAnSMnVgASG48V",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        544
+      ],
+      "id": "6918cabd-d373-4f6d-be82-311bdda7b0bf",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of items) {\n  if (item.json.text) {\n    item.json.text = item.json.text\n      .replace(/\\r?\\n|\\r/g, ' ') // Quitar lineas\n      .replace(/\\s+/g, ' ') // Quitar espacios extra\n      .replace(/[^\\p{L}\\p{N}\\s.,]/gu, '') // Quitar caracteres especiales excepto letras, numeros, puntos y comas\n      .trim(); // Quitar espacios iniciales y finales\n  }\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        528
+      ],
+      "id": "603df08d-72b5-47e5-ba04-b9af54e74d0c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "content": "## CAPTURAR Y FORMATEAR INFO\n\n\nCode: Reformatea informacion para que tenga la estructura que necesitamos, la creamos con IA\n",
+        "height": 368,
+        "width": 576
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        400
+      ],
+      "id": "bef78d37-c993-4687-8d92-2c96a7bd9887",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "### OldCode - BACKUP\n(código anterior guardado como referencia)"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        320
+      ],
+      "id": "9ae2c744-357d-4a16-96ff-869f8851afb1",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        656,
+        400
+      ],
+      "id": "048db1de-86b4-4924-9b50-8ce39386b362",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "content": "##\n**LOOP** Lo que hace es ver si va a ser un unico PDF o si van a ser varios. El Loop va configurando uno a uno cada pdf"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c395aa4d-9a39-45c3-84c4-2f19e8424cb4",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Dada la siguiente factura dentro de las etiquetas XML <factura>, extrae la siguiente información según se indica a continuación.\nSi no puedes encontrar la información para un ítem específico, déjalo en blanco y pasa al siguiente.\n\nDescripción – una breve descripción (1-2 líneas) de la factura, por ejemplo: \"Uso mensual de Elevenlabs\" – OBLIGATORIO\n\nTipo – [OPCIONES: Recurrente Mensual, Recurrente Anual, Pago Único] – OBLIGATORIO\n\nFecha de la factura (fecha en que se recibió la factura) – OBLIGATORIO\n\nFecha de pago (fecha en que se realizará el pago; no siempre es la misma que la de emisión de la factura) – OBLIGATORIO\n\nNúmero de factura – OBLIGATORIO\n\nNúmero de orden de compra\n\nNombre del proveedor\n\nNúmero de identificación fiscal (IVA) del proveedor\n\nArtículos de línea, incluyendo una descripción de los bienes o servicios prestados\n\nPrecio con y sin IVA (sin incluir la moneda)\n\nPrecio total (sin incluir la moneda) – OBLIGATORIO\n\nMoneda (USD, Euro, GBP, ARS) – OBLIGATORIO\n\nInformación adicional que consideres importante y que no esté incluida arriba\n\nInformación adicional importante como:\n\nCondiciones de pago (Transferencia 30 días, pago inmediato, etc.)\n\nMétodos de pago aceptados\n\nDetalles de cuenta bancaria si están disponibles\n\nCondiciones de descuento o incentivos por pago anticipado\n\nPenalizaciones por pagos tardíos o tasas de interés\n\nReferencias de exención de impuestos\n\nReferencias de contrato o acuerdos marco\n\nCondiciones de entrega\n\nInstrucciones especiales\n\nInformación de contacto para consultas de facturación\n\nPolíticas de devoluciones/reembolsos\n\nInformación de garantía si aplica\n\nCertificado de origen si está presente\n\nRequisitos de seguro\n\nInformación aduanera para envíos internacionales\n\n<factura>{{ $json.text }}</factura>",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        976,
+        432
+      ],
+      "id": "fb8ac730-4965-445c-b913-a145fa7b6928",
+      "name": "Basic LLM Chain",
+      "retryOnFail": true,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "## PROCESAMIENTO DE INFO \n",
+        "height": 448,
+        "width": 624,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        736,
+        352
+      ],
+      "id": "4b5030bf-f84c-4d55-a7a7-a5817902d555",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        768,
+        944
+      ],
+      "id": "6b6566a1-d6f6-4c4e-9a37-8d9bf96518dc",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "BcxPyrU3gHvY2ePY",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### COD REFERENCIA MIA\n\nAhora usa EJEMPLO JSON en vez de Schema.\nLos nombres de campos coinciden con Google Sheets."
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        384
+      ],
+      "id": "82dcb33f-ef56-4c2b-a729-6adc06406344",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RRig-o0utrtRaDaMhvEoMeGGa4k8b-PXR0EIcLo7Apc",
+          "mode": "list",
+          "cachedResultName": "Copy of Registro_Gastos_N8N",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RRig-o0utrtRaDaMhvEoMeGGa4k8b-PXR0EIcLo7Apc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1J23tr2BcNyM6GGJ_3YaemKep7WbMYWoY3F27moDFcCg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Datos remitente": "={{ $json.output['Nombre del proveedor'] }}",
+            "Cif": "={{ $json.output['Numero de identificacion fiscal del proveedor'] }}",
+            "Numero de factura": "={{ $json.output['Numero de factura'] }}",
+            "Fecha": "={{ $json.output['Fecha de la factura'] }}",
+            "Producto": "={{ $json.output['Articulos de linea'][0].descripcion }}",
+            "Precio unitario": "={{ $json.output['Articulos de linea'][0].precio_unitario }}",
+            "Cantidad": "={{ $json.output['Articulos de linea'][0].cantidad }}",
+            "Importe": "={{ $json.output['Articulos de linea'][0].total }}",
+            "Subtotal": "={{ $json.output['Subtotal sin IVA'] }}",
+            "IVA": "={{ $json.output['Subtotal con IVA'] - $json.output['Subtotal sin IVA'] }}",
+            "Total": "={{ $json.output['Precio total'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Datos remitente",
+              "displayName": "Datos remitente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cif",
+              "displayName": "Cif",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Numero de factura",
+              "displayName": "Numero de factura",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Producto",
+              "displayName": "Producto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Precio unitario",
+              "displayName": "Precio unitario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cantidad",
+              "displayName": "Cantidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Importe",
+              "displayName": "Importe",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subtotal",
+              "displayName": "Subtotal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IVA",
+              "displayName": "IVA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total",
+              "displayName": "Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1408,
+        464
+      ],
+      "id": "e4a6cf6d-63a3-494b-bd0f-e708d1c1b7e5",
+      "name": "Append row in sheet"
+    },
+    {
+      "parameters": {
+        "options": {
+          "prompt": "Instructions:\n--------------\n{instructions}\n--------------\nCompletion:\n--------------\n{completion}\n--------------\n\nAbove, the Completion did not satisfy the constraints given in the Instructions.\nError:\n--------------\n{error}\n--------------\n\nPlease try again. Please only respond with an answer that satisfies the constraints laid out in the Instructions:"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "typeVersion": 1,
+      "position": [
+        944,
+        752
+      ],
+      "id": "da6cd57a-7a75-45ae-83e8-01f6894219ba",
+      "name": "Auto-fixing Output Parser"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "={\n  \"type\": \"object\",\n  \"required\": [\n    \"Numero de factura\",\n    \"Fecha de la factura\",\n    \"Descripcion\",\n    \"Fecha de pago\",\n    \"Tipo\",\n    \"Precio total\"\n  ],\n  \"properties\": {\n    \"Descripcion\": { \"type\": \"string\" },\n    \n    \"Fecha de la factura\": {\n      \"type\": \"string\",\n      \"format\": \"date\",\n      \"formatDisplay\": \"dd/mm/yyyy\"\n    },\n    \"Fecha de pago\": {\n      \"type\": \"string\",\n      \"format\": \"date\",\n      \"formatDisplay\": \"dd/mm/yyyy\"\n    },\n    \n    \"Tipo\": { \n      \"type\": \"string\",\n      \"enum\": [\"Recurrente Anual\", \"Recurrente Mensual\", \"Pago Unico\"]\n    },\n    \"Numero de factura\": { \"type\": \"string\" },\n    \"Numero de orden de compra\": { \"type\": \"string\" },\n    \"Nombre del proveedor\": { \"type\": \"string\" },\n    \"Direccion del proveedor\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"direccion 1\": { \"type\": \"string\" },\n        \"direccion 2\": { \"type\": \"string\" },\n        \"ciudad\": { \"type\": \"string\" },\n        \"codigo postal\": { \"type\": \"string\" }\n      }\n    },\n    \"Numero de identificacion fiscal del proveedor\": { \"type\": \"string\" },\n    \"Nombre del cliente\": { \"type\": \"string\" },\n    \"Direccion del cliente\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"direccion 1\": { \"type\": \"string\" },\n        \"direccion 2\": { \"type\": \"string\" },\n        \"ciudad\": { \"type\": \"string\" },\n        \"codigo postal\": { \"type\": \"string\" }\n      }\n    },\n    \"Numero de identificacion fiscal del cliente\": { \"type\": \"string\" },\n    \"Direcciones de envio\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"direccion 1\": { \"type\": \"string\" },\n          \"direccion 2\": { \"type\": \"string\" },\n          \"ciudad\": { \"type\": \"string\" },\n          \"codigo postal\": { \"type\": \"string\" }\n        }\n      }\n    },\n    \"Articulos de linea\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"name\": \"string\",\n        \"description\": \"string\",\n        \"price\": \"number\",\n        \"discount\": \"number\"\n      }\n    },\n    \"Subtotal sin IVA\": { \"type\": \"number\" },\n    \"Subtotal con IVA\": { \"type\": \"number\" },\n    \"Precio total\": { \"type\": \"number\" },\n    \"Moneda\": { \"type\": \"string\" },\n    \"Informacion adicional\": { \"type\": \"string\" }\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1248,
+        960
+      ],
+      "id": "4f8dc5ae-4ac3-4438-a730-74fd54a8c204",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-fixing Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f6dfee52-b2d2-4cce-870d-fee4461c644e",
+  "meta": {
+    "instanceId": "89dbe17b1d6844ebe461860833b924709cd8a3393ba96d7321a2cfeecf1fe85c"
+  },
+  "id": "jZSIYOZzyUUrn8vB",
+  "tags": []
+}
