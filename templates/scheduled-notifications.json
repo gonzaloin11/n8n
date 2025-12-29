@@ -1,0 +1,279 @@
+{
+  "name": "Scheduled Notifications - Daily Reminders",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily at 9 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM tasks WHERE status = 'pending' AND due_date <= CURRENT_DATE ORDER BY due_date ASC"
+      },
+      "id": "get-pending-tasks",
+      "name": "Get Pending Tasks",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [220, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-tasks",
+              "leftValue": "={{ $json.length || 0 }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "has-pending",
+      "name": "Has Pending Tasks?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format tasks into a readable message\nconst tasks = $input.all();\n\nlet message = '*Pending Tasks Report*\\n\\n';\nmessage += `*Date:* ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}\\n\\n`;\n\nlet overdueCount = 0;\nlet todayCount = 0;\nconst today = new Date().toISOString().split('T')[0];\n\ntasks.forEach((item, index) => {\n  const task = item.json;\n  const isOverdue = task.due_date < today;\n  const isToday = task.due_date === today;\n  \n  if (isOverdue) overdueCount++;\n  if (isToday) todayCount++;\n  \n  const status = isOverdue ? ' *OVERDUE*' : (isToday ? ' *DUE TODAY*' : '');\n  message += `${index + 1}. ${task.title}${status}\\n`;\n  message += `   Due: ${task.due_date}\\n`;\n  if (task.description) {\n    message += `   ${task.description.substring(0, 50)}${task.description.length > 50 ? '...' : ''}\\n`;\n  }\n  message += '\\n';\n});\n\nmessage += `\\n*Summary:*\\n`;\nmessage += `- Total pending: ${tasks.length}\\n`;\nmessage += `- Overdue: ${overdueCount}\\n`;\nmessage += `- Due today: ${todayCount}\\n`;\n\nreturn {\n  json: {\n    message,\n    taskCount: tasks.length,\n    overdueCount,\n    todayCount\n  }\n};"
+      },
+      "id": "format-message",
+      "name": "Format Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 200]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_CHAT_ID",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown",
+          "replyMarkup": "inlineKeyboard",
+          "inlineKeyboard": {
+            "rows": [
+              {
+                "row": {
+                  "buttons": [
+                    {
+                      "text": "View All Tasks",
+                      "additionalFields": {
+                        "callbackData": "view_all_tasks"
+                      }
+                    },
+                    {
+                      "text": "Mark Complete",
+                      "additionalFields": {
+                        "callbackData": "complete_first"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "id": "send-telegram",
+      "name": "Send Telegram Notification",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [880, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "your-email@example.com",
+        "subject": "=Daily Task Reminder - {{ $json.taskCount }} pending tasks",
+        "emailType": "html",
+        "message": "=<html>\n<body style=\"font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;\">\n<div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px 10px 0 0;\">\n<h1 style=\"color: white; margin: 0;\">Daily Task Reminder</h1>\n<p style=\"color: rgba(255,255,255,0.9); margin: 10px 0 0 0;\">{{ $now.format('EEEE, MMMM d, yyyy') }}</p>\n</div>\n\n<div style=\"background: #f8f9fa; padding: 20px; border-radius: 0 0 10px 10px;\">\n<div style=\"background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;\">\n<h2 style=\"color: #333; margin-top: 0;\">Summary</h2>\n<table style=\"width: 100%;\">\n<tr><td>Total Pending:</td><td style=\"text-align: right; font-weight: bold;\">{{ $json.taskCount }}</td></tr>\n<tr><td style=\"color: #dc3545;\">Overdue:</td><td style=\"text-align: right; font-weight: bold; color: #dc3545;\">{{ $json.overdueCount }}</td></tr>\n<tr><td style=\"color: #ffc107;\">Due Today:</td><td style=\"text-align: right; font-weight: bold; color: #ffc107;\">{{ $json.todayCount }}</td></tr>\n</table>\n</div>\n\n<p style=\"color: #666; font-size: 14px;\">Check your task management system for full details.</p>\n</div>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "Send Email Summary",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [880, 350],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "no-tasks",
+      "name": "No Pending Tasks",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [660, 400]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "notification_log",
+        "filters": {},
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldName": "last_notification_sent",
+              "fieldValue": "={{ $now.toISO() }}"
+            },
+            {
+              "fieldName": "tasks_notified",
+              "fieldValue": "={{ $('Format Message').first().json.taskCount }}"
+            }
+          ]
+        },
+        "options": {
+          "upsert": true
+        }
+      },
+      "id": "log-notification",
+      "name": "Log Notification",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1100, 275],
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily at 9 AM": {
+      "main": [
+        [
+          {
+            "node": "Get Pending Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pending Tasks": {
+      "main": [
+        [
+          {
+            "node": "Has Pending Tasks?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Pending Tasks?": {
+      "main": [
+        [
+          {
+            "node": "Format Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Pending Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Message": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Email Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram Notification": {
+      "main": [
+        [
+          {
+            "node": "Log Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "scheduler",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "notifications",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "reminders",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-12-29T00:00:00.000Z",
+  "versionId": "1"
+}

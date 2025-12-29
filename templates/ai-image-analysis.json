@@ -1,0 +1,265 @@
+{
+  "name": "AI Image Analysis with OpenAI Vision",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "analyze-image",
+        "options": {
+          "responseMode": "responseNode"
+        }
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 300],
+      "webhookId": "image-analysis"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-image",
+              "leftValue": "={{ $json.body.image_url || $binary?.data }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-input",
+      "name": "Has Image?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "options": {
+          "maxTokens": 2048,
+          "temperature": 0.3
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an expert image analyst. Analyze the provided image and extract the following information:\n\n1. Main subject/content of the image\n2. Text visible in the image (OCR)\n3. Key objects detected\n4. Colors and visual style\n5. Any relevant metadata you can infer\n\nRespond with a structured JSON object containing these fields:\n{\n  \"subject\": \"main subject description\",\n  \"text_content\": [\"array of text found\"],\n  \"objects\": [\"array of objects detected\"],\n  \"colors\": [\"dominant colors\"],\n  \"style\": \"visual style description\",\n  \"additional_info\": \"any other relevant information\"\n}\n\nOnly return the JSON, no additional text."
+            },
+            {
+              "type": "image",
+              "detail": "high",
+              "imageUrl": "={{ $json.body.image_url }}"
+            }
+          ]
+        },
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        }
+      },
+      "id": "openai-vision",
+      "name": "OpenAI Vision Analysis",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.4,
+      "position": [440, 200],
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "OpenAI Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the OpenAI response\nconst response = $input.first().json.message?.content || $input.first().json.text || '';\nconst imageUrl = $('Webhook').first().json.body?.image_url || '';\n\nlet analysisResult;\ntry {\n  // Extract JSON from the response\n  const jsonMatch = response.match(/\\{[\\s\\S]*\\}/);\n  if (jsonMatch) {\n    analysisResult = JSON.parse(jsonMatch[0]);\n  } else {\n    throw new Error('No JSON found in response');\n  }\n} catch (error) {\n  analysisResult = {\n    error: 'Failed to parse analysis',\n    rawResponse: response,\n    parseError: error.message\n  };\n}\n\nreturn {\n  json: {\n    success: !analysisResult.error,\n    timestamp: new Date().toISOString(),\n    image_url: imageUrl,\n    analysis: analysisResult\n  }\n};"
+      },
+      "id": "parse-response",
+      "name": "Parse Analysis Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 200]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "tableId": "image_analyses",
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldName": "image_url",
+              "fieldValue": "={{ $json.image_url }}"
+            },
+            {
+              "fieldName": "analysis_result",
+              "fieldValue": "={{ JSON.stringify($json.analysis) }}"
+            },
+            {
+              "fieldName": "created_at",
+              "fieldValue": "={{ $json.timestamp }}"
+            }
+          ]
+        }
+      },
+      "id": "save-to-db",
+      "name": "Save to Database",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [880, 200],
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($('Parse Analysis Result').first().json) }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "success-response",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1100, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: 'No image provided. Please include image_url in request body or upload binary data.' }) }}",
+        "options": {
+          "responseCode": 400,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "error-response",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [440, 400]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Has Image?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Image?": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Vision Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Vision Analysis": {
+      "main": [
+        [
+          {
+            "node": "Parse Analysis Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Analysis Result": {
+      "main": [
+        [
+          {
+            "node": "Save to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Database": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "ai",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "image-processing",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "openai",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2024-12-29T00:00:00.000Z",
+  "versionId": "1"
+}
