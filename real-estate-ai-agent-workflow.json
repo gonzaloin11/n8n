@@ -1,0 +1,913 @@
+{
+  "name": "Real Estate AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "9301d487-8c7d-419c-ada4-ee1254261d3a",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2672,
+        432
+      ],
+      "webhookId": "real-estate-webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "sessionId",
+              "value": "={{ $json.message.from.id.toString() }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "user_message",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "chat_id",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "a4",
+              "name": "first_name",
+              "value": "={{ $json.message.from.first_name || 'Usuario' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "570830e0-14e7-48e9-87a1-e86e849c70da",
+      "name": "Extract User Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2448,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Clasifica este mensaje en UNA categoría:\n\n**SALES** → El usuario menciona CUALQUIERA de estos:\n- Buscar/comprar/alquilar propiedades\n- Precios, ubicaciones específicas, metros cuadrados\n- Tipos de propiedad (casa, departamento, chalet, terreno)\n- Características específicas (habitaciones, baños, patio, pileta, jardín)\n- Consultas sobre propiedades disponibles\n- PEDIR MÁS INFORMACIÓN sobre una propiedad ya mencionada\n- Frases como: \"tenés más info?\", \"contame más\", \"más detalles\", \"cuéntame sobre esta\", \"qué más tiene?\"\n- Preguntas sobre servicios, ubicación, documentación de una propiedad específica\n- Mostrar interés en una propiedad: \"me interesa\", \"me gusta\", \"qué buena\", \"esta me convence\"\n\n**SCHEDULING** → El usuario quiere:\n- Agendar/reservar/programar una visita\n- Consultar disponibilidad de horarios\n- Menciona fechas u horas específicas para visitar\n- Pide ver una propiedad en persona\n- Proporciona nombre completo y email para confirmar visita\n- Frases como: \"quiero verla\", \"puedo visitarla?\", \"agendar una visita\"\n- CONFIRMACIONES en contexto de agendamiento: \"correcto\", \"sí, esa\", \"esa misma\", \"confirmado\"\n- Respuestas a preguntas del Scheduling Agent sobre horarios o datos\n\n**UNCLEAR** → Cualquier otro caso:\n- Saludos simples sin contexto (SOLO \"Hola\", \"Buenos días\", \"Buenas\")\n- Mensajes completamente vagos sin referencia a propiedades (\"Necesito ayuda\", \"Tengo una consulta\")\n- Preguntas sin contexto claro que NO mencionan propiedades\n- Mensajes ambiguos o confusos SIN indicación de qué necesita\n\n---\nMensaje: {{ $json.user_message }}\n---\n\nREGLAS DE DECISIÓN:\n1. Si menciona propiedades en CUALQUIER contexto → SALES (incluso si pide más info)\n2. Si pide \"más información\", \"detalles\", \"contame más\" → SALES (es parte del proceso de venta)\n3. Si muestra INTERÉS en una propiedad (\"me gusta\", \"me interesa\") → SALES\n4. Si menciona \"visita\", \"agendar\", \"ver la propiedad\" → SCHEDULING\n5. Si menciona fecha/hora para visitar → SCHEDULING\n6. Si SOLO saluda sin mencionar propiedades → UNCLEAR\n7. Ante la duda, si hay ALGUNA mención a propiedades → SALES\n8. Si el mensaje anterior fue del Scheduling Agent y el usuario confirma/responde → SCHEDULING\n\nIMPORTANTE: \"Pedir más información sobre una propiedad\" es SALES, NO unclear.\n\nResponde SOLO con: SALES | SCHEDULING | UNCLEAR",
+        "options": {
+          "systemMessage": "Eres un clasificador de intenciones para una agencia inmobiliaria de Buenos Aires, Argentina.\n\nClasifica el mensaje del usuario en una de estas 3 categorías:\n- SALES: Cualquier consulta relacionada con propiedades (búsqueda, detalles, preguntas)\n- SCHEDULING: Intención clara de agendar una visita o consultar disponibilidad\n- UNCLEAR: Saludos simples o mensajes sin contexto de propiedades\n\nPRINCIPIO CLAVE: Si el mensaje menciona propiedades de CUALQUIER forma, es SALES.\nPedir \"más información\" o \"detalles\" de una propiedad es parte del proceso de venta = SALES.\n\nAnaliza el CONTENIDO COMPLETO del mensaje, no solo las primeras palabras.\n\nIMPORTANTE: Responde SOLO con UNA palabra: SALES, SCHEDULING o UNCLEAR"
+        }
+      },
+      "id": "b9eba0ec-41f8-4ba0-9663-2d007dd29603",
+      "name": "Router Classifier",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -2224,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "id": "6e1977db-4e49-4d18-91dd-767dfaf6178b",
+      "name": "Router Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -2224,
+        656
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "SALES",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "9025c387-6e85-404e-8a45-c70504447d97"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Sales"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "SCHEDULING",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "e8ed2b02-041e-4645-9c43-1ab9a3772fc7"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Scheduling"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "20c83ba0-1017-4ecd-bd24-b27a9e4492be",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "UNCLEAR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Unclear"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "dfdfabff-9ecc-4bf4-a8c8-0af6c61ff603",
+      "name": "Route Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1872,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Cliente: {{ $('Extract User Data').item.json.first_name }}\nMensaje: {{ $('Extract User Data').item.json.user_message }}",
+        "options": {
+          "systemMessage": "Eres un experto agente inmobiliario virtual. Tu objetivo es ayudar a los clientes a encontrar su propiedad ideal.\n\nHERRAMIENTAS DISPONIBLES Y CUÁNDO USARLAS:\n\n1. **Búsqueda en Airtable** - Para BÚSQUEDAS INICIALES\n   Usar cuando el usuario:\n   - Busca propiedades por primera vez\n   - Filtra por ubicación, precio, tipo, habitaciones\n   - Quiere ver opciones disponibles\n   - Dice \"quiero comprar/alquilar\", \"busco una casa\", \"cuánto cuesta\"\n   \n   Respuesta: Mostrar lista de 3 propiedades con info básica\n\n2. **Property Knowledge Base** - Para DETALLES ESPECÍFICOS\n   Usar cuando el usuario:\n   - Ya vio resultados y pide MÁS INFORMACIÓN de una propiedad específica\n   - Pregunta por servicios, ubicación exacta, documentación, vecindario\n   - Dice \"tenés más info?\", \"contame más\", \"más detalles\", \"cuéntame sobre...\"\n   - Muestra interés en una propiedad específica ya mencionada\n   \n   Respuesta: Proporcionar información DETALLADA de esa propiedad específica\n\nFLUJO TÍPICO:\n1. Usuario busca → Usar Airtable → Mostrar 3 propiedades\n2. Usuario se interesa en una → Usar Knowledge Base → Mostrar detalles completos\n3. Usuario quiere agendar → Redirigir a Scheduling Agent\n\nREGLAS:\n1. Muestra MÁXIMO 3 propiedades por búsqueda inicial\n2. Cuando uses Knowledge Base, proporciona TODA la información relevante disponible\n3. Si no hay resultados en Airtable, sugiere ampliar criterios\n4. Si no hay info en Knowledge Base, indica que solo tienes la info básica\n\nSINTAXIS DE AIRTABLE (MUY IMPORTANTE):\n\nAl generar fórmulas de filtro para Airtable, usa EXACTAMENTE esta sintaxis con LLAVES {}:\n\n**Campos de texto:**\n- {Ciudad} = 'Chascomús'\n- {Operación} = 'Venta'          ← V mayúscula\n- {Operación} = 'Alquiler'       ← A mayúscula\n- {Tipo} = 'Casa'\n- {Zona} = 'Centro'\n\n**Campos numéricos:**\n- {Habitaciones} >= 2\n- {Baños} >= 1\n- {Precio} <= 150000\n- {Superficie} >= 100\n\n**Campos Single Select (Patio):**\nIMPORTANTE: Estos campos usan valores de texto 'Sí' o 'No'\n- {Patio} = 'Sí'\n\n**Combinar condiciones:**\nAND(condición1, condición2, condición3)\n\n**Ejemplos válidos:**\n- AND({Ciudad} = 'Chascomús', {Operación} = 'alquiler', {Habitaciones} >= 1, {Patio} = 'Sí')\n- AND({Ciudad} = 'La Plata', {Precio} <= 100000, {Patio} = 'Sí')\n- AND({Operación} = 'venta', {Tipo} = 'Casa', {Patio} = 'Sí')\n\nFORMATO DE RESPUESTA:\n🏠 **Nombre**\n📍 Ubicación\n💰 Precio\n🛏️ Habitaciones | 🚿 Baños | 📐 m²\n✨ Características destacadas\n[Imagen si está disponible]\n\nTONO: Profesional pero cercano. Respuestas concisas.",
+          "maxIterations": 10
+        }
+      },
+      "id": "0a33b8db-2009-499a-b1f5-ea69e641328b",
+      "name": "Sales Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -1488,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "id": "432e4731-79f0-4d52-ba4d-505f24a9ccb3",
+      "name": "Sales Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -1648,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Extract User Data').item.json.sessionId }}"
+      },
+      "id": "554ade7e-50ca-4a72-9065-c8226fbb5ab7",
+      "name": "Sales Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -1520,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "property_knowledge",
+        "toolDescription": "Esta herramienta contiene información DETALLADA de cada propiedad incluyendo:\n- Descripción completa y características específicas\n- Servicios e instalaciones (agua, luz, gas, cloacas, etc.)\n- Ubicación y accesibilidad (cómo llegar, transporte público)\n- Puntos de interés cercanos (comercios, escuelas, hospitales)\n- Aspectos legales y documentación\n- Información económica detallada\n- Observaciones adicionales del vendedor\n\nCUÁNDO USAR ESTA HERRAMIENTA:\n✅ Cuando el usuario pide MÁS INFORMACIÓN sobre una propiedad ya mencionada\n✅ Cuando pregunta por detalles específicos: servicios, ubicación, vecindario, documentación\n✅ Cuando dice \"tenés más info\", \"contame más\", \"más detalles\"\n✅ Después de mostrar resultados de Airtable y el usuario muestra interés en alguna\n\nNO USAR PARA:\n❌ Búsquedas iniciales de propiedades (usar Airtable)\n❌ Filtrar por precio, habitaciones, ubicación (usar Airtable)\n\nINPUT: El nombre o ID de la propiedad sobre la que el usuario quiere más información, \no la pregunta específica del usuario.\n\nEJEMPLO DE USO:\nUsuario: \"Me interesa la cabaña en la laguna, tenés más información?\"\n→ USAR esta herramienta con query: \"cabaña laguna Chascomús detalles\"",
+        "tableName": {
+          "__rl": true,
+          "value": "property_embeddings",
+          "mode": "list",
+          "cachedResultName": "property_embeddings"
+        },
+        "options": {}
+      },
+      "id": "732073ef-6283-4b2c-b5ce-7d08e4fb009e",
+      "name": "Property Knowledge Base",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        -1392,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {
+          "dimensions": 1536
+        }
+      },
+      "id": "fd5ee970-db76-4f22-b8a8-5363ab47b78f",
+      "name": "OpenAI Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Cliente: {{ $('Extract User Data').item.json.first_name }} \nTeléfono/SessionID: {{ $('Extract User Data').item.json.sessionId }} \nMensaje: {{ $('Extract User Data').item.json.user_message }}  \nFecha y hora actual: {{ $now.setZone('America/Argentina/Buenos_Aires').toFormat('cccc dd/MM/yyyy HH:mm') }} \nZona horaria: América/Argentina/Buenos Aires  \n\nIMPORTANTE: El cliente ya estuvo conversando con el Sales Agent. Revisa el contexto  de la conversación para identificar qué propiedad le interesa visitar.",
+        "options": {
+          "systemMessage": "Eres un asistente profesional de agendamiento para una agencia inmobiliaria de Buenos Aires, Argentina.\n\nCONTEXTO DE PROPIEDAD:\n- Tienes acceso al historial de conversación donde el Sales Agent mencionó propiedades\n- Identifica el nombre y dirección de la propiedad de interés del contexto previo\n- Si no está claro qué propiedad quiere visitar, pregunta amablemente\n\nHORARIOS DE VISITAS DISPONIBLES:\n- Días: Lunes a Sábado\n- Horarios estándar: 10:00, 12:00, 16:00, 18:00\n- Duración: 1 hora por visita\n\nHERRAMIENTAS DISPONIBLES Y USO:\n\n1. **Google Calendar - Check** (Consultar disponibilidad)\n   USAR: SIEMPRE como primer paso cuando el cliente quiere agendar\n   CÓMO: Consulta los próximos 3-5 días hábiles para identificar horarios libres\n   RESULTADO: Los horarios SIN eventos son los disponibles para ofrecer\n\n2. **Create an event in Google Calendar** (Crear evento)\n   USAR: SOLO cuando tengas TODOS estos datos confirmados:\n   - ✓ Nombre completo del cliente\n   - ✓ Email del cliente\n   - ✓ Teléfono del cliente\n   - ✓ Nombre de la propiedad\n   - ✓ Dirección de la propiedad\n   - ✓ Fecha/hora elegida por el cliente\n   \n   ⚠️ NO CREAR EVENTO si falta algún dato. Primero solicítalo.\n   \n   FORMATO:\n   - Título: \"Visita - [Nombre Propiedad]\"\n   - Descripción estructurada con todos los datos del cliente\n\n3. **Gmail - Confirmar visita** (Enviar email)\n   USAR: INMEDIATAMENTE después de crear el evento exitosamente\n   CONTENIDO: Email HTML con todos los detalles de la visita\n   ASUNTO: \"Confirmación de Visita - [Nombre Propiedad]\"\n\nFLUJO DE AGENDAMIENTO (SEGUIR EN ORDEN):\n\nPASO 1 - Identificar propiedad:\n   - Confirma qué propiedad quiere visitar IMPORTANTE (nombre y dirección)\n   - Si no está claro del contexto, pregunta amablemente\n\nPASO 2 - Consultar disponibilidad:\n   - USA \"Google Calendar - Check\" para ver los próximos 3-5 días\n   - Identifica los horarios LIBRES (10:00, 12:00, 16:00, 18:00)\n\nPASO 3 - Ofrecer opciones:\n   - Presenta 3 opciones de horarios DISPONIBLES\n   - Ejemplo: \"¡Perfecto! Para visitar Villa Moraleja, tengo disponible:\n     • Mañana (Martes 30) a las 10:00 o 16:00\n     • Miércoles 31 a las 12:00\n     ¿Cuál te viene mejor?\"\n\nPASO 4 - Recopilar datos:\n   - Una vez que el cliente elige horario, solicita los datos faltantes\n   - Necesitas: Nombre completo, Email, Teléfono\n   - Confirma todos los datos antes de proceder\n\nPASO 5 - Crear evento:\n   - USA \"Create an event in Google Calendar\"\n   - Verifica que se creó correctamente\n\nPASO 6 - Enviar confirmación:\n   - USA \"Gmail\" para enviar email de confirmación\n   - Incluye todos los detalles de la visita\n\nPASO 7 - Confirmar al cliente:\n   - Informa que la visita está agendada\n   - Menciona que recibirá email de confirmación e invitación de calendario\n\nDATOS OBLIGATORIOS PARA CREAR EVENTO:\n- Nombre completo del cliente\n- Email del cliente\n- Teléfono del cliente\n- Nombre de la propiedad\n- Dirección de la propiedad\n- Fecha y hora confirmada\n\nTONO: Amable, eficiente y proactivo. Guía al cliente paso a paso sin abrumarlo. No muestres indicios de ser una IA\n\nREGLAS DE DATOS (MUY IMPORTANTE):\n\n1. NOMBRE DE PROPIEDAD: Usa SIEMPRE el nombre EXACTO como aparece en la conversación\n\n2. DIRECCIÓN: Usa la dirección COMPLETA, no solo la ciudad\n\n3. Al crear el evento, verifica que estás usando los datos EXACTOS del contexto",
+          "maxIterations": 15
+        }
+      },
+      "id": "7ea21102-4c86-44df-b63e-48e2125cae1f",
+      "name": "Scheduling Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -1456,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "5d15eb7b-8fa3-41ee-bb5c-b30fea52d6c1",
+      "name": "Scheduling Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -1568,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Extract User Data').item.json.sessionId }}"
+      },
+      "id": "f1b1dc64-d84b-419b-8175-ffdb25d33add",
+      "name": "Scheduling Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -1440,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "response_text",
+              "value": "={{ $json.output || 'Lo siento, hubo un problema procesando tu solicitud. Por favor intenta de nuevo.' }}",
+              "type": "string"
+            },
+            {
+              "id": "r2",
+              "name": "chat_id",
+              "value": "={{ $('Extract User Data').item.json.chat_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e4a3cb8a-c5c2-489f-bfa9-d20fc8f1c7cd",
+      "name": "Prepare Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -896,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.response_text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "c9c5821d-cd2f-4418-aa03-320d9f40f069",
+      "name": "Send to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -672,
+        176
+      ],
+      "webhookId": "ac06074c-2d23-4191-bed5-5ab7acaa28c5"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Consulta la disponibilidad del calendario para verificar si hay eventos programados en un rango de fechas.\n\nCUÁNDO USAR:\n✅ SIEMPRE antes de ofrecer opciones de horarios al cliente\n✅ Cuando el cliente pregunta por disponibilidad\n✅ Para verificar que un horario propuesto está libre\n\nCÓMO USAR:\n- timeMin: Fecha/hora de inicio del rango a consultar (formato ISO 8601)\n- timeMax: Fecha/hora de fin del rango a consultar (formato ISO 8601)\n\nEJEMPLO:\nPara verificar disponibilidad del 30 de diciembre:\n- timeMin: 2025-12-30T09:00:00-03:00\n- timeMax: 2025-12-30T19:00:00-03:00\n\nINTERPRETAR RESULTADOS:\n- Si devuelve eventos → Esos horarios están OCUPADOS\n- Si no devuelve eventos en un horario → Está DISPONIBLE\n- Horarios disponibles: 10:00, 12:00, 16:00, 18:00",
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list",
+          "cachedResultName": "primary"
+        },
+        "limit": 52,
+        "timeMin": "={{ $fromAI('timeMin', 'Inicio del rango a consultar en formato ISO 8601, ej: 2024-01-15T09:00:00+01:00') }}",
+        "timeMax": "={{ $fromAI('timeMax', 'Fin del rango a consultar en formato ISO 8601, ej: 2024-01-15T19:00:00+01:00') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -1312,
+        544
+      ],
+      "id": "9368ace3-44af-4284-8669-4d593785e767",
+      "name": "Google Calendar - Check"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Crea un evento de visita en Google Calendar con todos los datos del cliente y la propiedad.\n\nCUÁNDO USAR:\n✅ SOLO después de tener TODOS los datos obligatorios confirmados:\n   - Nombre completo del cliente\n   - Email del cliente\n   - Teléfono del cliente\n   - Nombre de la propiedad\n   - Dirección de la propiedad\n   - Fecha y hora confirmada por el cliente\n\n❌ NO USAR si falta algún dato obligatorio\n\nPARÁMETROS REQUERIDOS:\n- eventTitle: \"Visita - [Nombre Propiedad]\" (ej: \"Visita - Villa Moraleja\")\n- start: Fecha/hora inicio en ISO 8601 (ej: 2025-12-30T10:00:00-03:00)\n- end: Fecha/hora fin en ISO 8601 (1 hora después del inicio)\n- clientEmail: Email del cliente para enviar invitación\n- propertyAddress: Dirección completa de la propiedad\n- eventDescription: Formato estructurado:\n  CLIENTE: [Nombre completo]\n  EMAIL: [email]\n  TELÉFONO: [teléfono]\n  PROPIEDAD: [nombre]\n  DIRECCIÓN: [dirección]\n\nIMPORTANTE: La zona horaria es America/Argentina/Buenos_Aires (-03:00)",
+        "calendar": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list",
+          "cachedResultName": "primary"
+        },
+        "start": "={{ $fromAI('start', 'Fecha y hora de inicio en formato ISO 8601, ej: 2024-01-15T10:00:00+01:00') }}",
+        "end": "={{ $fromAI('end', 'Fecha y hora de fin en formato ISO 8601, ej: 2024-01-15T11:00:00+01:00') }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ $fromAI('clientEmail', 'Email del cliente para enviar invitación') }}"
+          ],
+          "description": "=={{ $fromAI('eventDescription', 'Descripción estructurada. Formato EXACTO:\\nCLIENTE: [Nombre completo]\\nEMAIL: [email]\\nTELÉFONO: [teléfono]\\nPROPIEDAD: [Nombre EXACTO de la propiedad]\\nDIRECCIÓN: [Dirección COMPLETA de la propiedad]') }}",
+          "location": "=={{ $fromAI('propertyAddress', 'Dirección COMPLETA y EXACTA de la propiedad tal como aparece en el contexto de la conversación. Incluir calle, número, barrio/zona, ciudad. Ejemplo: \"Camino de Circunvalación, Laguna, Chascomús\". NO usar solo ciudad genérica.') }}",
+          "summary": "=={{ $fromAI('eventTitle', 'Título del evento. OBLIGATORIO usar el nombre EXACTO de la propiedad del contexto. Formato: \"Visita - [Nombre EXACTO de Propiedad]\". Ejemplo: Si la propiedad es \"Cabaña de Madera\", el título debe ser \"Visita - Cabaña de Madera\". NO abreviar ni modificar el nombre.') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -1184,
+        544
+      ],
+      "id": "5659447f-fcff-4c06-a5b6-ff325033a318",
+      "name": "Create an event in Google Calendar"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -2672,
+        1152
+      ],
+      "id": "6975b080-ccd6-45fe-b807-8bcd108a8ebd",
+      "name": "When chat message received",
+      "webhookId": "7bc5a2d5-4083-4900-8a2f-c1675f1400a3"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -2096,
+        656
+      ],
+      "id": "8f9f4dd6-ef7a-488f-8d96-1865f5597602",
+      "name": "Postgres Chat Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Busca propiedades en la base de datos de la inmobiliaria.\n\nCampos disponibles para filtrar:\n- Precio: Precio en dólares (numérico)\n- Ciudad: Ciudad (texto - ej: 'Chascomús', 'La Plata')\n- Zona: Zona de la ciudad (texto - ej: 'Centro', 'Barrio Jardín')\n- Tipo: Tipo de propiedad (texto - ej: 'Casa', 'Departamento', 'Quinta')\n- Habitaciones: Número de habitaciones (numérico)\n- Baños: Número de baños (numérico)\n- Operación: Operación (texto - valores: 'venta' o 'alquiler')\n- Superficie: Superficie en metros cuadrados (numérico)\n- Dirección: Dirección completa (texto)\n- Patio: Campo Single Select con valores 'Sí' o 'No' (usar {Patio} = 'Sí')\n- Imagen: URL de imagen de la propiedad\n- Descripción: Descripción detallada de la propiedad\n\nIMPORTANTE - Sintaxis de fórmulas:\n- Campos de texto: {Campo} = 'valor'\n- Campos numéricos: {Campo} >= valor o {Campo} <= valor\n- Campos Single Select (Patio, Jardín, Garage): {Campo} = 'Sí' o {Campo} = 'No'\n- Combinar: AND(condición1, condición2, condición3)\n\nDevuelve: Máximo 3 propiedades con todos los campos disponibles.",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "apppsJA3zOetOoWOP",
+          "mode": "list",
+          "cachedResultName": "Real Estate",
+          "cachedResultUrl": "https://airtable.com/apppsJA3zOetOoWOP"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblyoByNfMT88vAQV",
+          "mode": "list",
+          "cachedResultName": "real estate",
+          "cachedResultUrl": "https://airtable.com/apppsJA3zOetOoWOP/tblyoByNfMT88vAQV"
+        },
+        "filterByFormula": "={{ $fromAI('Filter_By_Formula', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -1104,
+        -64
+      ],
+      "id": "36302eb7-ab0d-40df-875d-f1922f6852bf",
+      "name": "Search records in Airtable"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Información del cliente:\n- Nombre: {{ $('Extract User Data').item.json.first_name }}\n- Mensaje actual: {{ $('Extract User Data').item.json.user_message }}",
+        "options": {
+          "systemMessage": "Eres un asistente virtual amigable de una inmobiliaria en Chascomús, Buenos Aires, Argentina.\n\nCONTEXTO DEL NEGOCIO:\n- Inmobiliaria local que gestiona propiedades en alquiler y venta\n- Propiedades: casas, departamentos, terrenos, locales comerciales\n- Servicios: búsqueda de propiedades y agendamiento de visitas\n\nTU ÚNICO OBJETIVO:\nDescubrir qué necesita el usuario para poder redirigirlo al agente especializado correcto:\n- **Sales Agent**: Si quiere buscar/consultar/ver opciones de propiedades\n- **Scheduling Agent**: Si quiere agendar una visita a una propiedad\n\nESTRATEGIA DE CONVERSACIÓN:\n1. Si el usuario saludó, saluda brevemente de vuelta\n2. Haz UNA pregunta específica y directa para clarificar su intención\n3. Ofrece las dos opciones principales claramente\n4. Sé CONCISO (máximo 2-3 líneas)\n\n\nTONO:\n- Profesional pero cercano\n- Eficiente (no te extiendas)\n- Orientado a la acción\n- Paciente si el usuario es vago\n\nIMPORTANTE: \n- Tu respuesta debe llevar al usuario a especificar si quiere BUSCAR propiedades o AGENDAR visita\n- Después de tu mensaje, el usuario responderá y se reclasificará automáticamente\n- No intentes resolver su consulta, solo CLARIFICA qué tipo de ayuda necesita"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -1456,
+        832
+      ],
+      "id": "158a8a69-61cc-48fd-a07b-c7a65684ea8d",
+      "name": "Conversation Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0.5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -1440,
+        1056
+      ],
+      "id": "0106e293-644f-4cd7-90de-3b5b6cae57e0",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Extract User Data').item.json.sessionId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -1312,
+        1056
+      ],
+      "id": "364f8660-c6c0-4a10-a839-d741d33fd4d1",
+      "name": "Postgres Chat Memory1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Extract User Data').item.json.chat_id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -896,
+        832
+      ],
+      "id": "4fc473ed-63da-4c96-8554-ea84f5919e6e",
+      "name": "Send a text message",
+      "webhookId": "e4b61b14-245e-4edb-aa7c-adc01b38b77c"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Envía un email de confirmación al cliente después de crear el evento en Google Calendar.\n\nCUÁNDO USAR:\n✅ INMEDIATAMENTE después de crear exitosamente el evento en Google Calendar\n✅ Solo cuando la visita ya está confirmada y agendada\n\n❌ NO USAR si el evento no se creó correctamente\n❌ NO USAR antes de crear el evento",
+        "sendTo": "={{ $fromAI('clientEmail') }} ",
+        "subject": "=Confirmación de Visita - {{ $fromAI('propertyName', 'Nombre EXACTO de la propiedad') }}",
+        "message": "=<h2>¡Tu visita está confirmada! 🏠</h2> \n<p>Hola <strong>{{ $fromAI('clientName') }}</strong>,</p> <p>Te confirmamos tu visita a la propiedad:</p> \n<ul>   \n<li><strong>Propiedad:</strong> ={{ $fromAI('propertyName', 'Nombre EXACTO de la propiedad') }}</li>   \n<li><strong>Dirección:</strong> {{ $fromAI('propertyAddress') }}</li>   \n<li><strong>Fecha:</strong> {{ $fromAI('visitDate') }}</li>  \n<li><strong>Hora:</strong> {{ $fromAI('visitTime') }}</li> \n</ul> \n<p>Si necesitas modificar o cancelar tu visita, contáctanos por Telegram.</p> \n<p>¡Te esperamos!</p> \n<p><em>Inmobiliaria Chascomús</em></p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        -1040,
+        480
+      ],
+      "id": "43a2654d-59c1-455a-a075-7764b9856fc5",
+      "name": "Confirmar visita",
+      "webhookId": "f7138e0e-72f5-43ec-a936-abd301ef871f"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "buffer",
+        "key": "=telegram:buffer:{{ $json.message.from.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -2336,
+        176
+      ],
+      "id": "3088b096-7fb9-46d9-979b-ba203f5b538b",
+      "name": "Redis - Get Existing Buffer",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener datos del mensaje de Telegram\nconst telegramData = $input.item.json.message;\nconst userId = telegramData.from.id;\nconst messageText = telegramData.text || '';\nconst timestamp = Date.now();\n\n// Intentar obtener buffer existente de Redis\nlet buffer = null;\ntry {\n  const redisNode = $('Redis - Get Existing Buffer');\n  if (redisNode && redisNode.item && redisNode.item.json) {\n    const redisResult = redisNode.item.json;\n    // Redis devuelve el valor directamente como string\n    if (redisResult && typeof redisResult === 'string') {\n      buffer = JSON.parse(redisResult);\n    }\n  }\n} catch (error) {\n  // Si hay error parseando o no existe, buffer queda null\n  console.log('No existing buffer or parse error:', error.message);\n}\n\n// Si no existe buffer, crear uno nuevo\nif (!buffer) {\n  buffer = {\n    messages: [],\n    first_message_time: timestamp,\n    user_id: userId,\n    chat_id: telegramData.chat.id,\n    first_name: telegramData.from.first_name || 'Usuario'\n  };\n}\n\n// Agregar el nuevo mensaje al array de mensajes\nbuffer.messages.push({\n  text: messageText,\n  timestamp: timestamp,\n  message_id: telegramData.message_id\n});\n\n// Actualizar metadata del buffer\nbuffer.last_updated = timestamp;\nbuffer.message_count = buffer.messages.length;\n\n// Determinar si es el primer mensaje (para activar el timer)\nconst isFirstMessage = buffer.messages.length === 1;\n\n// Retornar datos para el siguiente nodo\nreturn {\n  json: {\n    buffer: buffer,\n    user_id: userId,\n    is_first_message: isFirstMessage,\n    // Debug info (opcional)\n    debug: {\n      message_count: buffer.messages.length,\n      time_span_ms: timestamp - buffer.first_message_time\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2112,
+        176
+      ],
+      "id": "b32cdd73-534d-4223-b618-aa2867285125",
+      "name": "Code - Append Message to Buffer"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=telegram:buffer:{{ $json.user_id }}",
+        "value": "={{ JSON.stringify($json.buffer) }}",
+        "expire": true,
+        "ttl": 7
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1904,
+        176
+      ],
+      "id": "5066249d-2d39-46a2-aaff-67620aa1d0f7",
+      "name": "Redis"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract User Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract User Data": {
+      "main": [
+        [
+          {
+            "node": "Router Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router Classifier": {
+      "main": [
+        [
+          {
+            "node": "Route Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Router Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Switch": {
+      "main": [
+        [
+          {
+            "node": "Sales Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scheduling Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Conversation Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sales Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales Agent": {
+      "main": [
+        [
+          {
+            "node": "Prepare Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sales Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Sales Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Property Knowledge Base": {
+      "ai_tool": [
+        [
+          {
+            "node": "Sales Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Property Knowledge Base",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scheduling Agent": {
+      "main": [
+        [
+          {
+            "node": "Prepare Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scheduling Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Scheduling Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scheduling Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Scheduling Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Response": {
+      "main": [
+        [
+          {
+            "node": "Send to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar - Check": {
+      "ai_tool": [
+        [
+          {
+            "node": "Scheduling Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Scheduling Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Router Classifier",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records in Airtable": {
+      "ai_tool": [
+        [
+          {
+            "node": "Sales Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Conversation Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Conversation Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversation Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmar visita": {
+      "ai_tool": [
+        [
+          {
+            "node": "Scheduling Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis - Get Existing Buffer": {
+      "main": [
+        [
+          {
+            "node": "Code - Append Message to Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Append Message to Buffer": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}
