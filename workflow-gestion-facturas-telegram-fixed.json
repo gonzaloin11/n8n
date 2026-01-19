@@ -1,0 +1,1300 @@
+{
+  "name": "Gestión de Facturas y Comprobantes - Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 📥 Recepción Telegram\nTrigger para mensajes de cualquier tipo",
+        "height": 320,
+        "width": 280,
+        "color": 4
+      },
+      "id": "sticky-trigger",
+      "name": "Sticky Note - Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [0, 0],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 🔀 Router de Tipos\nClasifica por tipo de mensaje",
+        "height": 320,
+        "width": 350,
+        "color": 5
+      },
+      "id": "sticky-router",
+      "name": "Sticky Note - Router",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [300, 0],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 🎙️ Procesamiento Audio\nTranscripción con OpenAI Whisper",
+        "height": 200,
+        "width": 350,
+        "color": 6
+      },
+      "id": "sticky-audio",
+      "name": "Sticky Note - Audio",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [680, -100],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 🖼️ Procesamiento Imagen\nAnálisis con GPT-4 Vision",
+        "height": 200,
+        "width": 350,
+        "color": 3
+      },
+      "id": "sticky-imagen",
+      "name": "Sticky Note - Imagen",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [680, 120],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 📄 Procesamiento PDF\nExtracción de texto de PDF",
+        "height": 200,
+        "width": 350,
+        "color": 2
+      },
+      "id": "sticky-pdf",
+      "name": "Sticky Note - PDF",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [680, 340],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 🤖 Extracción IA\nProcesamiento con LLM y estructura JSON",
+        "height": 450,
+        "width": 500,
+        "color": 1
+      },
+      "id": "sticky-ia",
+      "name": "Sticky Note - IA",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1100, 0],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 📊 Google Sheets\nRegistro de datos",
+        "height": 320,
+        "width": 280,
+        "color": 7
+      },
+      "id": "sticky-sheets",
+      "name": "Sticky Note - Sheets",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1640, 0],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 📤 Respuesta Telegram\nEnvío de resumen al usuario",
+        "height": 320,
+        "width": 280
+      },
+      "id": "sticky-response",
+      "name": "Sticky Note - Response",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [1960, 0],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {
+          "download": true
+        }
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "position": [60, 120],
+      "webhookId": "telegram-facturas-webhook",
+      "typeVersion": 1.1,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot Facturas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "chat_id",
+              "name": "chat_id",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "user_name",
+              "name": "user_name",
+              "value": "={{ $json.message.from.first_name || 'Usuario' }}",
+              "type": "string"
+            },
+            {
+              "id": "message_id",
+              "name": "message_id",
+              "value": "={{ $json.message.message_id }}",
+              "type": "number"
+            },
+            {
+              "id": "has_text",
+              "name": "has_text",
+              "value": "={{ $json.message.text ? true : false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "has_photo",
+              "name": "has_photo",
+              "value": "={{ $json.message.photo ? true : false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "has_document",
+              "name": "has_document",
+              "value": "={{ $json.message.document ? true : false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "has_voice",
+              "name": "has_voice",
+              "value": "={{ $json.message.voice ? true : false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "has_audio",
+              "name": "has_audio",
+              "value": "={{ $json.message.audio ? true : false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "text_content",
+              "name": "text_content",
+              "value": "={{ $json.message.text || $json.message.caption || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "document_mime",
+              "name": "document_mime",
+              "value": "={{ $json.message.document?.mime_type || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ $now.format('yyyy-MM-dd HH:mm:ss') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "extract-data",
+      "name": "Extraer Datos del Mensaje",
+      "type": "n8n-nodes-base.set",
+      "position": [320, 120],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "outputKey": "Audio",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.has_voice }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "or"
+              }
+            },
+            {
+              "outputKey": "Audio",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.has_audio }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "or"
+              }
+            },
+            {
+              "outputKey": "Imagen",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.has_photo }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "PDF",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.document_mime }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "Imagen",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.document_mime }}",
+                    "rightValue": "image/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "outputKey": "Texto",
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.has_text }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "switch-tipo",
+      "name": "Router por Tipo",
+      "type": "n8n-nodes-base.switch",
+      "position": [540, 120],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice?.file_id || $('Telegram Trigger').item.json.message.audio?.file_id }}"
+      },
+      "id": "telegram-get-audio",
+      "name": "Obtener Archivo Audio",
+      "type": "n8n-nodes-base.telegram",
+      "position": [760, -40],
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot Facturas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "data",
+        "options": {
+          "language": "es"
+        }
+      },
+      "id": "openai-transcribe",
+      "name": "Transcribir Audio (Whisper)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [980, -40],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "texto_extraido",
+              "name": "texto_extraido",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "tipo_entrada",
+              "name": "tipo_entrada",
+              "value": "Audio",
+              "type": "string"
+            },
+            {
+              "id": "chat_id",
+              "name": "chat_id",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.chat_id }}",
+              "type": "number"
+            },
+            {
+              "id": "user_name",
+              "name": "user_name",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.user_name }}",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-audio-result",
+      "name": "Formatear Resultado Audio",
+      "type": "n8n-nodes-base.set",
+      "position": [1200, -40],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.photo ? $('Telegram Trigger').item.json.message.photo[$('Telegram Trigger').item.json.message.photo.length - 1].file_id : $('Telegram Trigger').item.json.message.document.file_id }}"
+      },
+      "id": "telegram-get-image",
+      "name": "Obtener Archivo Imagen",
+      "type": "n8n-nodes-base.telegram",
+      "position": [760, 180],
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot Facturas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o"
+        },
+        "text": "Analiza esta imagen de factura, comprobante o cheque. Extrae TODA la información visible incluyendo: emisor, receptor, CUIT/DNI, fecha, número de comprobante, conceptos/items con sus importes, subtotales, IVA, total, forma de pago y cualquier otro dato relevante. Devuelve la información de manera estructurada.",
+        "inputType": "base64",
+        "binaryPropertyName": "data",
+        "options": {
+          "detail": "high",
+          "maxTokens": 2000
+        }
+      },
+      "id": "openai-vision",
+      "name": "Analizar Imagen (GPT-4 Vision)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [980, 180],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "texto_extraido",
+              "name": "texto_extraido",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "tipo_entrada",
+              "name": "tipo_entrada",
+              "value": "Imagen",
+              "type": "string"
+            },
+            {
+              "id": "chat_id",
+              "name": "chat_id",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.chat_id }}",
+              "type": "number"
+            },
+            {
+              "id": "user_name",
+              "name": "user_name",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.user_name }}",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-image-result",
+      "name": "Formatear Resultado Imagen",
+      "type": "n8n-nodes-base.set",
+      "position": [1200, 180],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.document.file_id }}"
+      },
+      "id": "telegram-get-pdf",
+      "name": "Obtener Archivo PDF",
+      "type": "n8n-nodes-base.telegram",
+      "position": [760, 400],
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot Facturas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "extract-pdf",
+      "name": "Extraer Texto PDF",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [980, 400],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = items[0];\nif (item.json.text) {\n  item.json.text = item.json.text\n    .replace(/\\r?\\n|\\r/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .replace(/[^\\p{L}\\p{N}\\s.,\\-$%:/@]/gu, '')\n    .trim();\n}\nreturn items;"
+      },
+      "id": "reformatear-pdf",
+      "name": "Limpiar Texto PDF",
+      "type": "n8n-nodes-base.code",
+      "position": [1200, 400],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "texto_extraido",
+              "name": "texto_extraido",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "tipo_entrada",
+              "name": "tipo_entrada",
+              "value": "PDF",
+              "type": "string"
+            },
+            {
+              "id": "chat_id",
+              "name": "chat_id",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.chat_id }}",
+              "type": "number"
+            },
+            {
+              "id": "user_name",
+              "name": "user_name",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.user_name }}",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-pdf-result",
+      "name": "Formatear Resultado PDF",
+      "type": "n8n-nodes-base.set",
+      "position": [1420, 400],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "texto_extraido",
+              "name": "texto_extraido",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.text_content }}",
+              "type": "string"
+            },
+            {
+              "id": "tipo_entrada",
+              "name": "tipo_entrada",
+              "value": "Texto",
+              "type": "string"
+            },
+            {
+              "id": "chat_id",
+              "name": "chat_id",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.chat_id }}",
+              "type": "number"
+            },
+            {
+              "id": "user_name",
+              "name": "user_name",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.user_name }}",
+              "type": "string"
+            },
+            {
+              "id": "timestamp",
+              "name": "timestamp",
+              "value": "={{ $('Extraer Datos del Mensaje').item.json.timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-text-result",
+      "name": "Formatear Texto Directo",
+      "type": "n8n-nodes-base.set",
+      "position": [760, 560],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {},
+      "id": "merge-results",
+      "name": "Unificar Resultados",
+      "type": "n8n-nodes-base.merge",
+      "position": [1500, 120],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analiza el siguiente contenido de un comprobante, factura o cheque y extrae la información estructurada.\n\nTIPO DE ENTRADA: {{ $json.tipo_entrada }}\n\nCONTENIDO:\n<documento>{{ $json.texto_extraido }}</documento>\n\nExtrae la siguiente información según corresponda:\n\n1. TIPO DE DOCUMENTO - [OPCIONES: Factura, Recibo, Cheque, Comprobante de Pago, Nota de Crédito, Nota de Débito, Otro]\n2. EMISOR - Nombre/Razón social del emisor\n3. CUIT/DNI EMISOR - Número de identificación fiscal del emisor\n4. RECEPTOR - Nombre/Razón social del receptor (si aplica)\n5. CUIT/DNI RECEPTOR - Número de identificación fiscal del receptor (si aplica)\n6. NÚMERO DE COMPROBANTE - Número identificador del documento\n7. FECHA DE EMISIÓN - Fecha del documento (formato DD/MM/YYYY)\n8. FECHA DE VENCIMIENTO - Si aplica (formato DD/MM/YYYY)\n9. CONCEPTOS/ITEMS - Lista de items con descripción y monto\n10. SUBTOTAL - Monto sin impuestos\n11. IVA - Monto de IVA (si aplica)\n12. OTROS IMPUESTOS - Percepciones u otros (si aplica)\n13. TOTAL - Monto total del documento\n14. MONEDA - [ARS, USD, EUR, etc.]\n15. FORMA DE PAGO - Efectivo, Transferencia, Cheque, etc.\n16. OBSERVACIONES - Cualquier información adicional relevante\n\nSi no puedes encontrar algún campo, déjalo en blanco.\nPara los items/conceptos, incluye descripción, cantidad (si aplica), precio unitario (si aplica) e importe.",
+        "hasOutputParser": true
+      },
+      "id": "modelo-extraccion",
+      "name": "Modelo Extracción de Datos",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [1700, 120],
+      "typeVersion": 1.4,
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "openai-model",
+      "name": "Modelo OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [1520, 400],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "prompt": "Instructions:\n--------------\n{instructions}\n--------------\nCompletion:\n--------------\n{completion}\n--------------\n\nEl resultado anterior no cumple con el formato JSON requerido.\nError:\n--------------\n{error}\n--------------\n\nPor favor, intenta de nuevo asegurándote de devolver un JSON válido con todos los campos especificados:"
+        }
+      },
+      "id": "corrector-formato",
+      "name": "Corrector de Formatos",
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "position": [1700, 340],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsonSchema": "{\n  \"type\": \"object\",\n  \"required\": [\n    \"tipo_documento\",\n    \"emisor\",\n    \"fecha_emision\",\n    \"total\"\n  ],\n  \"properties\": {\n    \"tipo_documento\": {\n      \"type\": \"string\",\n      \"enum\": [\"Factura\", \"Recibo\", \"Cheque\", \"Comprobante de Pago\", \"Nota de Crédito\", \"Nota de Débito\", \"Otro\"]\n    },\n    \"emisor\": { \"type\": \"string\" },\n    \"cuit_emisor\": { \"type\": \"string\" },\n    \"receptor\": { \"type\": \"string\" },\n    \"cuit_receptor\": { \"type\": \"string\" },\n    \"numero_comprobante\": { \"type\": \"string\" },\n    \"fecha_emision\": {\n      \"type\": \"string\",\n      \"format\": \"date\"\n    },\n    \"fecha_vencimiento\": {\n      \"type\": \"string\",\n      \"format\": \"date\"\n    },\n    \"conceptos\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"descripcion\": { \"type\": \"string\" },\n          \"cantidad\": { \"type\": \"number\" },\n          \"precio_unitario\": { \"type\": \"number\" },\n          \"importe\": { \"type\": \"number\" }\n        }\n      }\n    },\n    \"subtotal\": { \"type\": \"number\" },\n    \"iva\": { \"type\": \"number\" },\n    \"otros_impuestos\": { \"type\": \"number\" },\n    \"total\": { \"type\": \"number\" },\n    \"moneda\": {\n      \"type\": \"string\",\n      \"enum\": [\"ARS\", \"USD\", \"EUR\", \"Otro\"]\n    },\n    \"forma_pago\": { \"type\": \"string\" },\n    \"observaciones\": { \"type\": \"string\" }\n  }\n}"
+      },
+      "id": "parseador-datos",
+      "name": "Parseador de Datos JSON",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [1860, 500],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_GOOGLE_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultName": "Hoja 1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha Registro": "={{ $('Unificar Resultados').item.json.timestamp }}",
+            "Tipo Entrada": "={{ $('Unificar Resultados').item.json.tipo_entrada }}",
+            "Tipo Documento": "={{ $json.output.tipo_documento }}",
+            "Emisor": "={{ $json.output.emisor }}",
+            "CUIT Emisor": "={{ $json.output.cuit_emisor }}",
+            "Receptor": "={{ $json.output.receptor }}",
+            "CUIT Receptor": "={{ $json.output.cuit_receptor }}",
+            "Nro Comprobante": "={{ $json.output.numero_comprobante }}",
+            "Fecha Emisión": "={{ $json.output.fecha_emision }}",
+            "Fecha Vencimiento": "={{ $json.output.fecha_vencimiento }}",
+            "Conceptos": "={{ JSON.stringify($json.output.conceptos) }}",
+            "Subtotal": "={{ $json.output.subtotal }}",
+            "IVA": "={{ $json.output.iva }}",
+            "Otros Impuestos": "={{ $json.output.otros_impuestos }}",
+            "Total": "={{ $json.output.total }}",
+            "Moneda": "={{ $json.output.moneda }}",
+            "Forma Pago": "={{ $json.output.forma_pago }}",
+            "Observaciones": "={{ $json.output.observaciones }}",
+            "Usuario": "={{ $('Unificar Resultados').item.json.user_name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha Registro",
+              "displayName": "Fecha Registro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo Entrada",
+              "displayName": "Tipo Entrada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo Documento",
+              "displayName": "Tipo Documento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Emisor",
+              "displayName": "Emisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CUIT Emisor",
+              "displayName": "CUIT Emisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Receptor",
+              "displayName": "Receptor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CUIT Receptor",
+              "displayName": "CUIT Receptor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nro Comprobante",
+              "displayName": "Nro Comprobante",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha Emisión",
+              "displayName": "Fecha Emisión",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha Vencimiento",
+              "displayName": "Fecha Vencimiento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conceptos",
+              "displayName": "Conceptos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subtotal",
+              "displayName": "Subtotal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IVA",
+              "displayName": "IVA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Otros Impuestos",
+              "displayName": "Otros Impuestos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total",
+              "displayName": "Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Moneda",
+              "displayName": "Moneda",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Forma Pago",
+              "displayName": "Forma Pago",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Usuario",
+              "displayName": "Usuario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "google-sheets-append",
+      "name": "Registrar en Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [1980, 120],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "mensaje_resumen",
+              "name": "mensaje_resumen",
+              "value": "=✅ *Comprobante Registrado*\n\n📄 *Tipo:* {{ $('Modelo Extracción de Datos').item.json.output.tipo_documento }}\n🏢 *Emisor:* {{ $('Modelo Extracción de Datos').item.json.output.emisor }}\n📋 *Nro:* {{ $('Modelo Extracción de Datos').item.json.output.numero_comprobante || 'N/A' }}\n📅 *Fecha:* {{ $('Modelo Extracción de Datos').item.json.output.fecha_emision }}\n💰 *Total:* {{ $('Modelo Extracción de Datos').item.json.output.moneda || 'ARS' }} {{ $('Modelo Extracción de Datos').item.json.output.total }}\n\n_Entrada: {{ $('Unificar Resultados').item.json.tipo_entrada }}_\n_Registrado: {{ $('Unificar Resultados').item.json.timestamp }}_",
+              "type": "string"
+            },
+            {
+              "id": "chat_id",
+              "name": "chat_id",
+              "value": "={{ $('Unificar Resultados').item.json.chat_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "preparar-resumen",
+      "name": "Preparar Resumen",
+      "type": "n8n-nodes-base.set",
+      "position": [2200, 120],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.mensaje_resumen }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-send-response",
+      "name": "Enviar Resumen Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "position": [2420, 120],
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot Facturas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Extraer Datos del Mensaje').item.json.chat_id }}",
+        "text": "⚠️ No pude procesar tu mensaje. Por favor envía:\n\n📷 Una foto/imagen del comprobante\n📄 Un archivo PDF\n🎙️ Un mensaje de voz describiendo el gasto\n✍️ Un texto con los datos del comprobante",
+        "additionalFields": {}
+      },
+      "id": "telegram-error",
+      "name": "Enviar Mensaje Error",
+      "type": "n8n-nodes-base.telegram",
+      "position": [760, 700],
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot Facturas"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extraer Datos del Mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer Datos del Mensaje": {
+      "main": [
+        [
+          {
+            "node": "Router por Tipo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router por Tipo": {
+      "main": [
+        [
+          {
+            "node": "Obtener Archivo Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Obtener Archivo Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Obtener Archivo Imagen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Obtener Archivo PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Obtener Archivo Imagen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Formatear Texto Directo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Archivo Audio": {
+      "main": [
+        [
+          {
+            "node": "Transcribir Audio (Whisper)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribir Audio (Whisper)": {
+      "main": [
+        [
+          {
+            "node": "Formatear Resultado Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear Resultado Audio": {
+      "main": [
+        [
+          {
+            "node": "Unificar Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Archivo Imagen": {
+      "main": [
+        [
+          {
+            "node": "Analizar Imagen (GPT-4 Vision)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analizar Imagen (GPT-4 Vision)": {
+      "main": [
+        [
+          {
+            "node": "Formatear Resultado Imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear Resultado Imagen": {
+      "main": [
+        [
+          {
+            "node": "Unificar Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Archivo PDF": {
+      "main": [
+        [
+          {
+            "node": "Extraer Texto PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer Texto PDF": {
+      "main": [
+        [
+          {
+            "node": "Limpiar Texto PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpiar Texto PDF": {
+      "main": [
+        [
+          {
+            "node": "Formatear Resultado PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear Resultado PDF": {
+      "main": [
+        [
+          {
+            "node": "Unificar Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear Texto Directo": {
+      "main": [
+        [
+          {
+            "node": "Unificar Resultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unificar Resultados": {
+      "main": [
+        [
+          {
+            "node": "Modelo Extracción de Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Modelo Extracción de Datos",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Corrector de Formatos",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Corrector de Formatos": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Modelo Extracción de Datos",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parseador de Datos JSON": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Corrector de Formatos",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modelo Extracción de Datos": {
+      "main": [
+        [
+          {
+            "node": "Registrar en Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar en Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Preparar Resumen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Resumen": {
+      "main": [
+        [
+          {
+            "node": "Enviar Resumen Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": ""
+  },
+  "id": "",
+  "tags": []
+}

@@ -1,0 +1,764 @@
+{
+    "name": "Gon_Finance_Telegram_Assistant",
+    "flow": [
+        {
+            "id": 1,
+            "module": "telegram:WatchUpdates",
+            "version": 1,
+            "parameters": {
+                "__IMTHOOK__": 1723647
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 600
+                },
+                "restore": {
+                    "parameters": {
+                        "__IMTHOOK__": {
+                            "data": {
+                                "editable": "false"
+                            },
+                            "label": "My Telegram Bot Updates webhook"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTHOOK__",
+                        "type": "hook:telegramapi",
+                        "label": "Webhook",
+                        "required": true
+                    }
+                ]
+            }
+        },
+        {
+            "id": 11,
+            "module": "builtin:BasicRouter",
+            "version": 1,
+            "mapper": null,
+            "metadata": {
+                "designer": {
+                    "x": 300,
+                    "y": 600
+                }
+            },
+            "routes": [
+                {
+                    "flow": [
+                        {
+                            "id": 5,
+                            "module": "telegram:DownloadFile",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 6850633
+                            },
+                            "filter": {
+                                "name": "PDF",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{1.message.attachment.mime_type}}",
+                                            "b": "application/pdf",
+                                            "o": "text:equal"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "fileId": "{{1.message.attachment.file_id}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 150
+                                },
+                                "restore": {
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "telegram"
+                                            },
+                                            "label": "GonFinanzas"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:telegram",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "fileId",
+                                        "type": "text",
+                                        "label": "File ID",
+                                        "required": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "id": 10,
+                            "module": "pdf-co:PdfToImages",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 7055871
+                            },
+                            "mapper": {
+                                "import": {
+                                    "importType": "upload",
+                                    "data": "{{5.fileOutput}}",
+                                    "name": "{{5.fileName}}"
+                                },
+                                "convert": {
+                                    "convertType": "toJpg"
+                                },
+                                "async": 15000,
+                                "inline": false,
+                                "expiration": "60",
+                                "export": {
+                                    "exportType": "downloadFile"
+                                }
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 900,
+                                    "y": 150
+                                }
+                            }
+                        },
+                        {
+                            "id": 2,
+                            "module": "openai-gpt-3:analyzeImages",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 6372438
+                            },
+                            "mapper": {
+                                "model": "gpt-4o-mini",
+                                "top_p": "1",
+                                "images": [
+                                    {
+                                        "imageFileData": "{{10.data}}",
+                                        "imageUploadType": "imageFile"
+                                    }
+                                ],
+                                "prompt": "Eres un experto en contabilidad digital y tu trabajo es analizar la imagen de un comprobante (factura, ticket, recibo, etc.) para extraer datos financieros relevantes. Tu objetivo es identificar cualquier tipo de gasto o cobro.\r\n\r\nAnaliza la imagen y devuelve **SOLO un objeto JSON válido**. Si algún dato no está disponible, deja el campo vacío (\"\"), sin usar \"null\", \"N/A\" ni otros marcadores. El JSON debe estar perfectamente estructurado y **sin etiquetas adicionales como \"json\" ni comillas invertidas (backticks).**\r\n\r\n**El JSON debe contener exactamente los siguientes campos, en español neutro:**\r\n\r\n{\r\n\"FECHA DEL COBRO\": \"\",\r\n\"SERVICIO / COMERCIO\": \"\",\r\n\"CONCEPTO\": \"\",\r\n\"IMPORTE\": \"\",\r\n\"ID DE TRANSACCION\": \"\",\r\n\"CATEGORIA\": \"\",\r\n\"TIPO DE GASTO\": \"\",\r\n\"ORIGEN DEL COBRO\": \"\"\r\n}\r\n\r\n**Instrucciones específicas para cada campo:**\r\n\r\n1.  **\"FECHA DEL COBRO\":** Extrae la fecha del cobro del documento en formato \"Mes día, Año\" (ej. \"Junio 25, 2025\"). Prioriza la fecha más relevante al cobro. Si solo hay año y mes, incluye el día 1. Si no hay año, asume el año actual (2025).\r\n2.  **\"SERVICIO / COMERCIO\":** Nombre de la empresa, comercio, proveedor o plataforma que realizó el cobro, tal como aparece en el documento (ej. \"Netflix\", \"Uber Eats\", \"Mercadona\").\r\n3.  **\"CONCEPTO\":** Breve descripción del producto o servicio específico por el que se realizó el cobro (ej. \"Inscripción mensual\", \"Dominos Pizza\", \"Vuelo Madrid\", \"Libro Meditacion\", \"Comida\").\r\n4.  **\"IMPORTE\":** Valor numérico total del cargo. **devuelve solo el valor numérico, sin símbolo de monedal(ej.: 1.250,50). al inicio y usa la coma (`,`) como separador decimal** y el punto (`.`) como separador de miles si aplica (ej. \"$12,99\", \"$1.250,50\"). Asume que todos los importes están en Pesos Argentinos.\r\n5.  **\"ID DE TRANSACCION\":** Si aparece un número de referencia, código, ID de transacción, número de pedido o similar en el documento, extráelo aquí.\r\n6.  **\"CATEGORIA\":** Clasifica el gasto en una de las siguientes subcategorías, buscando la más específica. Si no encaja con ninguna, usa \"Misceláneos\".\r\n    * `Vivienda`\r\n    * `Alimentacion`\r\n    * `Transporte`\r\n    * `Salud y Bienestar`\r\n    * `Viajes`\r\n    * `Suscripciones`\r\n    * `Educacion`\r\n    * `Entretenimiento y Ocio`\r\n    * `Compras Personales / Ropa`\r\n    * `Deudas y Prestamos`\r\n    * `Misceláneos`\r\n    * `Ai Tools`\r\n    * `Servicios`\r\n    * `Impuestos`\r\n    * `Café`\r\n    * `Tarjeta`\r\n    * `Ingresos`\r\n\r\n7.  **\"TIPO DE GASTO\":** Define si es un gasto `Único` o `Recurrente`. Los gastos de suscripciones se consideran `Recurrente`. Otros gastos son `Único`.\r\n8.  **\"ORIGEN DEL COBRO\":** Deja este campo vacío (\"\"). Este dato será extraído del email por Make, no del adjunto.\r\n\r\n**Detección de Idioma y Relevancia:**\r\n* El documento puede estar en español, inglés o italiano. Reconoce el idioma y extrae los datos independientemente de ello.\r\n* Determina si la imagen es verdaderamente un recibo, factura, confirmación de pago o información de suscripción. Si no es un cobro/gasto, o es irrelevante, devuelve un JSON donde la mayoría de los campos estén vacíos. Queremos detectar también los microgastos de suscripciones.\r\n\r\n**Formato de Salida:**\r\n* El output debe ser un único objeto JSON plano.\r\n* **Crucial:** Asegúrate de que el texto final solo contenga el objeto JSON, sin ningún texto introductorio o de cierre.",
+                                "max_tokens": "2048",
+                                "temperature": "1",
+                                "n_completions": "1"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1200,
+                                    "y": 150
+                                }
+                            }
+                        },
+                        {
+                            "id": 8,
+                            "module": "builtin:BasicRouter",
+                            "version": 1,
+                            "mapper": null,
+                            "metadata": {
+                                "designer": {
+                                    "x": 1500,
+                                    "y": 150
+                                }
+                            },
+                            "routes": [
+                                {
+                                    "flow": [
+                                        {
+                                            "id": 9,
+                                            "module": "telegram:SendReplyMessage",
+                                            "version": 1,
+                                            "parameters": {
+                                                "__IMTCONN__": 6850633
+                                            },
+                                            "filter": {
+                                                "name": "sin resultado",
+                                                "conditions": [
+                                                    [
+                                                        {
+                                                            "a": "{{2.result}}",
+                                                            "b": "NO",
+                                                            "o": "text:equal"
+                                                        },
+                                                        {
+                                                            "a": "{{2.result}}",
+                                                            "o": "notexist"
+                                                        }
+                                                    ]
+                                                ]
+                                            },
+                                            "mapper": {
+                                                "text": "Hubo un error con esa imagen, por favor intente con otra",
+                                                "chatId": "5941269835",
+                                                "parseMode": "",
+                                                "replyMarkup": "",
+                                                "messageThreadId": "",
+                                                "replyToMessageId": "",
+                                                "replyMarkupAssembleType": "reply_markup_enter"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1800,
+                                                    "y": 0
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "flow": [
+                                        {
+                                            "id": 3,
+                                            "module": "json:ParseJSON",
+                                            "version": 1,
+                                            "parameters": {
+                                                "type": ""
+                                            },
+                                            "filter": {
+                                                "name": "Con Resultado",
+                                                "conditions": [
+                                                    [
+                                                        {
+                                                            "a": "{{2.result}}",
+                                                            "b": "NO",
+                                                            "o": "text:notequal:ci"
+                                                        }
+                                                    ]
+                                                ]
+                                            },
+                                            "mapper": {
+                                                "json": "{{2.result}}"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1800,
+                                                    "y": 300
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "id": 4,
+                                            "module": "google-sheets:addRow",
+                                            "version": 2,
+                                            "parameters": {
+                                                "__IMTCONN__": 6373227
+                                            },
+                                            "mapper": {
+                                                "from": "share",
+                                                "mode": "select",
+                                                "values": {
+                                                    "0": "={{if(3.`FECHA DEL COBRO` = null; formatDate(now; \"DD/MM/YYYY\"); 3.`FECHA DEL COBRO`)}}",
+                                                    "1": "={{3.`SERVICIO / COMERCIO`}}",
+                                                    "2": "={{3.CONCEPTO}}",
+                                                    "3": "={{3.IMPORTE}}",
+                                                    "4": "={{3.`ID DE TRANSACCION`}}",
+                                                    "5": "={{3.CATEGORIA}}",
+                                                    "6": "={{3.`TIPO DE GASTO`}}",
+                                                    "7": "={{3.`ORIGEN DEL COBRO`}}"
+                                                },
+                                                "sheetId": "REGISTRO DE GASTOS",
+                                                "spreadsheetId": "/17nt_TH6hUAWYjbF8IGPzL8ZzhIrHw1X5/1DUykR9TcOSqUiMvpqQY_kkuebXc6vcH0dQiru0kR918",
+                                                "includesHeaders": true,
+                                                "insertDataOption": "INSERT_ROWS",
+                                                "valueInputOption": "USER_ENTERED",
+                                                "insertUnformatted": false
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 2100,
+                                                    "y": 300
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "id": 40,
+                                            "module": "telegram:SendReplyMessage",
+                                            "version": 1,
+                                            "parameters": {
+                                                "__IMTCONN__": 6850633
+                                            },
+                                            "mapper": {
+                                                "text": "GASTO GON REGISTRADO ",
+                                                "chatId": "5941269835",
+                                                "parseMode": "",
+                                                "replyMarkup": "",
+                                                "messageThreadId": "",
+                                                "replyToMessageId": "",
+                                                "replyMarkupAssembleType": "reply_markup_enter"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 2400,
+                                                    "y": 300
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "id": 63,
+                                            "module": "google-drive:uploadAFile",
+                                            "version": 4,
+                                            "parameters": {
+                                                "__IMTCONN__": 7052746
+                                            },
+                                            "mapper": {
+                                                "select": "value",
+                                                "filename": "{{5.fileName}}",
+                                                "data": "{{5.fileOutput}}",
+                                                "convert": false,
+                                                "destination": "share",
+                                                "folderId": "1rJK3nbmhUWUFpe71m1hPa35uda9eRQrn/1YFu48XnUDnOole8Waq5tIGlsZM4pI51e/15yu7uAZINzmJ1rveQM6hBEL0bGIdBtfj"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 2700,
+                                                    "y": 300
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "id": 64,
+                                            "module": "google-email:sendAnEmail",
+                                            "version": 4,
+                                            "parameters": {
+                                                "__IMTCONN__": 6373193
+                                            },
+                                            "mapper": {
+                                                "to": [
+                                                    "gonzalo.insua11@gmail.com"
+                                                ],
+                                                "subject": "FACTURA {{3.`SERVICIO / COMERCIO`}}",
+                                                "bodyType": "collection",
+                                                "contents": [
+                                                    {
+                                                        "text": "Hola Gonzalo, tu factura fue cargada \n\nEl monto de tu factura es de :\n\n{{3.IMPORTE}}",
+                                                        "image": {
+                                                            "data": "{{5.fileOutput}}",
+                                                            "filename": "{{5.fileName}}"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 3000,
+                                                    "y": 300
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 25,
+                            "module": "telegram:DownloadFile",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 6850633
+                            },
+                            "filter": {
+                                "name": "Audio",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{1.message.attachment.type}}",
+                                            "b": "Voice",
+                                            "o": "text:equal"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "fileId": "{{1.message.attachment.file_id}}"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 750
+                                }
+                            }
+                        },
+                        {
+                            "id": 26,
+                            "module": "openai-gpt-3:CreateTranscription",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 6372438
+                            },
+                            "mapper": {
+                                "model": "whisper-1",
+                                "prompt": "Transcribe el audio",
+                                "fileData": "{{25.fileOutput}}",
+                                "fileName": "{{25.fileName}}",
+                                "temperature": "1",
+                                "response_format": "text"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 900,
+                                    "y": 750
+                                }
+                            }
+                        },
+                        {
+                            "id": 33,
+                            "module": "openai-gpt-3:transformTextToStructuredData",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 6372438
+                            },
+                            "mapper": {
+                                "model": "gpt-4o",
+                                "prompt": "Eres un experto en contabilidad digital y tu trabajo es analizar detalladamente el texto del cuerpo de un correo electrónico o de un chat bot para extraer datos financieros relevantes.",
+                                "rawText": "{{26.text}}",
+                                "parameters": [
+                                    {
+                                        "name": "fecha_del_cobro",
+                                        "type": "string",
+                                        "isRequired": false,
+                                        "description": "Fecha del ticket o la factura"
+                                    },
+                                    {
+                                        "name": "id_de_transaccion",
+                                        "type": "string",
+                                        "isRequired": false,
+                                        "description": "Número o código del recibo, factura o orden de compra"
+                                    },
+                                    {
+                                        "name": "concepto",
+                                        "type": "string",
+                                        "isRequired": false,
+                                        "description": "el motivo del pago"
+                                    },
+                                    {
+                                        "name": "Importe",
+                                        "type": "number",
+                                        "isRequired": false,
+                                        "description": "Valor total pagado"
+                                    },
+                                    {
+                                        "name": "servicio_comercio",
+                                        "type": "string",
+                                        "isRequired": false,
+                                        "description": "Empresa que emite la factura"
+                                    },
+                                    {
+                                        "name": "categoria",
+                                        "type": "string",
+                                        "isRequired": false,
+                                        "description": "Categoría del gasto"
+                                    },
+                                    {
+                                        "name": "tipo_de_gasto",
+                                        "type": "string",
+                                        "isRequired": false,
+                                        "description": "Recurrente o Único"
+                                    }
+                                ]
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1200,
+                                    "y": 750
+                                }
+                            }
+                        },
+                        {
+                            "id": 28,
+                            "module": "builtin:BasicRouter",
+                            "version": 1,
+                            "mapper": null,
+                            "metadata": {
+                                "designer": {
+                                    "x": 1500,
+                                    "y": 750
+                                }
+                            },
+                            "routes": [
+                                {
+                                    "flow": [
+                                        {
+                                            "id": 31,
+                                            "module": "google-sheets:addRow",
+                                            "version": 2,
+                                            "parameters": {
+                                                "__IMTCONN__": 6373227
+                                            },
+                                            "mapper": {
+                                                "from": "drive",
+                                                "mode": "select",
+                                                "values": {
+                                                    "0": "={{if(33.fecha_del_cobro = null; formatDate(now; \"DD/MM/YYYY\"); 33.fecha_del_cobro)}}",
+                                                    "1": "={{33.servicio_comercio}}",
+                                                    "2": "={{33.concepto}}",
+                                                    "3": "={{formatNumber(33.Importe; 2; \",\"; \".\")}}",
+                                                    "4": "={{33.id_de_transaccion}}",
+                                                    "5": "={{33.categoria}}",
+                                                    "6": "={{33.tipo_de_gasto}}",
+                                                    "7": "=De {{1.message.from.first_name}} en Telegram"
+                                                },
+                                                "sheetId": "REGISTRO DE GASTOS",
+                                                "spreadsheetId": "/17nt_TH6hUAWYjbF8IGPzL8ZzhIrHw1X5/1DUykR9TcOSqUiMvpqQY_kkuebXc6vcH0dQiru0kR918",
+                                                "includesHeaders": true,
+                                                "insertDataOption": "INSERT_ROWS",
+                                                "valueInputOption": "USER_ENTERED",
+                                                "insertUnformatted": false
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1800,
+                                                    "y": 600
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "id": 32,
+                                            "module": "telegram:SendReplyMessage",
+                                            "version": 1,
+                                            "parameters": {
+                                                "__IMTCONN__": 6850633
+                                            },
+                                            "mapper": {
+                                                "text": "Gasto Gon Registrado",
+                                                "chatId": "5941269835",
+                                                "parseMode": "",
+                                                "replyMarkup": "",
+                                                "messageThreadId": "",
+                                                "replyToMessageId": "",
+                                                "replyMarkupAssembleType": "reply_markup_enter"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 2100,
+                                                    "y": 600
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                {
+                                    "flow": [
+                                        {
+                                            "id": 29,
+                                            "module": "telegram:SendReplyMessage",
+                                            "version": 1,
+                                            "parameters": {
+                                                "__IMTCONN__": 6850633
+                                            },
+                                            "filter": {
+                                                "name": "No es gasto",
+                                                "conditions": [
+                                                    [
+                                                        {
+                                                            "a": "{{33.Importe}}",
+                                                            "b": "{{emptyarray}}",
+                                                            "o": "text:equal"
+                                                        }
+                                                    ],
+                                                    [
+                                                        {
+                                                            "a": "{{33.Importe}}",
+                                                            "b": "0",
+                                                            "o": "text:equal"
+                                                        }
+                                                    ]
+                                                ]
+                                            },
+                                            "mapper": {
+                                                "text": "No pude procesar el audio ",
+                                                "chatId": "5941269835",
+                                                "parseMode": "",
+                                                "replyMarkup": "",
+                                                "messageThreadId": "",
+                                                "replyToMessageId": "",
+                                                "replyMarkupAssembleType": "reply_markup_enter"
+                                            },
+                                            "metadata": {
+                                                "designer": {
+                                                    "x": 1800,
+                                                    "y": 900
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 44,
+                            "module": "openai-gpt-3:transformTextToStructuredData",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 6372438
+                            },
+                            "filter": {
+                                "name": "Texto",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{1.message.text}}",
+                                            "o": "exist"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "model": "gpt-4o",
+                                "prompt": "Eres un experto en contabilidad digital y tu trabajo es analizar detalladamente el texto para extraer datos financieros relevantes.",
+                                "rawText": "{{1.message.text}}",
+                                "parameters": [
+                                    {
+                                        "name": "fecha_del_cobro",
+                                        "type": "string",
+                                        "isRequired": false,
+                                        "description": "Fecha del cobro"
+                                    },
+                                    {
+                                        "name": "Servicio_Comercio",
+                                        "type": "string",
+                                        "isRequired": false,
+                                        "description": "Nombre de la empresa"
+                                    },
+                                    {
+                                        "name": "id_de_transaccion",
+                                        "type": "string",
+                                        "isRequired": false,
+                                        "description": "ID de transacción"
+                                    },
+                                    {
+                                        "name": "Concepto",
+                                        "type": "string",
+                                        "isRequired": false,
+                                        "description": "Motivo del pago"
+                                    },
+                                    {
+                                        "name": "importe",
+                                        "type": "number",
+                                        "isRequired": false,
+                                        "description": "Valor del cargo"
+                                    },
+                                    {
+                                        "name": "categoria",
+                                        "type": "string",
+                                        "isRequired": false,
+                                        "description": "Categoría del gasto"
+                                    },
+                                    {
+                                        "name": "Tipo_de_Gasto",
+                                        "type": "string",
+                                        "isRequired": false,
+                                        "description": "Recurrente o Único"
+                                    }
+                                ]
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 600,
+                                    "y": 1200
+                                }
+                            }
+                        },
+                        {
+                            "id": 22,
+                            "module": "google-sheets:addRow",
+                            "version": 2,
+                            "parameters": {
+                                "__IMTCONN__": 6373227
+                            },
+                            "mapper": {
+                                "from": "drive",
+                                "mode": "select",
+                                "values": {
+                                    "0": "={{if(44.fecha_del_cobro = null; formatDate(now; \"DD/MM/YYYY\"); 44.fecha_del_cobro)}}",
+                                    "1": "={{44.Servicio_Comercio}}",
+                                    "2": "={{44.Concepto}}",
+                                    "3": "={{formatNumber(44.importe; 2; \",\"; \".\")}}",
+                                    "4": "={{44.id_de_transaccion}}",
+                                    "5": "={{44.categoria}}",
+                                    "6": "={{44.Tipo_de_Gasto}}",
+                                    "7": "=De {{1.message.from.first_name}} en Telegram"
+                                },
+                                "sheetId": "REGISTRO DE GASTOS",
+                                "spreadsheetId": "/17nt_TH6hUAWYjbF8IGPzL8ZzhIrHw1X5/1DUykR9TcOSqUiMvpqQY_kkuebXc6vcH0dQiru0kR918",
+                                "includesHeaders": true,
+                                "insertDataOption": "INSERT_ROWS",
+                                "valueInputOption": "USER_ENTERED",
+                                "insertUnformatted": false
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 900,
+                                    "y": 1200
+                                }
+                            }
+                        },
+                        {
+                            "id": 23,
+                            "module": "telegram:SendReplyMessage",
+                            "version": 1,
+                            "parameters": {
+                                "__IMTCONN__": 6850633
+                            },
+                            "mapper": {
+                                "text": "GASTO GON REGISTRADO ",
+                                "chatId": "5941269835",
+                                "parseMode": "",
+                                "replyMarkup": "",
+                                "messageThreadId": "",
+                                "replyToMessageId": "",
+                                "replyMarkupAssembleType": "reply_markup_enter"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1200,
+                                    "y": 1200
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "instant": true,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "us2.make.com",
+        "notes": []
+    }
+}
