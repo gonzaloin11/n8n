@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Samples - Sistema de Gastos con IA</title>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    @font-face {
+      font-family: 'Neue Machina';
+      src: url("https://www.genspark.ai/image_placeholder.png") format('woff2');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    body{
+      font-family: 'Roboto Mono', monospace;
+      background-color:#0F0F0F;
+      color:#DDDDDD;
+      margin:0;
+      padding:0;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .container{
+      width:1280px;
+      height:720px;
+      margin:0 auto;
+      padding:24px 50px;
+      display:flex;
+      flex-direction:column;
+      box-sizing:border-box;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      color:#CBF400;
+      font-weight:600;
+      font-size:16px;
+      letter-spacing:0.5px;
+    }
+    .logo i{ margin-right:10px; font-size:16px; }
+
+    .date{
+      color:#CBF400;
+      font-size:16px;
+    }
+
+    .title-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      margin-bottom:20px;
+    }
+
+    .main-title{
+      font-family:'Neue Machina', sans-serif;
+      color:#CBF400;
+      font-size:72px;
+      font-weight:700;
+      margin:0;
+      line-height:0.9;
+      letter-spacing:-1px;
+    }
+
+    .subtitle{
+      color:#CBF400;
+      font-size:14px;
+      max-width:380px;
+      text-align:right;
+      line-height:1.5;
+      opacity:0.9;
+    }
+
+    .samples-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:20px;
+      flex:1;
+      min-height:0;
+    }
+
+    .sample-card{
+      background-color:rgba(203,244,0,0.03);
+      border:2px solid rgba(203,244,0,0.3);
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+    }
+
+    .sample-card.highlight{
+      border-color:#CBF400;
+      background-color:rgba(203,244,0,0.08);
+    }
+
+    .card-header{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:12px;
+      padding-bottom:10px;
+      border-bottom:1px solid rgba(203,244,0,0.2);
+    }
+
+    .card-icon{
+      width:28px;
+      height:28px;
+      background-color:#CBF400;
+      color:#0F0F0F;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+    }
+
+    .card-title{
+      font-family:'Neue Machina', sans-serif;
+      color:#CBF400;
+      font-size:14px;
+      font-weight:600;
+      margin:0;
+    }
+
+    .card-content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      overflow:hidden;
+    }
+
+    /* Telegram mockup */
+    .telegram-mock{
+      background-color:#1a1a1a;
+      border-radius:8px;
+      padding:10px;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      overflow:hidden;
+    }
+
+    .tg-message{
+      max-width:90%;
+      padding:8px 10px;
+      border-radius:8px;
+      font-size:11px;
+      line-height:1.4;
+    }
+
+    .tg-user{
+      background-color:#2a2a2a;
+      align-self:flex-end;
+      color:#DDDDDD;
+    }
+
+    .tg-bot{
+      background-color:#1e3a1e;
+      align-self:flex-start;
+      color:#DDDDDD;
+    }
+
+    .tg-success{
+      color:#4ade80;
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    .tg-data{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      margin-top:4px;
+    }
+
+    .tg-row{
+      display:flex;
+      gap:6px;
+    }
+
+    .tg-label{
+      color:#9ca3af;
+    }
+
+    .tg-value{
+      color:#DDDDDD;
+    }
+
+    .tg-photo{
+      background:linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
+      height:60px;
+      border-radius:6px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#666;
+      font-size:20px;
+    }
+
+    .tg-audio{
+      background-color:#7c3aed;
+      border-radius:20px;
+      padding:6px 12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:10px;
+      color:white;
+    }
+
+    /* Database mockup */
+    .db-mock{
+      background-color:#1a1a1a;
+      border-radius:4px;
+      overflow:hidden;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .db-header{
+      background-color:#2a2a2a;
+      padding:6px 10px;
+      display:grid;
+      grid-template-columns: 0.8fr 1.2fr 0.8fr 0.8fr;
+      gap:8px;
+      font-size:9px;
+      color:#9ca3af;
+      font-weight:600;
+      border-bottom:1px solid #3a3a3a;
+    }
+
+    .db-row{
+      padding:6px 10px;
+      display:grid;
+      grid-template-columns: 0.8fr 1.2fr 0.8fr 0.8fr;
+      gap:8px;
+      font-size:9px;
+      color:#DDDDDD;
+      border-bottom:1px solid #2a2a2a;
+    }
+
+    .db-row:hover{
+      background-color:rgba(203,244,0,0.05);
+    }
+
+    .db-id{
+      color:#CBF400;
+      font-family:monospace;
+    }
+
+    /* Spreadsheet mockup */
+    .sheet-mock{
+      background-color:#1a1a1a;
+      border-radius:4px;
+      overflow:hidden;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .sheet-header{
+      background-color:#CBF400;
+      color:#0F0F0F;
+      padding:6px 8px;
+      display:grid;
+      grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr;
+      gap:6px;
+      font-size:9px;
+      font-weight:600;
+    }
+
+    .sheet-row{
+      padding:6px 8px;
+      display:grid;
+      grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr;
+      gap:6px;
+      font-size:9px;
+      color:#DDDDDD;
+      border-bottom:1px solid #2a2a2a;
+    }
+
+    .sheet-row:nth-child(even){
+      background-color:rgba(255,255,255,0.02);
+    }
+
+    /* Drive mockup */
+    .drive-mock{
+      background-color:#1a1a1a;
+      border-radius:4px;
+      padding:10px;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .drive-path{
+      font-size:10px;
+      color:#9ca3af;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    .drive-files{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      flex:1;
+    }
+
+    .drive-file{
+      background-color:#2a2a2a;
+      border-radius:4px;
+      padding:8px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+    }
+
+    .drive-file-icon{
+      width:36px;
+      height:44px;
+      background:linear-gradient(135deg, #ea4335 0%, #c5221f 100%);
+      border-radius:2px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .drive-file-name{
+      font-size:9px;
+      color:#DDDDDD;
+      text-align:center;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      width:100%;
+    }
+
+    .flow-arrow{
+      color:#CBF400;
+      font-size:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:4px 0;
+    }
+
+    .mini-label{
+      font-size:9px;
+      color:#9ca3af;
+      text-align:center;
+      margin-top:4px;
+    }
+
+    .footer-note{
+      margin-top:16px;
+      padding:12px 16px;
+      background-color:#CBF400;
+      color:#0F0F0F;
+      font-size:13px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .footer-note i{
+      font-size:16px;
+    }
+
+    .footer-note strong{
+      font-weight:700;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="logo">
+<i class="fas fa-chevron-up"></i>
+<p style="margin:0;">SISTEMA DE GASTOS CON IA</p>
+</div>
+<div class="date">
+<p style="margin:0;">30 - 01 - 2026</p>
+</div>
+</div>
+
+<div class="title-row">
+<h1 class="main-title">Samples</h1>
+<p class="subtitle">Ejemplos reales del flujo: desde el mensaje del usuario hasta el registro estructurado.</p>
+</div>
+
+<div class="samples-grid">
+<!-- Column 1: Telegram Input -->
+<div class="sample-card highlight">
+<div class="card-header">
+<div class="card-icon"><i class="fa-brands fa-telegram"></i></div>
+<p class="card-title">1. Entrada via Telegram</p>
+</div>
+<div class="card-content">
+<div class="telegram-mock">
+<div class="tg-message tg-user">
+<div class="tg-photo"><i class="fas fa-receipt"></i></div>
+<p class="mini-label">Foto de factura enviada</p>
+</div>
+
+<div class="tg-message tg-bot">
+<div class="tg-success"><i class="fas fa-check-circle"></i> Gasto registrado exitosamente</div>
+<div class="tg-data">
+<div class="tg-row"><span class="tg-label">Fecha:</span><span class="tg-value">15/01/2026</span></div>
+<div class="tg-row"><span class="tg-label">Empresa:</span><span class="tg-value">TECH SOLUTIONS SA</span></div>
+<div class="tg-row"><span class="tg-label">Concepto:</span><span class="tg-value">Insumos de oficina</span></div>
+<div class="tg-row"><span class="tg-label">Total:</span><span class="tg-value">$45,890</span></div>
+<div class="tg-row"><span class="tg-label">Tipo:</span><span class="tg-value">Factura B</span></div>
+<div class="tg-row"><span class="tg-label">ID:</span><span class="tg-value">B92X-45678901234</span></div>
+</div>
+</div>
+
+<div class="tg-message tg-user">
+<div class="tg-audio"><i class="fas fa-play"></i> 0:08 <span style="opacity:0.7">Audio</span></div>
+</div>
+
+<div class="tg-message tg-bot">
+<div class="tg-success"><i class="fas fa-check-circle"></i> Gasto registrado</div>
+<div class="tg-data">
+<div class="tg-row"><span class="tg-label">Concepto:</span><span class="tg-value">Almuerzo reunión</span></div>
+<div class="tg-row"><span class="tg-label">Total:</span><span class="tg-value">$12,500</span></div>
+<div class="tg-row"><span class="tg-label">Categoría:</span><span class="tg-value">Representación</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Column 2: Database -->
+<div class="sample-card">
+<div class="card-header">
+<div class="card-icon"><i class="fas fa-database"></i></div>
+<p class="card-title">2. Registro en Base de Datos</p>
+</div>
+<div class="card-content">
+<div class="db-mock">
+<div class="db-header">
+<span>ID</span>
+<span>Concepto</span>
+<span>Fecha</span>
+<span>Tipo</span>
+</div>
+<div class="db-row">
+<span class="db-id">B92X-456...</span>
+<span>Insumos oficina</span>
+<span>15/01/2026</span>
+<span>Factura B</span>
+</div>
+<div class="db-row">
+<span class="db-id">A15M-789...</span>
+<span>Almuerzo reunión</span>
+<span>15/01/2026</span>
+<span>Ticket</span>
+</div>
+<div class="db-row">
+<span class="db-id">C33P-012...</span>
+<span>Combustible</span>
+<span>14/01/2026</span>
+<span>Factura A</span>
+</div>
+<div class="db-row">
+<span class="db-id">D77Q-345...</span>
+<span>Hosting mensual</span>
+<span>12/01/2026</span>
+<span>Factura B</span>
+</div>
+<div class="db-row">
+<span class="db-id">E99R-678...</span>
+<span>Viáticos Córdoba</span>
+<span>10/01/2026</span>
+<span>Varios</span>
+</div>
+<div class="db-row">
+<span class="db-id">F22S-901...</span>
+<span>Papelería</span>
+<span>08/01/2026</span>
+<span>Ticket</span>
+</div>
+<div class="db-row">
+<span class="db-id">G44T-234...</span>
+<span>Cuota escolar</span>
+<span>05/01/2026</span>
+<span>Factura C</span>
+</div>
+</div>
+
+<div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+
+<div class="sheet-mock">
+<div class="sheet-header">
+<span>Concepto</span>
+<span>Empresa</span>
+<span>IVA</span>
+<span>Total</span>
+</div>
+<div class="sheet-row">
+<span>Insumos oficina</span>
+<span>TECH SOL.</span>
+<span>$7,982</span>
+<span>$45,890</span>
+</div>
+<div class="sheet-row">
+<span>Almuerzo</span>
+<span>REST. NORTE</span>
+<span>$2,175</span>
+<span>$12,500</span>
+</div>
+<div class="sheet-row">
+<span>Combustible</span>
+<span>YPF SA</span>
+<span>$4,521</span>
+<span>$26,000</span>
+</div>
+</div>
+<p class="mini-label">Export automático a Spreadsheet</p>
+</div>
+</div>
+
+<!-- Column 3: Storage -->
+<div class="sample-card">
+<div class="card-header">
+<div class="card-icon"><i class="fa-brands fa-google-drive"></i></div>
+<p class="card-title">3. Archivos Organizados</p>
+</div>
+<div class="card-content">
+<div class="drive-mock">
+<div class="drive-path">
+<i class="fas fa-folder"></i> Comprobantes > 2026 > Enero
+</div>
+<div class="drive-files">
+<div class="drive-file">
+<div class="drive-file-icon">PDF</div>
+<p class="drive-file-name">2026-01-15_B92X.pdf</p>
+</div>
+<div class="drive-file">
+<div class="drive-file-icon">PDF</div>
+<p class="drive-file-name">2026-01-14_C33P.pdf</p>
+</div>
+<div class="drive-file">
+<div class="drive-file-icon">PDF</div>
+<p class="drive-file-name">2026-01-12_D77Q.pdf</p>
+</div>
+<div class="drive-file">
+<div class="drive-file-icon">PDF</div>
+<p class="drive-file-name">2026-01-10_E99R.pdf</p>
+</div>
+</div>
+<p class="mini-label" style="margin-top:auto;">Nomenclatura automática por fecha + ID</p>
+</div>
+
+<div style="height:12px;"></div>
+
+<div style="background:#1e3a1e;border-radius:4px;padding:10px;">
+<p style="margin:0;font-size:10px;color:#4ade80;font-weight:600;"><i class="fas fa-robot" style="margin-right:6px;"></i>Procesamiento automático</p>
+<p style="margin:6px 0 0 0;font-size:9px;color:#DDDDDD;line-height:1.5;">
+OCR extrae datos de la imagen<br/>
+NLP clasifica por categoría<br/>
+Validación contra políticas<br/>
+Archivo + registro sin intervención
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="footer-note">
+<i class="fas fa-lightbulb"></i>
+<p style="margin:0;"><strong>Datos ficticios de demostración.</strong> El sistema real procesa facturas, tickets, audios y texto — todo desde un único chat de Telegram.</p>
+</div>
+</div>
+</body>
+</html>
