@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lo Que el Cliente Obtiene - Sistema de Gastos con IA</title>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    @font-face {
+      font-family: 'Neue Machina';
+      src: url("https://www.genspark.ai/image_placeholder.png") format('woff2');
+      font-weight: 700;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Neue Machina';
+      src: url("https://www.genspark.ai/image_placeholder.png") format('woff2');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    body{
+      font-family: 'Roboto Mono', monospace;
+      margin:0;
+      padding:0;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      background:#0F0F0F;
+    }
+
+    .container{
+      width:1280px;
+      height:720px;
+      margin:0 auto;
+      display:flex;
+      box-sizing:border-box;
+    }
+
+    .left-section{
+      width:45%;
+      background-color:#CBF400;
+      position:relative;
+      overflow:hidden;
+    }
+    .image-container{
+      width:100%;
+      height:100%;
+      overflow:hidden;
+    }
+    .image-container img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .image-container::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background-color:rgba(15,15,15,0.15);
+      pointer-events:none;
+    }
+
+    .right-section{
+      width:55%;
+      background-color:#0F0F0F;
+      padding:30px 60px;
+      display:flex;
+      flex-direction:column;
+      box-sizing:border-box;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:32px;
+    }
+    .logo{
+      display:flex;
+      align-items:center;
+      color:#CBF400;
+      font-weight:600;
+      font-size:16px;
+      letter-spacing:0.5px;
+    }
+    .logo i{
+      margin-right:10px;
+      font-size:16px;
+    }
+    .date{
+      color:#CBF400;
+      font-size:16px;
+    }
+
+    .main-title{
+      font-family:'Neue Machina', sans-serif;
+      color:#CBF400;
+      font-size:120px;
+      font-weight:700;
+      line-height:0.9;
+      margin:0;
+      margin-top:10px;
+      letter-spacing:-1px;
+    }
+
+    .desc-wrap{
+      margin-top:22px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      flex:1;
+    }
+
+    .benefits{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      max-width:650px;
+    }
+
+    .benefit{
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      padding:10px 12px;
+      border:2px solid #CBF400;
+      box-sizing:border-box;
+    }
+
+    .icon{
+      width:32px;
+      height:32px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background-color:#CBF400;
+      color:#0F0F0F;
+      flex:0 0 32px;
+      margin-top:1px;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .benefit-title{
+      font-family:'Neue Machina', sans-serif;
+      color:#CBF400;
+      font-size:18px;
+      font-weight:600;
+      margin:0 0 4px 0;
+      line-height:1.1;
+    }
+
+    .benefit-text{
+      color:#DDDDDD;
+      font-size:14px;
+      line-height:1.55;
+      margin:0;
+      opacity:0.95;
+    }
+
+    .note{
+      margin-top:auto;
+      background-color:#DDDDDD;
+      color:#0F0F0F;
+      padding:18px 20px;
+      box-sizing:border-box;
+      border-left:6px solid #CBF400;
+    }
+    .note p{
+      margin:0;
+      font-size:14px;
+      line-height:1.6;
+    }
+    .note strong{
+      font-family:'Neue Machina', sans-serif;
+      font-weight:700;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+<div class="left-section">
+<div class="image-container">
+<img alt="Profesional trabajando con tecnología en laptop" src="https://page.gensparksite.com/slides_images/c878a5fe411ebdba8835dfcf84b4c1d3.jpg"/>
+</div>
+</div>
+<div class="right-section">
+<div class="header">
+<div class="logo">
+<i class="fas fa-chevron-up"></i>
+<p style="margin:0;">SISTEMA DE GASTOS CON IA</p>
+</div>
+<div class="date">
+<p style="margin:0;">30 - 01 - 2026</p>
+</div>
+</div>
+<h1 class="main-title">Lo Que<br/>Obtiene</h1>
+<div class="desc-wrap">
+<div class="benefits">
+<div class="benefit">
+<div class="icon"><i class="fas fa-bolt"></i></div>
+<div>
+<p class="benefit-title">Tiempo</p>
+<p class="benefit-text">Lo que antes tomaba horas de carga manual, ahora se resuelve en segundos.</p>
+</div>
+</div>
+<div class="benefit">
+<div class="icon"><i class="fas fa-layer-group"></i></div>
+<div>
+<p class="benefit-title">Claridad</p>
+<p class="benefit-text">Registros ordenados, trazables y listos para usar (sin perseguir tickets sueltos).</p>
+</div>
+</div>
+<div class="benefit">
+<div class="icon"><i class="fas fa-shield-halved"></i></div>
+<div>
+<p class="benefit-title">Menos errores</p>
+<p class="benefit-text">Chequeos automáticos, validaciones y detección de inconsistencias antes de que escalen.</p>
+</div>
+</div>
+<div class="benefit">
+<div class="icon"><i class="fas fa-water"></i></div>
+<div>
+<p class="benefit-title">Tranquilidad</p>
+<p class="benefit-text">El control aparece sin fricción: cuando algo no cierra, se pide aclaración o se marca para revisión.</p>
+</div>
+</div>
+<div class="benefit">
+<div class="icon"><i class="fas fa-comment-dots"></i></div>
+<div>
+<p class="benefit-title">Cero entrenamiento</p>
+<p class="benefit-text">Si puede mandar un mensaje, puede usarlo (sin apps nuevas ni curva de aprendizaje).</p>
+</div>
+</div>
+</div>
+<div class="note">
+<p><strong>Nota clave:</strong> lo valioso no es "lo que hace" el sistema, sino lo que devuelve: <strong>claridad</strong>, <strong>tiempo</strong> y <strong>calma</strong>.</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
