@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Del Mensaje al Registro</title>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    @font-face {
+      font-family: 'Neue Machina';
+      src: url("https://www.genspark.ai/image_placeholder.png") format('woff2');
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Neue Machina';
+      src: url("https://www.genspark.ai/image_placeholder.png") format('woff2');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    body{
+      font-family: 'Roboto Mono', monospace;
+      background-color:#0F0F0F;
+      color:#DDDDDD;
+      margin:0;
+      padding:0;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .container{
+      width:1280px;
+      height:720px;
+      margin:0 auto;
+      padding:30px 60px;
+      display:flex;
+      flex-direction:column;
+      box-sizing:border-box;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:40px;
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      color:#CBF400;
+      font-weight:600;
+      font-size:16px;
+      letter-spacing:0.5px;
+    }
+    .logo i{ margin-right:10px; font-size:16px; }
+
+    .date{
+      color:#CBF400;
+      font-size:16px;
+    }
+
+    .content{
+      display:flex;
+      flex:1;
+      gap:40px;
+      min-height:0;
+    }
+
+    .left-column{
+      width:40%;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
+
+    .right-column{
+      width:60%;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
+
+    .main-title{
+      font-family:'Neue Machina', sans-serif;
+      color:#CBF400;
+      font-size:120px;
+      font-weight:700;
+      margin:0 0 10px 0;
+      line-height:0.9;
+      letter-spacing:-1px;
+    }
+
+    .subtitle{
+      color:#CBF400;
+      font-size:16px;
+      line-height:1.6;
+      max-width:420px;
+      margin:0 0 18px 0;
+      opacity:0.95;
+    }
+
+    .image-container{
+      width:100%;
+      overflow:hidden;
+      margin-top:10px;
+      border-radius:5px;
+      border:2px solid rgba(203,244,0,0.0);
+      flex:1;
+      min-height:0;
+    }
+    .image-container img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      opacity:0.95;
+    }
+
+    .phases-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      grid-template-rows:1fr 1fr;
+      gap:20px;
+      margin-top:20px;
+      flex:1;
+      min-height:0;
+    }
+
+    .phase-box{
+      padding:20px;
+      border-radius:2px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-height:0;
+    }
+
+    .phase-filled{
+      background-color:#CBF400;
+      color:#0F0F0F;
+    }
+
+    .phase-outline{
+      background-color:transparent;
+      border:2px solid #CBF400;
+      color:#CBF400;
+    }
+
+    .phase-title{
+      font-family:'Neue Machina', sans-serif;
+      font-size:18px;
+      font-weight:600;
+      margin:0 0 10px 0;
+      text-align:center;
+      letter-spacing:0.2px;
+    }
+
+    .phase-text{
+      font-size:14px;
+      line-height:1.5;
+      text-align:center;
+      margin:0;
+      opacity:0.95;
+    }
+
+    .micro{
+      font-size:12px;
+      line-height:1.5;
+      text-align:center;
+      margin:10px 0 0 0;
+      opacity:0.9;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="logo">
+<i class="fas fa-chevron-up"></i>
+<p style="margin:0;">SISTEMA DE GASTOS CON IA</p>
+</div>
+<div class="date">
+<p style="margin:0;">30 - 01 - 2026</p>
+</div>
+</div>
+<div class="content">
+<div class="left-column">
+<h1 class="main-title"><span style="font-size:64px;">Del</span></h1>
+<h1 class="main-title" style="position:relative; transform: translate(0px, -46px);">
+<span style="font-size:64px;">Mensaje</span> <span style="font-size:64px;">al</span>
+</h1>
+<h1 class="main-title" style="position:relative; transform: translate(0px, -92px);">
+<span style="font-size:64px;">Registro</span>
+</h1>
+<p class="subtitle" style="position:relative; transform: translate(0px, -70px);">
+          Un flujo simple para el cliente; estructura, control y orden automáticos por detrás.
+        </p>
+<div class="image-container" style="position:relative; transform: translate(0px, -55px);">
+<img alt="Persona usando mensajería en el trabajo" src="https://page.gensparksite.com/slides_images/b28615be2122393ce25e5c989666dca9.jpg"/>
+</div>
+</div>
+<div class="right-column">
+<div class="phases-grid">
+<div class="phase-box phase-filled">
+<p class="phase-title">Fase 1 — Ingreso</p>
+<p class="phase-text">Telegram como punto único de entrada, sin curva de aprendizaje.</p>
+<p class="micro">Foto · PDF · Audio · Texto</p>
+</div>
+<div class="phase-box phase-outline">
+<p class="phase-title">Fase 2 — Comprensión</p>
+<p class="phase-text">OCR/ASR/NLP para extraer y estructurar datos clave.</p>
+<p class="micro">Importe · Proveedor · Fecha · Moneda · Impuestos</p>
+</div>
+<div class="phase-box phase-outline">
+<p class="phase-title">Fase 3 — Clasificar + Validar</p>
+<p class="phase-text">Autocategoría (reglas + ML), chequeos de política y anomalías.</p>
+<p class="micro">Si algo no cierra: pide aclaración o marca para revisión</p>
+</div>
+<div class="phase-box phase-filled">
+<p class="phase-title">Fase 4 — Registrar + Revisar</p>
+<p class="phase-text">Registro ordenado, listo para contabilidad, con flags para control humano.</p>
+<p class="micro">Trazabilidad y control sin fricción</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
