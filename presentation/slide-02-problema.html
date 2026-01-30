@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Antes: El Problema Real</title>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    @font-face {
+      font-family: 'Neue Machina';
+      src: url("https://www.genspark.ai/image_placeholder.png") format('woff2');
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Neue Machina';
+      src: url("https://www.genspark.ai/image_placeholder.png") format('woff2');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    body{
+      font-family:'Roboto Mono', monospace;
+      background-color:#0F0F0F;
+      color:#DDDDDD;
+      margin:0;
+      padding:0;
+      height:720px;
+      width:1280px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .container{
+      width:1280px;
+      height:720px;
+      margin:0 auto;
+      padding:30px 60px;
+      box-sizing:border-box;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:40px;
+      flex:0 0 auto;
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      color:#CBF400;
+      font-weight:600;
+      font-size:16px;
+      letter-spacing:0.5px;
+    }
+    .logo i{
+      margin-right:10px;
+      font-size:16px;
+    }
+    .date{
+      color:#CBF400;
+      font-size:16px;
+    }
+
+    .content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+      min-height:0;
+    }
+
+    .main-title{
+      font-family:'Neue Machina', sans-serif;
+      color:#CBF400;
+      font-size:140px;
+      font-weight:700;
+      margin:0 0 18px 0;
+      line-height:0.95;
+      letter-spacing:-1px;
+    }
+
+    .description{
+      color:#CBF400;
+      font-size:18px;
+      line-height:1.6;
+      max-width:920px;
+      margin:0 0 46px 0;
+    }
+
+    .problems-container{
+      display:flex;
+      gap:30px;
+      width:100%;
+      margin-top:auto;
+    }
+
+    .problem-box{
+      flex:1;
+      padding:30px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-height:240px;
+      box-sizing:border-box;
+    }
+
+    .problem-left{
+      border:2px solid #CBF400;
+      color:#CBF400;
+      background-color:transparent;
+    }
+
+    .problem-right{
+      background-color:#CBF400;
+      color:#0F0F0F;
+    }
+
+    .problem-title{
+      font-family:'Neue Machina', sans-serif;
+      font-size:22px;
+      font-weight:600;
+      margin:0 0 18px 0;
+      text-align:center;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+    }
+
+    .problem-text{
+      font-size:16px;
+      line-height:1.65;
+      text-align:center;
+      margin:0;
+    }
+
+    .problem-text span{
+      font-weight:700;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="logo">
+<i class="fas fa-chevron-up"></i>
+<p style="margin:0;">SISTEMA DE GASTOS CON IA</p>
+</div>
+<div class="date">
+<p style="margin:0;">30 - 01 - 2026</p>
+</div>
+</div>
+<div class="content">
+<h1 class="main-title">Antes:<br/>El Problema Real</h1>
+<div class="description">
+<p style="margin:0;">
+          El desafío no era "hacer una app nueva". Era <span>ordenar gastos</span> sin cambiar hábitos:
+          si alguien puede mandar un mensaje, debería poder registrar un gasto.
+        </p>
+</div>
+<div class="problems-container">
+<div class="problem-box problem-left">
+<div class="problem-title">
+<i aria-hidden="true" class="fas fa-clock"></i>
+<p style="margin:0;">Realidad manual</p>
+</div>
+<p class="problem-text">
+<span>Horas</span> de carga y revisión<br/>
+            Recibos y PDFs <span>dispersos</span><br/>
+            Errores de transcripción y datos incompletos<br/>
+            Cero visibilidad en tiempo real
+          </p>
+</div>
+<div class="problem-box problem-right">
+<div class="problem-title">
+<i aria-hidden="true" class="fas fa-lock"></i>
+<p style="margin:0;">No negociables</p>
+</div>
+<p class="problem-text">
+<span>Sin</span> apps nuevas ni curva de aprendizaje<br/>
+            Operar con mensajes simples<br/>
+            Soportar <span>fotos</span>, PDFs, audios y texto<br/>
+            Validación y feedback <span>inmediatos</span>
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
