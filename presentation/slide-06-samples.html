@@ -7,6 +7,7 @@
 <title>Samples - Sistema de Gastos con IA</title>
 <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
     @font-face {
       font-family: 'Neue Machina';
@@ -40,7 +41,7 @@
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom:14px;
+      margin-bottom:12px;
     }
 
     .logo{
@@ -62,13 +63,13 @@
       display:flex;
       justify-content:space-between;
       align-items:flex-end;
-      margin-bottom:14px;
+      margin-bottom:12px;
     }
 
     .main-title{
       font-family:'Neue Machina', sans-serif;
       color:#CBF400;
-      font-size:64px;
+      font-size:56px;
       font-weight:700;
       margin:0;
       line-height:0.9;
@@ -77,8 +78,8 @@
 
     .subtitle{
       color:#CBF400;
-      font-size:13px;
-      max-width:400px;
+      font-size:12px;
+      max-width:380px;
       text-align:right;
       line-height:1.5;
       opacity:0.9;
@@ -86,29 +87,29 @@
 
     .main-content{
       display:flex;
-      gap:16px;
+      gap:14px;
       flex:1;
       min-height:0;
     }
 
     .left-column{
-      width:35%;
+      width:32%;
       display:flex;
       flex-direction:column;
-      gap:12px;
+      gap:10px;
     }
 
     .right-column{
-      width:65%;
+      width:68%;
       display:flex;
       flex-direction:column;
-      gap:12px;
+      gap:10px;
     }
 
     .sample-card{
       background-color:rgba(203,244,0,0.03);
       border:2px solid rgba(203,244,0,0.3);
-      padding:12px;
+      padding:10px;
       display:flex;
       flex-direction:column;
       overflow:hidden;
@@ -124,26 +125,26 @@
       display:flex;
       align-items:center;
       gap:8px;
-      margin-bottom:10px;
-      padding-bottom:8px;
+      margin-bottom:8px;
+      padding-bottom:6px;
       border-bottom:1px solid rgba(203,244,0,0.2);
     }
 
     .card-icon{
-      width:24px;
-      height:24px;
+      width:22px;
+      height:22px;
       background-color:#CBF400;
       color:#0F0F0F;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:11px;
+      font-size:10px;
     }
 
     .card-title{
       font-family:'Neue Machina', sans-serif;
       color:#CBF400;
-      font-size:13px;
+      font-size:12px;
       font-weight:600;
       margin:0;
     }
@@ -152,7 +153,7 @@
       flex:1;
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:4px;
       overflow:hidden;
     }
 
@@ -160,20 +161,20 @@
     .telegram-mock{
       background-color:#1a1a1a;
       border-radius:6px;
-      padding:8px;
+      padding:6px;
       flex:1;
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:5px;
       overflow:hidden;
     }
 
     .tg-message{
       max-width:92%;
-      padding:6px 8px;
+      padding:5px 7px;
       border-radius:6px;
-      font-size:10px;
-      line-height:1.4;
+      font-size:9px;
+      line-height:1.3;
     }
 
     .tg-user{
@@ -193,21 +194,21 @@
       font-weight:600;
       display:flex;
       align-items:center;
-      gap:4px;
-      font-size:9px;
+      gap:3px;
+      font-size:8px;
     }
 
     .tg-data{
       display:flex;
       flex-direction:column;
       gap:1px;
-      margin-top:3px;
+      margin-top:2px;
     }
 
     .tg-row{
       display:flex;
-      gap:4px;
-      font-size:9px;
+      gap:3px;
+      font-size:8px;
     }
 
     .tg-label{
@@ -220,124 +221,234 @@
 
     .tg-photo{
       background:linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
-      height:45px;
+      height:38px;
       border-radius:4px;
       display:flex;
       align-items:center;
       justify-content:center;
       color:#666;
-      font-size:16px;
+      font-size:14px;
     }
 
     .tg-audio{
       background-color:#7c3aed;
-      border-radius:16px;
-      padding:4px 10px;
+      border-radius:14px;
+      padding:3px 8px;
       display:flex;
       align-items:center;
-      gap:6px;
-      font-size:9px;
+      gap:5px;
+      font-size:8px;
       color:white;
     }
 
-    /* Spreadsheet mockup - ENHANCED */
-    .spreadsheet-container{
-      background-color:#1a1a1a;
-      border-radius:6px;
+    /* Google Sheets mockup - REALISTIC */
+    .gsheets-container{
+      background-color:#ffffff;
+      border-radius:4px;
       overflow:hidden;
       flex:1;
       display:flex;
       flex-direction:column;
+      box-shadow:0 2px 8px rgba(0,0,0,0.3);
     }
 
-    .spreadsheet-toolbar{
-      background-color:#2a2a2a;
-      padding:6px 10px;
+    .gsheets-titlebar{
+      background-color:#f9fbfd;
+      padding:4px 10px;
       display:flex;
       align-items:center;
-      gap:12px;
-      border-bottom:1px solid #3a3a3a;
+      gap:10px;
+      border-bottom:1px solid #e0e0e0;
     }
 
-    .spreadsheet-toolbar-icon{
-      color:#34a853;
-      font-size:14px;
-    }
-
-    .spreadsheet-title{
-      color:#DDDDDD;
-      font-size:11px;
-      font-weight:500;
-    }
-
-    .spreadsheet-tabs{
-      margin-left:auto;
+    .gsheets-icon{
+      width:20px;
+      height:28px;
+      background:linear-gradient(135deg, #0f9d58 0%, #0d8043 100%);
+      border-radius:2px;
       display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+
+    .gsheets-icon::after{
+      content:"";
+      width:12px;
+      height:2px;
+      background:white;
+      position:absolute;
+      box-shadow:0 4px 0 white, 0 8px 0 white;
+    }
+
+    .gsheets-filename{
+      font-family:Arial, sans-serif;
+      font-size:14px;
+      color:#202124;
+      font-weight:400;
+    }
+
+    .gsheets-saved{
+      font-family:Arial, sans-serif;
+      font-size:10px;
+      color:#5f6368;
+      display:flex;
+      align-items:center;
       gap:4px;
     }
 
-    .spreadsheet-tab{
-      background-color:#3a3a3a;
-      color:#9ca3af;
-      padding:3px 8px;
-      font-size:8px;
+    .gsheets-saved i{
+      color:#1a73e8;
+    }
+
+    .gsheets-menu{
+      background-color:#f9fbfd;
+      padding:2px 10px;
+      display:flex;
+      gap:2px;
+      border-bottom:1px solid #e0e0e0;
+    }
+
+    .gsheets-menu span{
+      font-family:Arial, sans-serif;
+      font-size:10px;
+      color:#202124;
+      padding:3px 6px;
+      cursor:pointer;
+    }
+
+    .gsheets-menu span:hover{
+      background-color:#e8eaed;
       border-radius:2px;
     }
 
-    .spreadsheet-tab.active{
-      background-color:#34a853;
-      color:white;
+    .gsheets-toolbar{
+      background-color:#f9fbfd;
+      padding:3px 8px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      border-bottom:1px solid #e0e0e0;
+      font-size:10px;
+      color:#5f6368;
     }
 
-    .spreadsheet-grid{
-      flex:1;
-      overflow:hidden;
+    .gsheets-toolbar i{
+      padding:3px;
+      cursor:pointer;
     }
 
-    .spreadsheet-header{
-      display:grid;
-      grid-template-columns: 0.15fr 1fr 0.6fr 0.6fr 0.8fr 0.7fr 0.5fr 0.5fr 0.8fr 0.7fr;
-      background-color:#f0f0f0;
-      border-bottom:2px solid #ccc;
+    .gsheets-toolbar .divider{
+      width:1px;
+      height:16px;
+      background-color:#dadce0;
+      margin:0 4px;
     }
 
-    .spreadsheet-header span{
-      padding:5px 6px;
-      font-size:8px;
-      font-weight:700;
-      color:#333;
-      border-right:1px solid #ddd;
+    .gsheets-formulabar{
+      background-color:#ffffff;
+      padding:3px 8px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      border-bottom:1px solid #e0e0e0;
+      font-family:Arial, sans-serif;
+      font-size:11px;
+    }
+
+    .gsheets-cell-ref{
+      background-color:#f1f3f4;
+      padding:2px 8px;
+      border:1px solid #dadce0;
+      border-radius:2px;
+      color:#202124;
+      min-width:30px;
       text-align:center;
     }
 
-    .spreadsheet-row{
+    .gsheets-fx{
+      color:#5f6368;
+      font-style:italic;
+    }
+
+    .gsheets-formula-input{
+      flex:1;
+      color:#202124;
+    }
+
+    .gsheets-grid{
+      flex:1;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      font-family:Arial, sans-serif;
+    }
+
+    .gsheets-colheader{
       display:grid;
-      grid-template-columns: 0.15fr 1fr 0.6fr 0.6fr 0.8fr 0.7fr 0.5fr 0.5fr 0.8fr 0.7fr;
-      border-bottom:1px solid #3a3a3a;
+      grid-template-columns: 26px repeat(9, 1fr);
+      background-color:#f8f9fa;
+      border-bottom:1px solid #e0e0e0;
     }
 
-    .spreadsheet-row:nth-child(even){
-      background-color:rgba(255,255,255,0.02);
+    .gsheets-colheader span{
+      padding:3px 4px;
+      font-size:10px;
+      font-weight:500;
+      color:#5f6368;
+      text-align:center;
+      border-right:1px solid #e0e0e0;
     }
 
-    .spreadsheet-row span{
-      padding:4px 6px;
-      font-size:8px;
-      color:#DDDDDD;
-      border-right:1px solid #2a2a2a;
+    .gsheets-colheader span:first-child{
+      background-color:#f8f9fa;
+    }
+
+    .gsheets-colheader span.selected{
+      background-color:#d3e3fd;
+      color:#1967d2;
+    }
+
+    .gsheets-row{
+      display:grid;
+      grid-template-columns: 26px repeat(9, 1fr);
+      border-bottom:1px solid #e8eaed;
+    }
+
+    .gsheets-row.header-row{
+      background-color:#f8f9fa;
+      font-weight:500;
+    }
+
+    .gsheets-row span{
+      padding:3px 5px;
+      font-size:9px;
+      color:#202124;
+      border-right:1px solid #e8eaed;
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
     }
 
-    .spreadsheet-row .row-num{
-      background-color:#2a2a2a;
-      color:#9ca3af;
+    .gsheets-row .row-num{
+      background-color:#f8f9fa;
+      color:#5f6368;
       text-align:center;
+      font-size:9px;
     }
 
-    .spreadsheet-row .highlight-cell{
-      color:#CBF400;
+    .gsheets-row.header-row span{
+      background-color:#f8f9fa;
+      font-weight:600;
+      color:#202124;
+    }
+
+    .gsheets-row span.selected{
+      background-color:#e8f0fe;
+    }
+
+    .gsheets-row span.money{
+      text-align:right;
     }
 
     /* Database mockup */
@@ -351,33 +462,33 @@
 
     .db-toolbar{
       background-color:#2a2a2a;
-      padding:4px 8px;
+      padding:3px 6px;
       display:flex;
       align-items:center;
-      gap:8px;
+      gap:6px;
       border-bottom:1px solid #3a3a3a;
-      font-size:9px;
+      font-size:8px;
       color:#9ca3af;
     }
 
     .db-header{
       background-color:#1e1e1e;
-      padding:5px 8px;
+      padding:4px 6px;
       display:grid;
       grid-template-columns: 0.9fr 1.1fr 0.7fr 0.7fr;
-      gap:6px;
-      font-size:8px;
+      gap:4px;
+      font-size:7px;
       color:#9ca3af;
       font-weight:600;
       border-bottom:1px solid #3a3a3a;
     }
 
     .db-row{
-      padding:4px 8px;
+      padding:3px 6px;
       display:grid;
       grid-template-columns: 0.9fr 1.1fr 0.7fr 0.7fr;
-      gap:6px;
-      font-size:8px;
+      gap:4px;
+      font-size:7px;
       color:#DDDDDD;
       border-bottom:1px solid #2a2a2a;
     }
@@ -391,51 +502,51 @@
     .drive-mock{
       background-color:#1a1a1a;
       border-radius:4px;
-      padding:8px;
+      padding:6px;
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:5px;
     }
 
     .drive-path{
-      font-size:9px;
+      font-size:8px;
       color:#9ca3af;
       display:flex;
       align-items:center;
-      gap:4px;
+      gap:3px;
     }
 
     .drive-files{
       display:flex;
-      gap:6px;
+      gap:5px;
     }
 
     .drive-file{
       background-color:#2a2a2a;
       border-radius:3px;
-      padding:6px;
+      padding:5px;
       display:flex;
       flex-direction:column;
       align-items:center;
-      gap:4px;
+      gap:3px;
       flex:1;
     }
 
     .drive-file-icon{
-      width:28px;
-      height:34px;
+      width:24px;
+      height:30px;
       background:linear-gradient(135deg, #ea4335 0%, #c5221f 100%);
       border-radius:2px;
       display:flex;
       align-items:center;
       justify-content:center;
       color:white;
-      font-size:9px;
+      font-size:8px;
       font-weight:700;
     }
 
     .drive-file-name{
-      font-size:7px;
+      font-size:6px;
       color:#DDDDDD;
       text-align:center;
       white-space:nowrap;
@@ -445,38 +556,29 @@
     }
 
     .mini-label{
-      font-size:8px;
+      font-size:7px;
       color:#9ca3af;
       text-align:center;
       margin-top:2px;
     }
 
     .footer-note{
-      margin-top:10px;
-      padding:10px 14px;
+      margin-top:8px;
+      padding:8px 12px;
       background-color:#CBF400;
       color:#0F0F0F;
-      font-size:12px;
+      font-size:11px;
       display:flex;
       align-items:center;
-      gap:10px;
+      gap:8px;
     }
 
     .footer-note i{
-      font-size:14px;
+      font-size:12px;
     }
 
     .footer-note strong{
       font-weight:700;
-    }
-
-    .flow-indicator{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#CBF400;
-      font-size:12px;
-      padding:4px 0;
     }
   </style>
 </head>
@@ -494,17 +596,17 @@
 
 <div class="title-row">
 <h1 class="main-title">Samples</h1>
-<p class="subtitle">Ejemplos del flujo completo: desde el mensaje hasta el registro estructurado y exportable.</p>
+<p class="subtitle">Ejemplos del flujo completo: mensaje, base de datos, spreadsheet y archivos.</p>
 </div>
 
 <div class="main-content">
 <!-- Left Column: Telegram + Database -->
 <div class="left-column">
 <!-- Telegram Input -->
-<div class="sample-card highlight" style="flex:1.2;">
+<div class="sample-card highlight" style="flex:1.1;">
 <div class="card-header">
 <div class="card-icon"><i class="fa-brands fa-telegram"></i></div>
-<p class="card-title">1. Entrada via Telegram</p>
+<p class="card-title">1. Entrada Telegram</p>
 </div>
 <div class="card-content">
 <div class="telegram-mock">
@@ -514,25 +616,24 @@
 </div>
 
 <div class="tg-message tg-bot">
-<div class="tg-success"><i class="fas fa-check-circle"></i> Gasto registrado exitosamente</div>
+<div class="tg-success"><i class="fas fa-check-circle"></i> Gasto registrado</div>
 <div class="tg-data">
 <div class="tg-row"><span class="tg-label">Fecha:</span><span class="tg-value">15/01/2026</span></div>
-<div class="tg-row"><span class="tg-label">Empresa:</span><span class="tg-value">TECH SOLUTIONS SA</span></div>
-<div class="tg-row"><span class="tg-label">Concepto:</span><span class="tg-value">Insumos oficina</span></div>
-<div class="tg-row"><span class="tg-label">Total:</span><span class="tg-value">$45,890</span></div>
-<div class="tg-row"><span class="tg-label">ID:</span><span class="tg-value">B92X-456789</span></div>
+<div class="tg-row"><span class="tg-label">Empresa:</span><span class="tg-value">DISTRIB. NORTE SRL</span></div>
+<div class="tg-row"><span class="tg-label">Concepto:</span><span class="tg-value">Insumos limpieza</span></div>
+<div class="tg-row"><span class="tg-label">Total:</span><span class="tg-value">$42,350</span></div>
 </div>
 </div>
 
 <div class="tg-message tg-user">
-<div class="tg-audio"><i class="fas fa-play"></i> 0:08</div>
+<div class="tg-audio"><i class="fas fa-play"></i> 0:12</div>
 </div>
 
 <div class="tg-message tg-bot">
 <div class="tg-success"><i class="fas fa-check-circle"></i> Gasto registrado</div>
 <div class="tg-data">
-<div class="tg-row"><span class="tg-label">Concepto:</span><span class="tg-value">Almuerzo reunión</span></div>
-<div class="tg-row"><span class="tg-label">Total:</span><span class="tg-value">$12,500</span></div>
+<div class="tg-row"><span class="tg-label">Concepto:</span><span class="tg-value">Almuerzo equipo</span></div>
+<div class="tg-row"><span class="tg-label">Total:</span><span class="tg-value">$18,500</span></div>
 </div>
 </div>
 </div>
@@ -540,7 +641,7 @@
 </div>
 
 <!-- Database -->
-<div class="sample-card" style="flex:0.8;">
+<div class="sample-card" style="flex:0.9;">
 <div class="card-header">
 <div class="card-icon"><i class="fas fa-database"></i></div>
 <p class="card-title">2. Base de Datos</p>
@@ -548,7 +649,7 @@
 <div class="card-content">
 <div class="db-mock">
 <div class="db-toolbar">
-<i class="fas fa-table"></i> transacciones <span style="margin-left:auto;">7 registros</span>
+<i class="fas fa-table"></i> transacciones <span style="margin-left:auto;">4 rows</span>
 </div>
 <div class="db-header">
 <span>id_transaccion</span>
@@ -557,27 +658,27 @@
 <span>tipo</span>
 </div>
 <div class="db-row">
-<span class="db-id">B92X-456...</span>
-<span>Insumos oficina</span>
+<span class="db-id">FAC-2026011501</span>
+<span>Insumos limpieza</span>
 <span>15/01/2026</span>
 <span>Factura B</span>
 </div>
 <div class="db-row">
-<span class="db-id">A15M-789...</span>
-<span>Almuerzo reunión</span>
+<span class="db-id">TKT-1705320000</span>
+<span>Almuerzo equipo</span>
 <span>15/01/2026</span>
 <span>Ticket</span>
 </div>
 <div class="db-row">
-<span class="db-id">C33P-012...</span>
-<span>Combustible</span>
-<span>14/01/2026</span>
+<span class="db-id">FAC-2026011201</span>
+<span>Serv. Internet</span>
+<span>12/01/2026</span>
 <span>Factura A</span>
 </div>
 <div class="db-row">
-<span class="db-id">D77Q-345...</span>
-<span>Hosting mensual</span>
-<span>12/01/2026</span>
+<span class="db-id">FAC-2026010801</span>
+<span>Mensual. Gimnasio</span>
+<span>08/01/2026</span>
 <span>Factura B</span>
 </div>
 </div>
@@ -585,118 +686,173 @@
 </div>
 </div>
 
-<!-- Right Column: Spreadsheet + Drive -->
+<!-- Right Column: Google Sheets + Drive -->
 <div class="right-column">
-<!-- Spreadsheet - MAIN FEATURE -->
-<div class="sample-card highlight" style="flex:1.4;">
+<!-- Google Sheets - MAIN FEATURE -->
+<div class="sample-card highlight" style="flex:1.5;">
 <div class="card-header">
 <div class="card-icon"><i class="fas fa-table"></i></div>
-<p class="card-title">3. Export a Spreadsheet</p>
+<p class="card-title">3. Export a Google Sheets</p>
 </div>
 <div class="card-content">
-<div class="spreadsheet-container">
-<div class="spreadsheet-toolbar">
-<i class="spreadsheet-toolbar-icon fa-brands fa-google-drive"></i>
-<span class="spreadsheet-title">Gastos_Enero_2026.xlsx</span>
-<div class="spreadsheet-tabs">
-<span class="spreadsheet-tab active">Gastos</span>
-<span class="spreadsheet-tab">Resumen</span>
-<span class="spreadsheet-tab">IVA</span>
+<div class="gsheets-container">
+<!-- Title bar -->
+<div class="gsheets-titlebar">
+<div class="gsheets-icon"></div>
+<span class="gsheets-filename">Planilla Gastos n8n</span>
+<span class="gsheets-saved"><i class="fa-solid fa-cloud"></i> Saved to Drive</span>
 </div>
+
+<!-- Menu bar -->
+<div class="gsheets-menu">
+<span>File</span>
+<span>Edit</span>
+<span>View</span>
+<span>Insert</span>
+<span>Format</span>
+<span>Data</span>
+<span>Tools</span>
+<span>Extensions</span>
+<span>Help</span>
 </div>
-<div class="spreadsheet-grid">
-<div class="spreadsheet-header">
+
+<!-- Toolbar -->
+<div class="gsheets-toolbar">
+<i class="fas fa-undo"></i>
+<i class="fas fa-redo"></i>
+<i class="fas fa-print"></i>
+<span class="divider"></span>
+<span style="padding:2px 6px;border:1px solid #dadce0;border-radius:2px;">100%</span>
+<span class="divider"></span>
+<i class="fas fa-dollar-sign"></i>
+<i class="fas fa-percent"></i>
+<span class="divider"></span>
+<i class="fas fa-bold"></i>
+<i class="fas fa-italic"></i>
+</div>
+
+<!-- Formula bar -->
+<div class="gsheets-formulabar">
+<span class="gsheets-cell-ref">A1</span>
+<span class="gsheets-fx">fx</span>
+<span class="gsheets-formula-input">Concepto</span>
+</div>
+
+<!-- Grid -->
+<div class="gsheets-grid">
+<!-- Column headers -->
+<div class="gsheets-colheader">
 <span></span>
-<span>A - Concepto</span>
-<span>B - Fecha</span>
-<span>C - Tipo</span>
-<span>D - Empresa</span>
-<span>E - $ s/Imp</span>
-<span>F - IVA</span>
-<span>G - Otros</span>
-<span>H - ID Trans.</span>
-<span>I - Total $</span>
+<span class="selected">A</span>
+<span>B</span>
+<span>C</span>
+<span>D</span>
+<span>E</span>
+<span>F</span>
+<span>G</span>
+<span>H</span>
+<span>I</span>
 </div>
-<div class="spreadsheet-row">
+
+<!-- Header row -->
+<div class="gsheets-row header-row">
 <span class="row-num">1</span>
-<span>Insumos oficina</span>
-<span>15/01/2026</span>
-<span>Factura B</span>
-<span>TECH SOLUTIONS</span>
-<span>37,908</span>
-<span>7,982</span>
-<span>0</span>
-<span class="highlight-cell">B92X-456789</span>
-<span class="highlight-cell">45,890</span>
+<span class="selected">Concepto</span>
+<span>Fecha</span>
+<span>Tipo Comprob.</span>
+<span>Nombre Empresa</span>
+<span>$ sin Impuestos</span>
+<span>IVA</span>
+<span>Otros Imp.</span>
+<span>id transaccion</span>
+<span>Total $</span>
 </div>
-<div class="spreadsheet-row">
+
+<!-- Data rows -->
+<div class="gsheets-row">
 <span class="row-num">2</span>
-<span>Almuerzo reunión</span>
+<span>Insumos limpieza</span>
+<span>15/01/2026</span>
+<span>Factura B</span>
+<span>DISTRIB. NORTE SRL</span>
+<span class="money">34958</span>
+<span class="money">7392</span>
+<span class="money"></span>
+<span>FAC-2026011501</span>
+<span class="money">42350</span>
+</div>
+
+<div class="gsheets-row">
+<span class="row-num">3</span>
+<span>Almuerzo equipo</span>
 <span>15/01/2026</span>
 <span>Ticket</span>
-<span>REST. NORTE</span>
-<span>10,325</span>
-<span>2,175</span>
-<span>0</span>
-<span class="highlight-cell">A15M-789012</span>
-<span class="highlight-cell">12,500</span>
+<span>RESTAURANTE SOL</span>
+<span class="money">15289</span>
+<span class="money">3211</span>
+<span class="money"></span>
+<span>TKT-1705320000</span>
+<span class="money">18500</span>
 </div>
-<div class="spreadsheet-row">
-<span class="row-num">3</span>
-<span>Combustible</span>
-<span>14/01/2026</span>
-<span>Factura A</span>
-<span>YPF SA</span>
-<span>21,479</span>
-<span>4,521</span>
-<span>0</span>
-<span class="highlight-cell">C33P-012345</span>
-<span class="highlight-cell">26,000</span>
-</div>
-<div class="spreadsheet-row">
+
+<div class="gsheets-row">
 <span class="row-num">4</span>
-<span>Hosting mensual</span>
+<span>Servicio Internet</span>
 <span>12/01/2026</span>
-<span>Factura B</span>
-<span>AWS INC</span>
-<span>15,620</span>
-<span>3,280</span>
-<span>0</span>
-<span class="highlight-cell">D77Q-345678</span>
-<span class="highlight-cell">18,900</span>
+<span>Factura A</span>
+<span>TELECOM ARG SA</span>
+<span class="money">22314</span>
+<span class="money">4686</span>
+<span class="money"></span>
+<span>FAC-2026011201</span>
+<span class="money">27000</span>
 </div>
-<div class="spreadsheet-row">
+
+<div class="gsheets-row">
 <span class="row-num">5</span>
-<span>Cuota escolar</span>
-<span>05/01/2026</span>
-<span>Factura C</span>
-<span>COLEGIO GOETHE</span>
-<span>324,308</span>
-<span>0</span>
-<span>0</span>
-<span class="highlight-cell">G44T-234567</span>
-<span class="highlight-cell">324,308</span>
+<span>Mensualidad Gimnasio</span>
+<span>08/01/2026</span>
+<span>Factura B</span>
+<span>FITNESS TOTAL SA</span>
+<span class="money">28512</span>
+<span class="money">5988</span>
+<span class="money"></span>
+<span>FAC-2026010801</span>
+<span class="money">34500</span>
 </div>
-<div class="spreadsheet-row">
+
+<div class="gsheets-row">
 <span class="row-num">6</span>
-<span>Mate y termo</span>
-<span>23/01/2024</span>
-<span>Ticket</span>
-<span>CAMPING PAT.</span>
-<span>20,825</span>
-<span>4,373</span>
-<span>0</span>
-<span class="highlight-cell">T-230124-001</span>
-<span class="highlight-cell">25,198</span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span class="money"></span>
+<span class="money"></span>
+<span class="money"></span>
+<span></span>
+<span class="money"></span>
+</div>
+
+<div class="gsheets-row">
+<span class="row-num">7</span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span class="money"></span>
+<span class="money"></span>
+<span class="money"></span>
+<span></span>
+<span class="money"></span>
 </div>
 </div>
 </div>
-<p class="mini-label">Actualización automática con cada nuevo gasto registrado</p>
 </div>
 </div>
 
 <!-- Drive Storage -->
-<div class="sample-card" style="flex:0.6;">
+<div class="sample-card" style="flex:0.5;">
 <div class="card-header">
 <div class="card-icon"><i class="fa-brands fa-google-drive"></i></div>
 <p class="card-title">4. Archivos en Drive</p>
@@ -709,26 +865,22 @@
 <div class="drive-files">
 <div class="drive-file">
 <div class="drive-file-icon">PDF</div>
-<p class="drive-file-name">2026-01-15_B92X.pdf</p>
+<p class="drive-file-name">2026-01-15_FAC01.pdf</p>
 </div>
 <div class="drive-file">
 <div class="drive-file-icon">PDF</div>
-<p class="drive-file-name">2026-01-15_A15M.pdf</p>
+<p class="drive-file-name">2026-01-15_TKT01.pdf</p>
 </div>
 <div class="drive-file">
 <div class="drive-file-icon">PDF</div>
-<p class="drive-file-name">2026-01-14_C33P.pdf</p>
+<p class="drive-file-name">2026-01-12_FAC01.pdf</p>
 </div>
 <div class="drive-file">
 <div class="drive-file-icon">PDF</div>
-<p class="drive-file-name">2026-01-12_D77Q.pdf</p>
-</div>
-<div class="drive-file">
-<div class="drive-file-icon">PDF</div>
-<p class="drive-file-name">2026-01-05_G44T.pdf</p>
+<p class="drive-file-name">2026-01-08_FAC01.pdf</p>
 </div>
 </div>
-<p class="mini-label">Nomenclatura automática: fecha + ID de transacción</p>
+<p class="mini-label">Nomenclatura automática: fecha + ID</p>
 </div>
 </div>
 </div>
