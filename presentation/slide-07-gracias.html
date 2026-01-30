@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gracias - Sistema de Gestión de Gastos con IA</title>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+        @font-face {
+            font-family: 'Neue Machina';
+            src: url("https://www.genspark.ai/image_placeholder.png") format('woff2');
+            font-weight: 700;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Neue Machina';
+            src: url("https://www.genspark.ai/image_placeholder.png") format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        body{
+            font-family: 'Roboto Mono', monospace;
+            background-color:#0F0F0F;
+            color:#DDDDDD;
+            margin:0;
+            padding:0;
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+        }
+
+        .container{
+            width:1280px;
+            height:720px;
+            margin:0 auto;
+            padding:30px 60px;
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+            box-sizing:border-box;
+            position:relative;
+            z-index:1;
+            overflow:hidden;
+        }
+
+        .container::before{
+            content:"";
+            position:absolute;
+            top:0; left:0;
+            width:100%; height:100%;
+            background-image:url('https://page.gensparksite.com/slides_images/8b7c56550a7adbfa021e07d1a5b0872a.jpg');
+            background-size:cover;
+            background-position:center;
+            opacity:0.22;
+            z-index:-2;
+        }
+
+        .container::after{
+            content:"";
+            position:absolute;
+            top:0; left:0;
+            width:100%; height:100%;
+            background-color: rgba(15, 15, 15, 0.55);
+            z-index:-1;
+        }
+
+        .header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            position:relative;
+            z-index:2;
+        }
+
+        .logo{
+            display:flex;
+            align-items:center;
+            color:#CBF400;
+            font-weight:600;
+            font-size:16px;
+            letter-spacing:0.5px;
+            text-shadow:0 0 10px rgba(15,15,15,0.9);
+        }
+        .logo i{
+            margin-right:10px;
+            font-size:16px;
+        }
+
+        .date{
+            color:#CBF400;
+            font-size:16px;
+            text-shadow:0 0 10px rgba(15,15,15,0.9);
+        }
+
+        .content{
+            flex:1;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            text-align:center;
+            position:relative;
+            z-index:2;
+            padding:10px 0;
+        }
+
+        .thank-you-title{
+            font-family:'Neue Machina', sans-serif;
+            color:#CBF400;
+            font-size:160px;
+            font-weight:700;
+            line-height:0.9;
+            margin:0;
+            letter-spacing:-2px;
+            text-shadow:0 0 22px rgba(15, 15, 15, 0.85);
+        }
+
+        .message{
+            margin-top:18px;
+            max-width:980px;
+            font-size:18px;
+            line-height:1.6;
+            color:#DDDDDD;
+            text-shadow:0 0 10px rgba(15,15,15,0.9);
+        }
+
+        .presenter-box{
+            background-color:#CBF400;
+            color:#0F0F0F;
+            padding:12px 38px;
+            font-size:18px;
+            margin-top:28px;
+            font-weight:600;
+            font-family:'Neue Machina', sans-serif;
+            box-shadow:0 0 15px rgba(203, 244, 0, 0.28);
+            max-width:980px;
+        }
+
+        .footer{
+            display:flex;
+            justify-content:space-between;
+            gap:18px;
+            color:#CBF400;
+            font-size:16px;
+            font-family:'Roboto Mono', monospace;
+            position:relative;
+            z-index:2;
+            text-shadow:0 0 10px rgba(15,15,15,0.9);
+            flex-wrap:wrap;
+        }
+
+        .footer > div{
+            white-space:nowrap;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="logo">
+<i class="fas fa-chevron-up"></i>
+<p style="margin:0;">SISTEMA DE GASTOS CON IA</p>
+</div>
+<div class="date">
+<p style="margin:0;">30 - 01 - 2026</p>
+</div>
+</div>
+<div class="content">
+<h1 class="thank-you-title">Gracias</h1>
+<div class="message">
+<p style="margin:0;">
+                    Cuando el trabajo está bien diseñado, nadie pregunta cómo funciona.<br/>
+                    Solo siente que <span style="color:#CBF400; font-weight:700;">todo fluye mejor</span>.
+                </p>
+</div>
+<div class="presenter-box">
+<p style="margin:0;">Workflow + instrucciones de setup en los comentarios</p>
+</div>
+</div>
+<div class="footer">
+<div><p style="margin:0;">Contacto: gonzalo.insua11@gmail.com</p></div>
+<div><p style="margin:0;">Canal: Telegram Bot</p></div>
+<div><p style="margin:0;">Sistema de Gestión de Gastos con IA</p></div>
+</div>
+</div>
+</body>
+</html>

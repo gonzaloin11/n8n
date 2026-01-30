@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Samples - Sistema de Gastos con IA</title>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+    @font-face {
+      font-family: 'Neue Machina';
+      src: url("https://www.genspark.ai/image_placeholder.png") format('woff2');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    body{
+      font-family: 'Roboto Mono', monospace;
+      background-color:#0F0F0F;
+      color:#DDDDDD;
+      margin:0;
+      padding:0;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .container{
+      width:1280px;
+      height:720px;
+      margin:0 auto;
+      padding:20px 40px;
+      display:flex;
+      flex-direction:column;
+      box-sizing:border-box;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:12px;
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      color:#CBF400;
+      font-weight:600;
+      font-size:16px;
+      letter-spacing:0.5px;
+    }
+    .logo i{ margin-right:10px; font-size:16px; }
+
+    .date{
+      color:#CBF400;
+      font-size:16px;
+    }
+
+    .title-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      margin-bottom:12px;
+    }
+
+    .main-title{
+      font-family:'Neue Machina', sans-serif;
+      color:#CBF400;
+      font-size:56px;
+      font-weight:700;
+      margin:0;
+      line-height:0.9;
+      letter-spacing:-1px;
+    }
+
+    .subtitle{
+      color:#CBF400;
+      font-size:12px;
+      max-width:380px;
+      text-align:right;
+      line-height:1.5;
+      opacity:0.9;
+    }
+
+    .main-content{
+      display:flex;
+      gap:14px;
+      flex:1;
+      min-height:0;
+    }
+
+    .left-column{
+      width:32%;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .right-column{
+      width:68%;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .sample-card{
+      background-color:rgba(203,244,0,0.03);
+      border:2px solid rgba(203,244,0,0.3);
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      flex:1;
+    }
+
+    .sample-card.highlight{
+      border-color:#CBF400;
+      background-color:rgba(203,244,0,0.08);
+    }
+
+    .card-header{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+      padding-bottom:6px;
+      border-bottom:1px solid rgba(203,244,0,0.2);
+    }
+
+    .card-icon{
+      width:22px;
+      height:22px;
+      background-color:#CBF400;
+      color:#0F0F0F;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:10px;
+    }
+
+    .card-title{
+      font-family:'Neue Machina', sans-serif;
+      color:#CBF400;
+      font-size:12px;
+      font-weight:600;
+      margin:0;
+    }
+
+    .card-content{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      overflow:hidden;
+    }
+
+    /* Telegram mockup */
+    .telegram-mock{
+      background-color:#1a1a1a;
+      border-radius:6px;
+      padding:6px;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+      overflow:hidden;
+    }
+
+    .tg-message{
+      max-width:92%;
+      padding:5px 7px;
+      border-radius:6px;
+      font-size:9px;
+      line-height:1.3;
+    }
+
+    .tg-user{
+      background-color:#2a2a2a;
+      align-self:flex-end;
+      color:#DDDDDD;
+    }
+
+    .tg-bot{
+      background-color:#1e3a1e;
+      align-self:flex-start;
+      color:#DDDDDD;
+    }
+
+    .tg-success{
+      color:#4ade80;
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      gap:3px;
+      font-size:8px;
+    }
+
+    .tg-data{
+      display:flex;
+      flex-direction:column;
+      gap:1px;
+      margin-top:2px;
+    }
+
+    .tg-row{
+      display:flex;
+      gap:3px;
+      font-size:8px;
+    }
+
+    .tg-label{
+      color:#9ca3af;
+    }
+
+    .tg-value{
+      color:#DDDDDD;
+    }
+
+    .tg-photo{
+      background:linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
+      height:38px;
+      border-radius:4px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#666;
+      font-size:14px;
+    }
+
+    .tg-audio{
+      background-color:#7c3aed;
+      border-radius:14px;
+      padding:3px 8px;
+      display:flex;
+      align-items:center;
+      gap:5px;
+      font-size:8px;
+      color:white;
+    }
+
+    /* Google Sheets mockup - REALISTIC */
+    .gsheets-container{
+      background-color:#ffffff;
+      border-radius:4px;
+      overflow:hidden;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      box-shadow:0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .gsheets-titlebar{
+      background-color:#f9fbfd;
+      padding:4px 10px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      border-bottom:1px solid #e0e0e0;
+    }
+
+    .gsheets-icon{
+      width:20px;
+      height:28px;
+      background:linear-gradient(135deg, #0f9d58 0%, #0d8043 100%);
+      border-radius:2px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+
+    .gsheets-icon::after{
+      content:"";
+      width:12px;
+      height:2px;
+      background:white;
+      position:absolute;
+      box-shadow:0 4px 0 white, 0 8px 0 white;
+    }
+
+    .gsheets-filename{
+      font-family:Arial, sans-serif;
+      font-size:14px;
+      color:#202124;
+      font-weight:400;
+    }
+
+    .gsheets-saved{
+      font-family:Arial, sans-serif;
+      font-size:10px;
+      color:#5f6368;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+
+    .gsheets-saved i{
+      color:#1a73e8;
+    }
+
+    .gsheets-menu{
+      background-color:#f9fbfd;
+      padding:2px 10px;
+      display:flex;
+      gap:2px;
+      border-bottom:1px solid #e0e0e0;
+    }
+
+    .gsheets-menu span{
+      font-family:Arial, sans-serif;
+      font-size:10px;
+      color:#202124;
+      padding:3px 6px;
+      cursor:pointer;
+    }
+
+    .gsheets-menu span:hover{
+      background-color:#e8eaed;
+      border-radius:2px;
+    }
+
+    .gsheets-toolbar{
+      background-color:#f9fbfd;
+      padding:3px 8px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      border-bottom:1px solid #e0e0e0;
+      font-size:10px;
+      color:#5f6368;
+    }
+
+    .gsheets-toolbar i{
+      padding:3px;
+      cursor:pointer;
+    }
+
+    .gsheets-toolbar .divider{
+      width:1px;
+      height:16px;
+      background-color:#dadce0;
+      margin:0 4px;
+    }
+
+    .gsheets-formulabar{
+      background-color:#ffffff;
+      padding:3px 8px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      border-bottom:1px solid #e0e0e0;
+      font-family:Arial, sans-serif;
+      font-size:11px;
+    }
+
+    .gsheets-cell-ref{
+      background-color:#f1f3f4;
+      padding:2px 8px;
+      border:1px solid #dadce0;
+      border-radius:2px;
+      color:#202124;
+      min-width:30px;
+      text-align:center;
+    }
+
+    .gsheets-fx{
+      color:#5f6368;
+      font-style:italic;
+    }
+
+    .gsheets-formula-input{
+      flex:1;
+      color:#202124;
+    }
+
+    .gsheets-grid{
+      flex:1;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      font-family:Arial, sans-serif;
+    }
+
+    .gsheets-colheader{
+      display:grid;
+      grid-template-columns: 26px repeat(9, 1fr);
+      background-color:#f8f9fa;
+      border-bottom:1px solid #e0e0e0;
+    }
+
+    .gsheets-colheader span{
+      padding:3px 4px;
+      font-size:10px;
+      font-weight:500;
+      color:#5f6368;
+      text-align:center;
+      border-right:1px solid #e0e0e0;
+    }
+
+    .gsheets-colheader span:first-child{
+      background-color:#f8f9fa;
+    }
+
+    .gsheets-colheader span.selected{
+      background-color:#d3e3fd;
+      color:#1967d2;
+    }
+
+    .gsheets-row{
+      display:grid;
+      grid-template-columns: 26px repeat(9, 1fr);
+      border-bottom:1px solid #e8eaed;
+    }
+
+    .gsheets-row.header-row{
+      background-color:#f8f9fa;
+      font-weight:500;
+    }
+
+    .gsheets-row span{
+      padding:3px 5px;
+      font-size:9px;
+      color:#202124;
+      border-right:1px solid #e8eaed;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .gsheets-row .row-num{
+      background-color:#f8f9fa;
+      color:#5f6368;
+      text-align:center;
+      font-size:9px;
+    }
+
+    .gsheets-row.header-row span{
+      background-color:#f8f9fa;
+      font-weight:600;
+      color:#202124;
+    }
+
+    .gsheets-row span.selected{
+      background-color:#e8f0fe;
+    }
+
+    .gsheets-row span.money{
+      text-align:right;
+    }
+
+    /* Database mockup */
+    .db-mock{
+      background-color:#1a1a1a;
+      border-radius:4px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .db-toolbar{
+      background-color:#2a2a2a;
+      padding:3px 6px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      border-bottom:1px solid #3a3a3a;
+      font-size:8px;
+      color:#9ca3af;
+    }
+
+    .db-header{
+      background-color:#1e1e1e;
+      padding:4px 6px;
+      display:grid;
+      grid-template-columns: 0.9fr 1.1fr 0.7fr 0.7fr;
+      gap:4px;
+      font-size:7px;
+      color:#9ca3af;
+      font-weight:600;
+      border-bottom:1px solid #3a3a3a;
+    }
+
+    .db-row{
+      padding:3px 6px;
+      display:grid;
+      grid-template-columns: 0.9fr 1.1fr 0.7fr 0.7fr;
+      gap:4px;
+      font-size:7px;
+      color:#DDDDDD;
+      border-bottom:1px solid #2a2a2a;
+    }
+
+    .db-id{
+      color:#CBF400;
+      font-family:monospace;
+    }
+
+    /* Drive mockup */
+    .drive-mock{
+      background-color:#1a1a1a;
+      border-radius:4px;
+      padding:6px;
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+    }
+
+    .drive-path{
+      font-size:8px;
+      color:#9ca3af;
+      display:flex;
+      align-items:center;
+      gap:3px;
+    }
+
+    .drive-files{
+      display:flex;
+      gap:5px;
+    }
+
+    .drive-file{
+      background-color:#2a2a2a;
+      border-radius:3px;
+      padding:5px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:3px;
+      flex:1;
+    }
+
+    .drive-file-icon{
+      width:24px;
+      height:30px;
+      background:linear-gradient(135deg, #ea4335 0%, #c5221f 100%);
+      border-radius:2px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-size:8px;
+      font-weight:700;
+    }
+
+    .drive-file-name{
+      font-size:6px;
+      color:#DDDDDD;
+      text-align:center;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      width:100%;
+    }
+
+    .mini-label{
+      font-size:7px;
+      color:#9ca3af;
+      text-align:center;
+      margin-top:2px;
+    }
+
+    .footer-note{
+      margin-top:8px;
+      padding:8px 12px;
+      background-color:#CBF400;
+      color:#0F0F0F;
+      font-size:11px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .footer-note i{
+      font-size:12px;
+    }
+
+    .footer-note strong{
+      font-weight:700;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="logo">
+<i class="fas fa-chevron-up"></i>
+<p style="margin:0;">SISTEMA DE GASTOS CON IA</p>
+</div>
+<div class="date">
+<p style="margin:0;">30 - 01 - 2026</p>
+</div>
+</div>
+
+<div class="title-row">
+<h1 class="main-title">Samples</h1>
+<p class="subtitle">Ejemplos del flujo completo: mensaje, base de datos, spreadsheet y archivos.</p>
+</div>
+
+<div class="main-content">
+<!-- Left Column: Telegram + Database -->
+<div class="left-column">
+<!-- Telegram Input -->
+<div class="sample-card highlight" style="flex:1.1;">
+<div class="card-header">
+<div class="card-icon"><i class="fa-brands fa-telegram"></i></div>
+<p class="card-title">1. Entrada Telegram</p>
+</div>
+<div class="card-content">
+<div class="telegram-mock">
+<div class="tg-message tg-user">
+<div class="tg-photo"><i class="fas fa-receipt"></i></div>
+<p class="mini-label">Foto de factura</p>
+</div>
+
+<div class="tg-message tg-bot">
+<div class="tg-success"><i class="fas fa-check-circle"></i> Gasto registrado</div>
+<div class="tg-data">
+<div class="tg-row"><span class="tg-label">Fecha:</span><span class="tg-value">15/01/2026</span></div>
+<div class="tg-row"><span class="tg-label">Empresa:</span><span class="tg-value">DISTRIB. NORTE SRL</span></div>
+<div class="tg-row"><span class="tg-label">Concepto:</span><span class="tg-value">Insumos limpieza</span></div>
+<div class="tg-row"><span class="tg-label">Total:</span><span class="tg-value">$42,350</span></div>
+</div>
+</div>
+
+<div class="tg-message tg-user">
+<div class="tg-audio"><i class="fas fa-play"></i> 0:12</div>
+</div>
+
+<div class="tg-message tg-bot">
+<div class="tg-success"><i class="fas fa-check-circle"></i> Gasto registrado</div>
+<div class="tg-data">
+<div class="tg-row"><span class="tg-label">Concepto:</span><span class="tg-value">Almuerzo equipo</span></div>
+<div class="tg-row"><span class="tg-label">Total:</span><span class="tg-value">$18,500</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Database -->
+<div class="sample-card" style="flex:0.9;">
+<div class="card-header">
+<div class="card-icon"><i class="fas fa-database"></i></div>
+<p class="card-title">2. Base de Datos</p>
+</div>
+<div class="card-content">
+<div class="db-mock">
+<div class="db-toolbar">
+<i class="fas fa-table"></i> transacciones <span style="margin-left:auto;">4 rows</span>
+</div>
+<div class="db-header">
+<span>id_transaccion</span>
+<span>concepto</span>
+<span>fecha</span>
+<span>tipo</span>
+</div>
+<div class="db-row">
+<span class="db-id">FAC-2026011501</span>
+<span>Insumos limpieza</span>
+<span>15/01/2026</span>
+<span>Factura B</span>
+</div>
+<div class="db-row">
+<span class="db-id">TKT-1705320000</span>
+<span>Almuerzo equipo</span>
+<span>15/01/2026</span>
+<span>Ticket</span>
+</div>
+<div class="db-row">
+<span class="db-id">FAC-2026011201</span>
+<span>Serv. Internet</span>
+<span>12/01/2026</span>
+<span>Factura A</span>
+</div>
+<div class="db-row">
+<span class="db-id">FAC-2026010801</span>
+<span>Mensual. Gimnasio</span>
+<span>08/01/2026</span>
+<span>Factura B</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Right Column: Google Sheets + Drive -->
+<div class="right-column">
+<!-- Google Sheets - MAIN FEATURE -->
+<div class="sample-card highlight" style="flex:1.5;">
+<div class="card-header">
+<div class="card-icon"><i class="fas fa-table"></i></div>
+<p class="card-title">3. Export a Google Sheets</p>
+</div>
+<div class="card-content">
+<div class="gsheets-container">
+<!-- Title bar -->
+<div class="gsheets-titlebar">
+<div class="gsheets-icon"></div>
+<span class="gsheets-filename">Planilla Gastos n8n</span>
+<span class="gsheets-saved"><i class="fa-solid fa-cloud"></i> Saved to Drive</span>
+</div>
+
+<!-- Menu bar -->
+<div class="gsheets-menu">
+<span>File</span>
+<span>Edit</span>
+<span>View</span>
+<span>Insert</span>
+<span>Format</span>
+<span>Data</span>
+<span>Tools</span>
+<span>Extensions</span>
+<span>Help</span>
+</div>
+
+<!-- Toolbar -->
+<div class="gsheets-toolbar">
+<i class="fas fa-undo"></i>
+<i class="fas fa-redo"></i>
+<i class="fas fa-print"></i>
+<span class="divider"></span>
+<span style="padding:2px 6px;border:1px solid #dadce0;border-radius:2px;">100%</span>
+<span class="divider"></span>
+<i class="fas fa-dollar-sign"></i>
+<i class="fas fa-percent"></i>
+<span class="divider"></span>
+<i class="fas fa-bold"></i>
+<i class="fas fa-italic"></i>
+</div>
+
+<!-- Formula bar -->
+<div class="gsheets-formulabar">
+<span class="gsheets-cell-ref">A1</span>
+<span class="gsheets-fx">fx</span>
+<span class="gsheets-formula-input">Concepto</span>
+</div>
+
+<!-- Grid -->
+<div class="gsheets-grid">
+<!-- Column headers -->
+<div class="gsheets-colheader">
+<span></span>
+<span class="selected">A</span>
+<span>B</span>
+<span>C</span>
+<span>D</span>
+<span>E</span>
+<span>F</span>
+<span>G</span>
+<span>H</span>
+<span>I</span>
+</div>
+
+<!-- Header row -->
+<div class="gsheets-row header-row">
+<span class="row-num">1</span>
+<span class="selected">Concepto</span>
+<span>Fecha</span>
+<span>Tipo Comprob.</span>
+<span>Nombre Empresa</span>
+<span>$ sin Impuestos</span>
+<span>IVA</span>
+<span>Otros Imp.</span>
+<span>id transaccion</span>
+<span>Total $</span>
+</div>
+
+<!-- Data rows -->
+<div class="gsheets-row">
+<span class="row-num">2</span>
+<span>Insumos limpieza</span>
+<span>15/01/2026</span>
+<span>Factura B</span>
+<span>DISTRIB. NORTE SRL</span>
+<span class="money">34958</span>
+<span class="money">7392</span>
+<span class="money"></span>
+<span>FAC-2026011501</span>
+<span class="money">42350</span>
+</div>
+
+<div class="gsheets-row">
+<span class="row-num">3</span>
+<span>Almuerzo equipo</span>
+<span>15/01/2026</span>
+<span>Ticket</span>
+<span>RESTAURANTE SOL</span>
+<span class="money">15289</span>
+<span class="money">3211</span>
+<span class="money"></span>
+<span>TKT-1705320000</span>
+<span class="money">18500</span>
+</div>
+
+<div class="gsheets-row">
+<span class="row-num">4</span>
+<span>Servicio Internet</span>
+<span>12/01/2026</span>
+<span>Factura A</span>
+<span>TELECOM ARG SA</span>
+<span class="money">22314</span>
+<span class="money">4686</span>
+<span class="money"></span>
+<span>FAC-2026011201</span>
+<span class="money">27000</span>
+</div>
+
+<div class="gsheets-row">
+<span class="row-num">5</span>
+<span>Mensualidad Gimnasio</span>
+<span>08/01/2026</span>
+<span>Factura B</span>
+<span>FITNESS TOTAL SA</span>
+<span class="money">28512</span>
+<span class="money">5988</span>
+<span class="money"></span>
+<span>FAC-2026010801</span>
+<span class="money">34500</span>
+</div>
+
+<div class="gsheets-row">
+<span class="row-num">6</span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span class="money"></span>
+<span class="money"></span>
+<span class="money"></span>
+<span></span>
+<span class="money"></span>
+</div>
+
+<div class="gsheets-row">
+<span class="row-num">7</span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span class="money"></span>
+<span class="money"></span>
+<span class="money"></span>
+<span></span>
+<span class="money"></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Drive Storage -->
+<div class="sample-card" style="flex:0.5;">
+<div class="card-header">
+<div class="card-icon"><i class="fa-brands fa-google-drive"></i></div>
+<p class="card-title">4. Archivos en Drive</p>
+</div>
+<div class="card-content">
+<div class="drive-mock">
+<div class="drive-path">
+<i class="fas fa-folder" style="color:#f6b93b;"></i> Comprobantes > 2026 > Enero
+</div>
+<div class="drive-files">
+<div class="drive-file">
+<div class="drive-file-icon">PDF</div>
+<p class="drive-file-name">2026-01-15_FAC01.pdf</p>
+</div>
+<div class="drive-file">
+<div class="drive-file-icon">PDF</div>
+<p class="drive-file-name">2026-01-15_TKT01.pdf</p>
+</div>
+<div class="drive-file">
+<div class="drive-file-icon">PDF</div>
+<p class="drive-file-name">2026-01-12_FAC01.pdf</p>
+</div>
+<div class="drive-file">
+<div class="drive-file-icon">PDF</div>
+<p class="drive-file-name">2026-01-08_FAC01.pdf</p>
+</div>
+</div>
+<p class="mini-label">Nomenclatura automática: fecha + ID</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="footer-note">
+<i class="fas fa-lightbulb"></i>
+<p style="margin:0;"><strong>Datos ficticios de demostración.</strong> El sistema procesa facturas, tickets, audios y texto — todo desde Telegram, estructurado y listo para contabilidad.</p>
+</div>
+</div>
+</body>
+</html>
