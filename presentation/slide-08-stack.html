@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stack Tecnológico - LÍA Agente IA</title>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+    @font-face {
+      font-family: 'Neue Machina';
+      src: url("https://www.genspark.ai/image_placeholder.png") format('woff2');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    body{
+      font-family: 'Roboto Mono', monospace;
+      background-color:#0F0F0F;
+      color:#DDDDDD;
+      margin:0;
+      padding:0;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .container{
+      width:1280px;
+      height:720px;
+      margin:0 auto;
+      padding:30px 50px;
+      display:flex;
+      flex-direction:column;
+      box-sizing:border-box;
+    }
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      color:#CBF400;
+      font-weight:600;
+      font-size:14px;
+      letter-spacing:0.5px;
+    }
+
+    .logo i{
+      margin-right:10px;
+      font-size:16px;
+    }
+
+    .date{
+      color:#CBF400;
+      font-size:14px;
+    }
+
+    .main-title{
+      font-family:'Neue Machina', sans-serif;
+      color:#CBF400;
+      font-size:72px;
+      font-weight:700;
+      margin:0 0 10px 0;
+      line-height:1;
+      letter-spacing:-1px;
+    }
+
+    .subtitle{
+      color:#DDDDDD;
+      font-size:16px;
+      margin:0 0 30px 0;
+      opacity:0.9;
+    }
+
+    .tech-grid{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap:16px;
+      flex:1;
+    }
+
+    .tech-card{
+      padding:24px 20px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      border-radius:4px;
+      transition: transform 0.2s;
+    }
+
+    .tech-card:hover{
+      transform: translateY(-2px);
+    }
+
+    .tech-card.dark{
+      background-color:#1a1a1a;
+      border:2px solid #CBF400;
+      color:#CBF400;
+    }
+
+    .tech-card.light{
+      background-color:#CBF400;
+      color:#0F0F0F;
+    }
+
+    .tech-icon{
+      font-size:32px;
+      margin-bottom:14px;
+    }
+
+    .tech-icon svg{
+      width:32px;
+      height:32px;
+    }
+
+    .tech-name{
+      font-family:'Neue Machina', sans-serif;
+      font-size:18px;
+      font-weight:700;
+      margin:0 0 6px 0;
+    }
+
+    .tech-desc{
+      font-size:11px;
+      letter-spacing:1.5px;
+      text-transform:uppercase;
+      opacity:0.85;
+      margin:0;
+    }
+
+    /* Custom icons */
+    .icon-n8n::before{
+      content:"";
+      display:block;
+      width:32px;
+      height:32px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23CBF400'%3E%3Cpath d='M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45L12 11.09 5.1 7.63 12 4.18zM4 8.82l7 3.5v7.36l-7-3.5V8.82zm9 10.86v-7.36l7-3.5v7.36l-7 3.5z'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+
+    .icon-n8n.dark-icon::before{
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230F0F0F'%3E%3Cpath d='M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45L12 11.09 5.1 7.63 12 4.18zM4 8.82l7 3.5v7.36l-7-3.5V8.82zm9 10.86v-7.36l7-3.5v7.36l-7 3.5z'/%3E%3C/svg%3E");
+    }
+
+    .meli-logo{
+      width:36px;
+      height:36px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="logo">
+<i class="fas fa-robot"></i>
+<p style="margin:0;">LÍA • AGENTE IA</p>
+</div>
+<div class="date">
+<p style="margin:0;">Arquitectura 2026</p>
+</div>
+</div>
+
+<h1 class="main-title">Stack Tecnológico</h1>
+<p class="subtitle">Orquestación precisa de 8 tecnologías clave para lograr inmediatez, memoria y acción.</p>
+
+<div class="tech-grid">
+<!-- Row 1 -->
+<div class="tech-card light">
+<div class="tech-icon">
+<svg viewBox="0 0 24 24" fill="#0F0F0F" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.5 13.5H16v-3h1.5v3zm-9-3H7v3h1.5v-3zm4.5 0h-1.5v3H13v-3zm7-5.5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 14H4V7h16v12z"/>
+</svg>
+</div>
+<p class="tech-name">n8n</p>
+<p class="tech-desc">AUTOMATIZACIÓN</p>
+</div>
+
+<div class="tech-card dark">
+<div class="tech-icon"><i class="fas fa-link"></i></div>
+<p class="tech-name">LangChain</p>
+<p class="tech-desc">AGENTE & TOOLS</p>
+</div>
+
+<div class="tech-card light">
+<div class="tech-icon"><i class="fas fa-brain"></i></div>
+<p class="tech-name">GPT-4o-mini</p>
+<p class="tech-desc">RAZONAMIENTO</p>
+</div>
+
+<div class="tech-card dark">
+<div class="tech-icon">
+<svg viewBox="0 0 24 24" fill="#CBF400" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2zm0 4h16v2H4v-2zm0 4h16v2H4v-2z"/>
+</svg>
+</div>
+<p class="tech-name">Redis</p>
+<p class="tech-desc">BUFFER (7S)</p>
+</div>
+
+<!-- Row 2 -->
+<div class="tech-card dark">
+<div class="tech-icon"><i class="fas fa-database"></i></div>
+<p class="tech-name">PostgreSQL</p>
+<p class="tech-desc">MEMORIA</p>
+</div>
+
+<div class="tech-card light">
+<div class="tech-icon">
+<svg viewBox="0 0 24 24" fill="#0F0F0F" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+</svg>
+</div>
+<p class="tech-name">Evolution API</p>
+<p class="tech-desc">WHATSAPP BRIDGE</p>
+</div>
+
+<div class="tech-card dark">
+<div class="tech-icon">
+<!-- Mercado Libre Handshake Logo -->
+<svg viewBox="0 0 48 48" fill="#CBF400" xmlns="http://www.w3.org/2000/svg" class="meli-logo">
+<path d="M24 4C12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20S35.046 4 24 4zm0 3c9.389 0 17 7.611 17 17s-7.611 17-17 17S7 33.389 7 24 14.611 7 24 7zm-6.5 10c-1.933 0-3.5 1.567-3.5 3.5 0 .837.303 1.601.795 2.205l5.705 5.795 5.705-5.795c.492-.604.795-1.368.795-2.205 0-1.933-1.567-3.5-3.5-3.5-.982 0-1.865.41-2.5 1.062-.635-.652-1.518-1.062-2.5-1.062zm-1 3.5c0-.827.673-1.5 1.5-1.5.413 0 .785.168 1.058.438l1.942 1.937 1.942-1.937c.273-.27.645-.438 1.058-.438.827 0 1.5.673 1.5 1.5 0 .413-.168.785-.438 1.058L21.5 25.5l-3.562-3.942c-.27-.273-.438-.645-.438-1.058zm3.5 9c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5h8c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5h-8z"/>
+</svg>
+</div>
+<p class="tech-name">Mercado Libre API</p>
+<p class="tech-desc">DATOS DE NEGOCIO</p>
+</div>
+
+<div class="tech-card light">
+<div class="tech-icon"><i class="fa-brands fa-whatsapp"></i></div>
+<p class="tech-name">WhatsApp</p>
+<p class="tech-desc">CANAL CLIENTE</p>
+</div>
+</div>
+</div>
+</body>
+</html>
