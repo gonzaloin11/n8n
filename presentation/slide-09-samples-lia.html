@@ -82,7 +82,7 @@
     .subtitle{
       color:#CBF400;
       font-size:12px;
-      max-width:400px;
+      max-width:420px;
       text-align:right;
       line-height:1.4;
       opacity:0.9;
@@ -90,16 +90,15 @@
 
     .samples-grid{
       display:grid;
-      grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-      gap:14px;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:16px;
       flex:1;
       min-height:0;
     }
 
     .sample-card{
       background-color:rgba(203,244,0,0.03);
-      border:2px solid rgba(203,244,0,0.3);
+      border:2px solid #CBF400;
       border-radius:4px;
       padding:10px;
       display:flex;
@@ -108,164 +107,40 @@
     }
 
     .card-label{
-      font-size:9px;
+      font-size:10px;
       color:#CBF400;
       text-transform:uppercase;
       letter-spacing:1px;
       margin-bottom:8px;
       font-weight:600;
-    }
-
-    /* WhatsApp mockup */
-    .whatsapp-mock{
-      background-color:#0b141a;
-      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-      border-radius:6px;
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
-    }
-
-    .wa-header{
-      background-color:#1f2c34;
-      padding:6px 10px;
       display:flex;
       align-items:center;
-      gap:8px;
-      border-bottom:1px solid #2a3942;
-    }
-
-    .wa-avatar{
-      width:28px;
-      height:28px;
-      border-radius:50%;
-      background:linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:white;
-      font-size:12px;
-    }
-
-    .wa-name{
-      color:#e9edef;
-      font-size:11px;
-      font-weight:500;
-    }
-
-    .wa-status{
-      color:#8696a0;
-      font-size:9px;
-    }
-
-    .wa-icons{
-      margin-left:auto;
-      color:#aebac1;
-      font-size:12px;
-      display:flex;
-      gap:12px;
-    }
-
-    .wa-chat{
-      flex:1;
-      padding:8px;
-      display:flex;
-      flex-direction:column;
       gap:6px;
+    }
+
+    .card-image{
+      flex:1;
+      border-radius:4px;
       overflow:hidden;
-    }
-
-    .wa-msg{
-      max-width:88%;
-      padding:6px 8px;
-      border-radius:6px;
-      font-size:9px;
-      line-height:1.4;
-      position:relative;
-    }
-
-    .wa-msg.bot{
-      background-color:#1f2c34;
-      color:#e9edef;
-      align-self:flex-start;
-      border-top-left-radius:0;
-    }
-
-    .wa-msg.user{
-      background-color:#005c4b;
-      color:#e9edef;
-      align-self:flex-end;
-      border-top-right-radius:0;
-    }
-
-    .wa-time{
-      font-size:7px;
-      color:#8696a0;
-      text-align:right;
-      margin-top:2px;
-    }
-
-    .wa-link{
-      color:#53bdeb;
-      word-break:break-all;
-    }
-
-    .wa-bold{
-      font-weight:600;
-      color:#CBF400;
-    }
-
-    .wa-audio{
-      background-color:#1f2c34;
-      border-radius:20px;
-      padding:6px 12px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      max-width:180px;
-    }
-
-    .wa-audio-avatar{
-      width:24px;
-      height:24px;
-      border-radius:50%;
-      background:#128C7E;
+      background-color:#0b141a;
       display:flex;
       align-items:center;
       justify-content:center;
     }
 
-    .wa-audio-avatar img{
+    .card-image img{
       width:100%;
       height:100%;
-      border-radius:50%;
-      object-fit:cover;
-    }
-
-    .wa-audio-wave{
-      flex:1;
-      height:20px;
-      background: linear-gradient(90deg, #25D366 30%, #8696a0 30%);
-      border-radius:10px;
-      position:relative;
-    }
-
-    .wa-audio-time{
-      font-size:8px;
-      color:#8696a0;
-    }
-
-    .wa-emoji{
-      font-size:12px;
+      object-fit:contain;
+      border-radius:4px;
     }
 
     .footer-note{
-      margin-top:10px;
-      padding:8px 14px;
+      margin-top:12px;
+      padding:10px 16px;
       background-color:#CBF400;
       color:#0F0F0F;
-      font-size:11px;
+      font-size:12px;
       display:flex;
       align-items:center;
       gap:10px;
@@ -273,7 +148,7 @@
     }
 
     .footer-note i{
-      font-size:14px;
+      font-size:16px;
     }
 
     .footer-note strong{
@@ -299,133 +174,27 @@
 </div>
 
 <div class="samples-grid">
-<!-- Sample 1: Product Recommendations -->
+<!-- Sample 1: Product Links -->
 <div class="sample-card">
-<div class="card-label"><i class="fas fa-shopping-cart" style="margin-right:6px;"></i>Recomendación de productos</div>
-<div class="whatsapp-mock">
-<div class="wa-header">
-<div class="wa-avatar"><i class="fa-brands fa-whatsapp"></i></div>
-<div>
-<div class="wa-name">Vitagel Wpp</div>
-<div class="wa-status">en línea</div>
-</div>
-<div class="wa-icons">
-<i class="fas fa-video"></i>
-<i class="fas fa-search"></i>
-</div>
-</div>
-<div class="wa-chat">
-<div class="wa-msg user">enviame link de ambos<div class="wa-time">9:26 a. m. ✓✓</div></div>
-<div class="wa-msg bot">
-Perfecto, te paso los links de las dos opciones que te recomendé para articulaciones:<br/><br/>
-<span class="wa-bold">1) Colágeno 450g neutro</span><br/>
-• Precio hoy: $46.550 (precio de lista $49.000)<br/>
-• Duración: 45 días<br/>
-• Link: <span class="wa-link">articulo.mercadolibre.com.ar/MLA-143...</span><br/><br/>
-<span class="wa-bold">2) Pack x2 900g (neutro)</span><br/>
-• Precio hoy: $96.797,43<br/>
-• Duración: 90 días<br/><br/>
-El envío es gratis a todo el país 🚚
-<div class="wa-time">9:28 a. m.</div>
-</div>
-</div>
+<div class="card-label"><i class="fas fa-shopping-cart"></i> Recomendación + Links</div>
+<div class="card-image">
+<img src="https://raw.githubusercontent.com/gonzaloin11/n8n/claude/create-presentation-slides-IFes4/presentation/wapp%20vitagel%20sample%201.png" alt="WhatsApp - Recomendación de productos con links"/>
 </div>
 </div>
 
-<!-- Sample 2: Location & Quick Link -->
+<!-- Sample 2: Quick Response -->
 <div class="sample-card">
-<div class="card-label"><i class="fas fa-map-marker-alt" style="margin-right:6px;"></i>Consulta rápida + Link</div>
-<div class="whatsapp-mock">
-<div class="wa-header">
-<div class="wa-avatar"><i class="fa-brands fa-whatsapp"></i></div>
-<div>
-<div class="wa-name">Vitagel Wpp</div>
-<div class="wa-status">en línea</div>
-</div>
-<div class="wa-icons">
-<i class="fas fa-video"></i>
-<i class="fas fa-search"></i>
-</div>
-</div>
-<div class="wa-chat">
-<div class="wa-msg bot">Córdoba?<div class="wa-time">7:20 p. m.</div></div>
-<div class="wa-msg user">si<div class="wa-time">7:21 p. m. ✓✓</div></div>
-<div class="wa-msg bot">
-Perfecto, Gonzalo. Acá tenés el link del Pack x2 900g (90 días). El envío es gratis a todo el país y podés pagar con tarjeta por MercadoPago. Cualquier cosita en la compra te acompaño 😊<br/><br/>
-<span class="wa-link">articulo.mercadolibre.com.ar/MLA-1436492592-vitagel-colageno...</span><br/><br/>
-<span class="wa-emoji">👍</span>
-<div class="wa-time">7:22 p. m.</div>
-</div>
-</div>
+<div class="card-label"><i class="fas fa-bolt"></i> Consulta Rápida</div>
+<div class="card-image">
+<img src="https://raw.githubusercontent.com/gonzaloin11/n8n/claude/create-presentation-slides-IFes4/presentation/wapp%20vitagel%20sample%202.png" alt="WhatsApp - Consulta rápida"/>
 </div>
 </div>
 
-<!-- Sample 3: Product Benefits -->
+<!-- Sample 3: Health + Audio -->
 <div class="sample-card">
-<div class="card-label"><i class="fas fa-star" style="margin-right:6px;"></i>Beneficios de producto</div>
-<div class="whatsapp-mock">
-<div class="wa-header">
-<div class="wa-avatar"><i class="fa-brands fa-whatsapp"></i></div>
-<div>
-<div class="wa-name">Vitagel Wpp</div>
-<div class="wa-status">en línea</div>
-</div>
-<div class="wa-icons">
-<i class="fas fa-video"></i>
-<i class="fas fa-search"></i>
-</div>
-</div>
-<div class="wa-chat">
-<div class="wa-msg user">Indicame que funciones hace el skin<div class="wa-time">9:17 a. m. ✓✓</div></div>
-<div class="wa-msg bot">
-El <span class="wa-bold">*Skin Beauty*</span> de Vitagel, que incluye colágeno y ácido hialurónico, tiene varios beneficios para la piel. Mirá:<br/><br/>
-1. <span class="wa-bold">*Mejora la elasticidad*</span>: Ayuda a que la piel se mantenga firme y flexible.<br/>
-2. <span class="wa-bold">*Reduce arrugas*</span>: Puede disminuir la apariencia de las arrugas.<br/>
-3. <span class="wa-bold">*Aumenta hidratación*</span>: Retiene la humedad.<br/>
-4. <span class="wa-bold">*Fortalece cabello y uñas*</span><br/>
-5. <span class="wa-bold">*Mejora apariencia de la piel*</span><br/><br/>
-Es una excelente opción si buscás cuidar tu piel 😊
-<div class="wa-time">9:18 a. m.</div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Sample 4: Health Consultation + Audio -->
-<div class="sample-card">
-<div class="card-label"><i class="fas fa-heartbeat" style="margin-right:6px;"></i>Consulta de salud + Audio</div>
-<div class="whatsapp-mock">
-<div class="wa-header">
-<div class="wa-avatar"><i class="fa-brands fa-whatsapp"></i></div>
-<div>
-<div class="wa-name">Vitagel Wpp</div>
-<div class="wa-status">en línea</div>
-</div>
-<div class="wa-icons">
-<i class="fas fa-video"></i>
-<i class="fas fa-search"></i>
-</div>
-</div>
-<div class="wa-chat">
-<div class="wa-msg user">Contame tengo 70 años y dolor articular, qué me conviene utilizar?<div class="wa-time">12:58 p. m. ✓✓</div></div>
-<div class="wa-msg bot">
-A los 70 años y con dolor articular, el <span class="wa-bold">colágeno hidrolizado</span> puede ser una excelente opción. Ayuda a regenerar cartílagos, fortalece ligamentos y tendones, y puede reducir el dolor. Te recomendaría una dosis diaria de 10g. Es importante que lo combines con un consumo constante durante al menos 3 meses. Si tenés más preguntas, ¡aquí estoy!
-<div class="wa-time">12:58 p. m.</div>
-</div>
-<div class="wa-msg user" style="padding:4px;">
-<div class="wa-audio">
-<div class="wa-audio-avatar"><i class="fas fa-user" style="font-size:10px;color:white;"></i></div>
-<i class="fas fa-play" style="color:#8696a0;font-size:10px;"></i>
-<div style="flex:1;height:16px;background:linear-gradient(90deg, #25D366 20%, #3b4a54 20%);border-radius:8px;"></div>
-<span class="wa-audio-time">0:04</span>
-</div>
-<div class="wa-time">1:16 p. m. ✓✓</div>
-</div>
-<div class="wa-msg bot">
-Sí, hacemos envíos a todo el país. Podés realizar tu pedido a través de la tienda oficial en <span class="wa-bold">MercadoLibre</span>, donde te enviarán el producto directamente a tu domicilio. Si necesitás más información sobre precios o stock, no dudes en decírmelo.
-<div class="wa-time">1:16 p. m.</div>
-</div>
-</div>
+<div class="card-label"><i class="fas fa-heartbeat"></i> Consulta Salud + Audio</div>
+<div class="card-image">
+<img src="https://raw.githubusercontent.com/gonzaloin11/n8n/claude/create-presentation-slides-IFes4/presentation/wapp%20vitagel%20sample%204full.png" alt="WhatsApp - Consulta de salud con audio"/>
 </div>
 </div>
 </div>
